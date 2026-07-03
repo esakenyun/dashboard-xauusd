@@ -1,0 +1,348 @@
+---
+const pathname = Astro.url.pathname;
+const isActive = (path: string) => {
+  if (path === '/') {
+    return pathname === '/' || pathname === '';
+  }
+  return pathname.startsWith(path);
+};
+---
+
+<header class="site-header">
+  <div class="header-container glass-panel">
+    <!-- Brand -->
+    <a href="/" class="brand">
+      <svg class="brand-logo" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L2 22h20L12 2z" stroke="url(#gold-grad-header)" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M12 6l-6 12h12l-6-12z" fill="url(#astro-grad-header)"/>
+        <defs>
+          <linearGradient id="gold-grad-header" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#fff" />
+            <stop offset="100%" stop-color="#3b82f6" />
+          </linearGradient>
+          <linearGradient id="astro-grad-header" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#8b5cf6" />
+            <stop offset="100%" stop-color="#3b82f6" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <span class="brand-text">LAZUARDI</span>
+    </a>
+    
+    <!-- Desktop Navigation Links -->
+    <nav class="nav-links desktop-nav">
+      <a href="/" class={`nav-item ${isActive('/') ? 'active' : ''}`}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Home
+      </a>
+      <a href="/dashboard-xauusd" class={`nav-item gold-hover ${isActive('/dashboard-xauusd') ? 'active gold-active' : ''}`}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Dashboard XAUUSD
+      </a>
+      <a href="/dashboard-astrologi-xauusd" class={`nav-item astro-hover ${isActive('/dashboard-astrologi-xauusd') ? 'active astro-active' : ''}`}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><path d="M12 3a6.36 6.36 0 0 1 9 9 9.75 9.75 0 0 0-9-9Z"/><path d="M11.3 12.7a5 5 0 1 1-7.1-7.1 9.75 9.75 0 0 0 7.1 7.1Z"/><path d="M12 22a9.75 9.75 0 0 0 9-9 9.75 9.75 0 0 0-9 9Z"/></svg>
+        Dashboard Astrologi
+      </a>
+    </nav>
+
+    <!-- Mobile Navigation Actions -->
+    <div class="mobile-actions">
+      <!-- Hamburger Menu Toggle Button -->
+      <button class="mobile-menu-toggle" id="menu-toggle" aria-label="Toggle Navigation Menu">
+        <span class="hamburger-line line-1"></span>
+        <span class="hamburger-line line-2"></span>
+        <span class="hamburger-line line-3"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Drawer Overlay Menu -->
+  <div class="mobile-drawer glass-panel" id="mobile-drawer">
+    <nav class="mobile-nav-links">
+      <a href="/" class={`nav-item ${isActive('/') ? 'active' : ''}`}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Home
+      </a>
+      <a href="/dashboard-xauusd" class={`nav-item gold-hover ${isActive('/dashboard-xauusd') ? 'active gold-active' : ''}`}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Dashboard XAUUSD
+      </a>
+      <a href="/dashboard-astrologi-xauusd" class={`nav-item astro-hover ${isActive('/dashboard-astrologi-xauusd') ? 'active astro-active' : ''}`}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><path d="M12 3a6.36 6.36 0 0 1 9 9 9.75 9.75 0 0 0-9-9Z"/><path d="M11.3 12.7a5 5 0 1 1-7.1-7.1 9.75 9.75 0 0 0 7.1 7.1Z"/><path d="M12 22a9.75 9.75 0 0 0 9-9 9.75 9.75 0 0 0-9 9Z"/></svg>
+        Dashboard Astrologi
+      </a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    width: 100%;
+    padding: 1rem 2rem 0;
+  }
+  
+  .header-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 2rem;
+    border-radius: 9999px; /* Pill shape */
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    position: relative;
+    z-index: 102;
+  }
+  
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    color: var(--text-primary);
+  }
+  
+  .brand-logo {
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  
+  .brand:hover .brand-logo {
+    transform: rotate(180deg);
+  }
+  
+  .brand-text {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    background: linear-gradient(135deg, #fff 40%, var(--accent-gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+  }
+  
+  .nav-icon {
+    opacity: 0.7;
+    transition: transform 0.2s ease;
+  }
+  
+  .nav-item:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+  }
+  
+  .nav-item:hover .nav-icon {
+    transform: translateY(-1px);
+  }
+  
+  /* Gold Hover & Active styles (mapped to new color palette) */
+  .gold-hover:hover {
+    color: var(--accent-gold);
+    border-color: var(--border-gold);
+    background: rgba(59, 130, 246, 0.05);
+  }
+  
+  .gold-active {
+    color: var(--accent-gold) !important;
+    background: rgba(59, 130, 246, 0.1) !important;
+    border-color: var(--border-gold) !important;
+  }
+  
+  /* Astro Hover & Active styles */
+  .astro-hover:hover {
+    color: var(--accent-astro);
+    border-color: rgba(139, 92, 246, 0.2);
+    background: rgba(139, 92, 246, 0.05);
+  }
+  
+  .astro-active {
+    color: var(--accent-astro) !important;
+    background: rgba(139, 92, 246, 0.1) !important;
+    border-color: rgba(139, 92, 246, 0.3) !important;
+  }
+  
+  .active {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.08);
+  }
+  
+  /* Mobile header features */
+  .mobile-actions {
+    display: none;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .mobile-menu-toggle {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 20px;
+    height: 14px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 105;
+  }
+  
+  .hamburger-line {
+    width: 100%;
+    height: 2px;
+    background-color: var(--text-primary);
+    border-radius: 1px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+
+  /* Hamburger transformations when open */
+  .mobile-menu-toggle.open .line-1 {
+    transform: translateY(6px) rotate(45deg);
+  }
+  
+  .mobile-menu-toggle.open .line-2 {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  
+  .mobile-menu-toggle.open .line-3 {
+    transform: translateY(-6px) rotate(-45deg);
+  }
+
+  /* Mobile slide-out drawer */
+  .mobile-drawer {
+    position: absolute;
+    top: calc(100% - 10px);
+    left: 2rem;
+    right: 2rem;
+    border-radius: 20px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    z-index: 101;
+    border-color: var(--border-gold);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 20px rgba(59, 130, 246, 0.1);
+  }
+  
+  .mobile-drawer.open {
+    opacity: 1;
+    transform: translateY(10px) scale(1);
+    pointer-events: all;
+  }
+
+  .mobile-nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .mobile-nav-links .nav-item {
+    justify-content: flex-start;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.95rem;
+    border-radius: 10px;
+  }
+
+  /* Responsive breakpoints */
+  @media (max-width: 768px) {
+    .site-header {
+      padding: 0.75rem 1rem 0;
+    }
+    
+    .header-container {
+      padding: 0.6rem 1.5rem;
+      border-radius: 9999px;
+    }
+
+    .desktop-nav {
+      display: none;
+    }
+
+    .mobile-actions {
+      display: flex;
+    }
+    
+    .mobile-drawer {
+      left: 1rem;
+      right: 1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .brand-text {
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
+    }
+    
+    .header-container {
+      padding: 0.5rem 1.25rem;
+    }
+  }
+</style>
+
+<script>
+  // Drawer Toggle Logic
+  function initMobileMenu() {
+    const toggleBtn = document.getElementById('menu-toggle');
+    const drawer = document.getElementById('mobile-drawer');
+    
+    if (toggleBtn && drawer) {
+      // Toggle states
+      toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleBtn.classList.toggle('open');
+        drawer.classList.toggle('open');
+      });
+      
+      // Close drawer when clicking anywhere outside it
+      document.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement;
+        if (!drawer.contains(target) && !toggleBtn.contains(target)) {
+          toggleBtn.classList.remove('open');
+          drawer.classList.remove('open');
+        }
+      });
+      
+      // Close drawer when clicking navigation items
+      const mobileItems = drawer.querySelectorAll('.nav-item');
+      mobileItems.forEach(item => {
+        item.addEventListener('click', () => {
+          toggleBtn.classList.remove('open');
+          drawer.classList.remove('open');
+        });
+      });
+    }
+  }
+
+  // Set up execution
+  initMobileMenu();
+  document.addEventListener('astro:after-swap', () => {
+    initMobileMenu();
+  });
+</script>

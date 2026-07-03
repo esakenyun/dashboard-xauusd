@@ -1,0 +1,226 @@
+---
+interface Props {
+	title?: string;
+	description?: string;
+}
+
+const { 
+	title = "Lazuardi XAUUSD Portal", 
+	description = "Advanced XAUUSD Gold Trading Dashboard & Astrological Correlation Engine" 
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="description" content={description} />
+		<title>{title}</title>
+		
+		<!-- Google Fonts -->
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+	</head>
+	<body>
+		<div class="stars-container">
+			<div class="stars"></div>
+			<div class="stars2"></div>
+			<div class="stars3"></div>
+		</div>
+		<slot />
+	</body>
+</html>
+
+<style is:global>
+	:root {
+		--bg-primary: #030712;
+		--bg-secondary: #090e1a;
+		--bg-tertiary: #111827;
+		--accent-gold: #3b82f6;
+		--accent-gold-glow: rgba(59, 130, 246, 0.15);
+		--accent-gold-dark: #1d4ed8;
+		--accent-astro: #8b5cf6;
+		--accent-astro-glow: rgba(139, 92, 246, 0.15);
+		--text-primary: #f9fafb;
+		--text-secondary: #e5e7eb;
+		--text-muted: #9ca3af;
+		--border-color: rgba(255, 255, 255, 0.08);
+		--border-gold: rgba(59, 130, 246, 0.2);
+		--border-astro: rgba(139, 92, 246, 0.2);
+		
+		--font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+		--font-serif: 'Playfair Display', Georgia, serif;
+		--font-display: 'Cinzel', serif;
+	}
+
+	* {
+		box-sizing: border-box;
+		margin: 0;
+		padding: 0;
+	}
+
+	html {
+		scroll-behavior: smooth;
+		background-color: var(--bg-primary);
+		color: var(--text-primary);
+		font-family: var(--font-sans);
+		overflow-x: hidden;
+	}
+
+	body {
+		min-height: 100vh;
+		display: flex;
+		flex-direction: column;
+		position: relative;
+	}
+
+	/* Custom Scrollbar */
+	::-webkit-scrollbar {
+		width: 8px;
+		height: 8px;
+	}
+
+	::-webkit-scrollbar-track {
+		background: var(--bg-primary);
+	}
+
+	::-webkit-scrollbar-thumb {
+		background: #27272a;
+		border-radius: 4px;
+	}
+
+	::-webkit-scrollbar-thumb:hover {
+		background: #3f3f46;
+	}
+
+	/* Stars Animated Background (Celestial theme helper) */
+	.stars-container {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		pointer-events: none;
+		z-index: 0;
+		overflow: hidden;
+	}
+
+	.stars {
+		width: 1px;
+		height: 1px;
+		background: transparent;
+		box-shadow: 
+			150px 200px #fff, 350px 400px #fff, 850px 100px #fff, 1250px 600px #fff,
+			250px 800px #fff, 750px 700px #fff, 1450px 300px #fff, 1850px 900px #fff,
+			1050px 400px #fff, 50px 500px #fff, 550px 250px #fff, 950px 850px #fff;
+		animation: animStar 50s linear infinite;
+		opacity: 0.2;
+	}
+
+	.stars2 {
+		width: 1.5px;
+		height: 1.5px;
+		background: transparent;
+		box-shadow: 
+			200px 300px #60a5fa, 600px 500px #fff, 1000px 150px #fff, 1400px 750px #60a5fa,
+			400px 900px #fff, 800px 650px #fff, 1200px 250px #fff, 1600px 850px #fff,
+			100px 150px #fff, 500px 800px #fff, 900px 350px #fff, 1300px 950px #fff;
+		animation: animStar 100s linear infinite;
+		opacity: 0.35;
+	}
+
+	.stars3 {
+		width: 2px;
+		height: 2px;
+		background: transparent;
+		box-shadow: 
+			300px 100px #8b5cf6, 700px 400px #fff, 1100px 800px #8b5cf6, 1500px 200px #fff,
+			500px 600px #fff, 900px 950px #fff, 1300px 100px #fff, 1700px 500px #fff;
+		animation: animStar 150s linear infinite;
+		opacity: 0.15;
+	}
+
+	@keyframes animStar {
+		from {
+			transform: translateY(0px);
+		}
+		to {
+			transform: translateY(-2000px);
+		}
+	}
+
+	/* Glassmorphism Classes */
+	.glass-panel {
+		background: rgba(18, 18, 20, 0.7);
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+		border: 1px solid var(--border-color);
+		border-radius: 16px;
+	}
+
+	.glass-panel-gold {
+		background: rgba(18, 18, 20, 0.75);
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+		border: 1px solid var(--border-gold);
+		box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 0 0 15px 0 var(--accent-gold-glow);
+		border-radius: 16px;
+	}
+
+	.glass-panel-astro {
+		background: rgba(18, 18, 20, 0.75);
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+		border: 1px solid var(--border-astro);
+		box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 0 0 15px 0 var(--accent-astro-glow);
+		border-radius: 16px;
+	}
+
+	/* Button Glow Classes */
+	.btn-gold {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.75rem 1.5rem;
+		font-weight: 600;
+		color: #000;
+		background: linear-gradient(135deg, var(--accent-gold), #fff);
+		border: none;
+		border-radius: 8px;
+		cursor: pointer;
+		text-decoration: none;
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		box-shadow: 0 4px 14px rgba(212, 175, 55, 0.3);
+	}
+
+	.btn-gold:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5), 0 0 10px var(--accent-gold);
+	}
+
+	.btn-astro {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.75rem 1.5rem;
+		font-weight: 600;
+		color: #fff;
+		background: linear-gradient(135deg, var(--accent-astro), #a855f7);
+		border: none;
+		border-radius: 8px;
+		cursor: pointer;
+		text-decoration: none;
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3);
+	}
+
+	.btn-astro:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5), 0 0 10px var(--accent-astro);
+	}
+</style>

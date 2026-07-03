@@ -1,0 +1,133 @@
+---
+---
+
+<footer class="site-footer">
+  <div class="footer-content glass-panel">
+    <div class="footer-left">
+      <div class="brand">
+        <span class="brand-text">LAZUARDI</span>
+        <span class="brand-subtext">Quantum & Celestial Gold Intelligence</span>
+      </div>
+      <p class="copyright">&copy; {new Date().getFullYear()} Lazuardi Analytics. All rights reserved.</p>
+    </div>
+    
+    <div class="footer-center">
+      <div class="coord-indicator">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
+        <span>LAT: 0°0'0" N | LONG: 107°36'0" E</span>
+      </div>
+    </div>
+
+    <div class="footer-right">
+      <div class="footer-links">
+        <a href="/">Home</a>
+        <a href="/dashboard-xauusd">XAUUSD</a>
+        <a href="/dashboard-astrologi-xauusd">Astrology</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    width: 100%;
+    padding: 2rem;
+    margin-top: auto;
+    z-index: 10;
+  }
+  
+  .footer-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 3rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+  
+  .footer-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .brand {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .brand-text {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--text-primary);
+  }
+  
+  .brand-subtext {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  
+  .copyright {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+  
+  .footer-center {
+    display: flex;
+    align-items: center;
+  }
+  
+  .coord-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: monospace;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.02);
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+  }
+  
+  .footer-links {
+    display: flex;
+    gap: 1.5rem;
+  }
+  
+  .footer-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.8rem;
+    transition: color 0.2s ease;
+  }
+  
+  .footer-links a:hover {
+    color: var(--accent-gold);
+  }
+  
+  @media (max-width: 768px) {
+    .footer-content {
+      flex-direction: column;
+      text-align: center;
+      padding: 1.5rem;
+      gap: 1rem;
+    }
+    
+    .footer-left {
+      align-items: center;
+    }
+    
+    .footer-links {
+      justify-content: center;
+    }
+  }
+</style>

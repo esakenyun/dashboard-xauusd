@@ -1,0 +1,964 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="Dashboard Harian XAUUSD — Gann · Time · Astro" description="Buku Harian Trader - Gann, Time, and Astrofinancial analytics dashboard.">
+  <!-- Dynamic Font loading for this specific page layout -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <Header />
+
+  <div class="xau-dashboard-page">
+    <div class="wrap">
+
+      <div class="hero">
+        <div class="eyebrow">Buku Harian Trader · Gann · Time · Astrofinancial</div>
+        <h1>Dashboard Harian <span class="g">XAUUSD</span></h1>
+        <div class="hbar">
+          <div class="field"><label>Tanggal</label><input id="tgl" type="date"></div>
+          <div class="field"><label>Harga sekarang</label><input id="price" class="price-in mono" type="number" step="0.01" value="4177"></div>
+          <div class="field"><label>Bias hari ini</label>
+            <select id="bias">
+              <option>Netral / Wait</option>
+              <option>Bullish (ikut momentum)</option>
+              <option>Bearish (fade rally)</option>
+            </select>
+          </div>
+          <div class="field"><label>Catatan cepat</label><input id="note" type="text" placeholder="mis. libur AS, tunggu 5–6 Jul" style="width:220px;font-family:'Inter'"></div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <!-- LEFT: Gann engine -->
+        <div>
+          <div class="card">
+            <h2><span class="num">01</span> Mesin Level Gann (Square of Nine)</h2>
+            <p class="hint">Masukkan <b>pivot</b> (level 360°) and <b>langkah per 90°</b> dari chart Anda. Tangga level dibuat otomatis, jarak ke harga dihitung, level terdekat &amp; "garis mati" ditandai.</p>
+            <div class="engine-row">
+              <div class="field"><label>Pivot (360°)</label><input id="pivot" type="number" step="0.01" value="4126.63"></div>
+              <div class="field"><label>Langkah / 90°</label><input id="step" type="number" step="0.01" value="20.2"></div>
+              <div class="field"><label>Garis mati (opsional)</label><input id="deadline" type="number" step="0.01" placeholder="mis. 4188"></div>
+            </div>
+            <div id="ladder" class="ladder"></div>
+          </div>
+        </div>
+
+        <!-- RIGHT: plan + astro -->
+        <div>
+          <div class="card">
+            <h2><span class="num">02</span> Rencana Hari Ini</h2>
+            <p class="hint">Tiga skenario. Edit bebas — tersimpan otomatis.</p>
+            <div class="planbox"><span class="tag a">A · LONG</span>
+              <textarea id="planA">Ikut momentum bila close H1 tahan &gt; 4188. Target 4208 → 4229. SL &lt; 4167. Ukuran kecil (libur AS).</textarea></div>
+            <div class="planbox"><span class="tag b">B · SHORT</span>
+              <textarea id="planB">Fade bila tolak di 4181–4195 + candle reversal &amp; close H1 &lt; 4167. Target 4147 → 4127. SL &gt; 4196. Hanya dengan konfirmasi.</textarea></div>
+            <div class="planbox"><span class="tag c">C · WAIT</span>
+              <textarea id="planC">Paling mungkin hari ini: range 4147–4188. Tahan diri, simpan modal untuk jendela 5–6 Juli / Senin 6 Juli. Jangan revenge trade.</textarea></div>
+          </div>
+
+          <div class="card">
+            <h2><span class="num">03</span> Waktu &amp; Astro</h2>
+            <p class="hint">Penanda waktu pekan ini (menandai <i>kapan</i> &amp; <i>intensitas</i>, bukan arah).</p>
+            <div class="chips">
+              <div class="chip">Mars ☌ Uranus <b>3 Jul · persis</b></div>
+              <div class="chip">Matahari □ Saturnus <b>5–6 Jul</b></div>
+              <div class="chip">AS kembali <b>6 Jul</b></div>
+              <div class="chip">Deadline MOU <b>~mid-Agu</b></div>
+            </div>
+            <textarea id="timenote">Jendela pivot intraday: 11:00–13:00 &amp; 19:00–21:00 WIB. Reversal utama diincar 5–6 Juli. Keputusan berbasis close M15/H1 di level.</textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Journal -->
+      <div class="card">
+        <h2><span class="num">04</span> Jurnal Trade &amp; P/L</h2>
+        <p class="hint">Catat tiap transaksi. Total P/L, win-rate, dan kurva ekuitas dihitung otomatis.</p>
+        <table id="jtable">
+          <thead>
+            <tr>
+              <th>Tgl</th>
+              <th>Arah</th>
+              <th>Entry</th>
+              <th>SL</th>
+              <th>TP</th>
+              <th>Hasil ($)</th>
+              <th>Catatan</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="jbody"></tbody>
+        </table>
+        <button class="btn addrow" onclick="addRow()">+ Tambah baris</button>
+        <div class="stat">
+          <div>Total P/L<b id="pl" class="mono">$0.00</b></div>
+          <div>Jumlah trade<b id="ntr" class="mono">0</b></div>
+          <div>Win rate<b id="wr" class="mono">–</b></div>
+          <div>Menang / Kalah<b id="wl" class="mono">0 / 0</b></div>
+        </div>
+        <canvas id="equity" width="1000" height="120"></canvas>
+      </div>
+
+      <div class="actions">
+        <button class="btn gold" onclick="saveAll(true)">Simpan</button>
+        <button class="btn" onclick="exportJSON()">Ekspor data (JSON)</button>
+        <label class="btn" style="display:inline-block">Impor data<input id="imp" type="file" accept="application/json" style="display:none" onchange="importJSON(event)"></label>
+        <button class="btn" onclick="resetAll()">Reset</button>
+        <span id="saved" class="saved">✓ tersimpan</span>
+      </div>
+
+      <p class="disc">Dashboard ini alat bantu edukasi untuk keputusan Anda sendiri — <b>bukan nasihat keuangan</b>. Semua data tersimpan lokal di browser Anda (localStorage) dan tidak dikirim ke mana pun. Gunakan tombol "Ekspor data" untuk mencadangkan. Level, waktu, dan probabilitas bersifat perkiraan yang dapat meleset; astrologi dipakai sebagai kerangka simbolik/timing, bukan penentu hasil. Trading emas berisiko tinggi.</p>
+    </div>
+  </div>
+
+  <Footer />
+</Layout>
+
+<style is:global>
+  /* Containerized layout matching user's CSS definitions and using electric blue dark theme */
+  .xau-dashboard-page {
+    --ink: #030712; 
+    --panel: #0b0f19; 
+    --panel2: #111827; 
+    --line: rgba(255, 255, 255, 0.08);
+    --gold: #3b82f6; 
+    --goldsoft: #60a5fa; 
+    --cream: #f9fafb;
+    --muted: #9ca3af; 
+    --green: #10b981; 
+    --greenbg: rgba(16, 185, 129, 0.1); 
+    --red: #ef4444; 
+    --redbg: rgba(239, 68, 68, 0.1);
+    --blue: #3b82f6;
+    
+    background:
+       radial-gradient(1200px 600px at 80% -10%, #0d1e3d 0%, transparent 60%),
+       linear-gradient(180deg,#030712 0%, #090e1a 100%);
+    background-color: #030712;
+    color: var(--cream);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    position: relative;
+    z-index: 10;
+  }
+  
+  .xau-dashboard-page * { 
+    box-sizing: border-box; 
+  }
+  
+  .xau-dashboard-page .wrap { 
+    max-width: 1080px; 
+    margin: 0 auto; 
+    padding: 22px 18px 60px; 
+  }
+  
+  .xau-dashboard-page h1,
+  .xau-dashboard-page h2,
+  .xau-dashboard-page h3 { 
+    font-family: 'Cormorant Garamond', serif; 
+    font-weight: 600; 
+    letter-spacing: .3px; 
+    margin: 0; 
+  }
+  
+  .xau-dashboard-page .mono { 
+    font-family: 'JetBrains Mono', monospace; 
+  }
+  
+  .xau-dashboard-page .eyebrow { 
+    font-family: 'JetBrains Mono', monospace; 
+    font-size: 11px; 
+    letter-spacing: 2.5px; 
+    text-transform: uppercase; 
+    color: var(--gold); 
+  }
+  
+  /* Hero section */
+  .xau-dashboard-page .hero { 
+    border: 1px solid var(--line); 
+    border-radius: 16px; 
+    background: linear-gradient(180deg, var(--panel) 0%, #090e1a 100%);
+    padding: 20px 22px; 
+    margin-bottom: 18px; 
+    position: relative; 
+    overflow: hidden; 
+  }
+  
+  .xau-dashboard-page .hero:before { 
+    content: ""; 
+    position: absolute; 
+    inset: 0; 
+    background-image:
+      linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size: 34px 34px; 
+    opacity: .12; 
+    pointer-events: none;
+    -webkit-mask: radial-gradient(400px 220px at 85% 0%,#000,transparent 75%); 
+    mask: radial-gradient(400px 220px at 85% 0%,#000,transparent 75%); 
+  }
+  
+  .xau-dashboard-page .hero h1 { 
+    font-size: 34px; 
+    line-height: 1.05; 
+    color: var(--cream); 
+  }
+  
+  .xau-dashboard-page .hero h1 .g { 
+    color: var(--gold); 
+  }
+  
+  .xau-dashboard-page .hbar { 
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 14px; 
+    align-items: flex-end; 
+    justify-content: space-between; 
+    margin-top: 14px; 
+    position: relative; 
+  }
+  
+  .xau-dashboard-page .field { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 4px; 
+  }
+  
+  .xau-dashboard-page .field label { 
+    font-size: 11px; 
+    letter-spacing: 1.5px; 
+    text-transform: uppercase; 
+    color: var(--muted); 
+    font-family: 'JetBrains Mono', monospace; 
+  }
+  
+  .xau-dashboard-page input,
+  .xau-dashboard-page select,
+  .xau-dashboard-page textarea { 
+    background: #030712; 
+    border: 1px solid var(--line); 
+    color: var(--cream); 
+    border-radius: 9px;
+    padding: 9px 11px; 
+    font-family: 'JetBrains Mono', monospace; 
+    font-size: 14px; 
+    outline: none; 
+  }
+  
+  .xau-dashboard-page input:focus,
+  .xau-dashboard-page select:focus,
+  .xau-dashboard-page textarea:focus { 
+    border-color: var(--gold); 
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.18); 
+  }
+  
+  .xau-dashboard-page textarea { 
+    font-family: 'Inter', sans-serif; 
+    line-height: 1.5; 
+    resize: vertical; 
+    min-height: 74px; 
+    width: 100%; 
+  }
+  
+  .xau-dashboard-page .price-in { 
+    font-size: 22px; 
+    font-weight: 600; 
+    width: 140px; 
+    color: var(--gold); 
+  }
+  
+  .xau-dashboard-page .grid { 
+    display: grid; 
+    grid-template-columns: 1.15fr .85fr; 
+    gap: 18px; 
+  }
+  
+  @media(max-width: 840px) { 
+    .xau-dashboard-page .grid { 
+      grid-template-columns: 1fr; 
+    } 
+    .xau-dashboard-page .hero h1 { 
+      font-size: 27px; 
+    } 
+  }
+  
+  .xau-dashboard-page .card { 
+    border: 1px solid var(--line); 
+    border-radius: 14px; 
+    background: var(--panel); 
+    padding: 18px 18px 16px; 
+    margin-bottom: 18px; 
+  }
+  
+  .xau-dashboard-page .card h2 { 
+    font-size: 22px; 
+    color: var(--cream); 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+  }
+  
+  .xau-dashboard-page .card h2 .num { 
+    font-family: 'JetBrains Mono', monospace; 
+    font-size: 12px; 
+    color: var(--gold); 
+    border: 1px solid var(--gold);
+    border-radius: 6px; 
+    padding: 2px 7px; 
+    font-weight: 600; 
+  }
+  
+  .xau-dashboard-page .hint { 
+    color: var(--muted); 
+    font-size: 12.5px; 
+    margin: 2px 0 14px; 
+  }
+  
+  /* ladder */
+  .xau-dashboard-page .ladder { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 4px; 
+  }
+  
+  .xau-dashboard-page .lv { 
+    display: grid; 
+    grid-template-columns: 64px 1fr auto; 
+    align-items: center; 
+    gap: 10px; 
+    padding: 7px 12px; 
+    border-radius: 9px;
+    border: 1px solid transparent; 
+    background: #030712; 
+  }
+  
+  .xau-dashboard-page .lv .deg { 
+    font-family: 'JetBrains Mono', monospace; 
+    font-size: 11px; 
+    color: var(--muted); 
+    text-align: center; 
+  }
+  
+  .xau-dashboard-page .lv .val { 
+    font-family: 'JetBrains Mono', monospace; 
+    font-size: 16px; 
+    font-weight: 600; 
+  }
+  
+  .xau-dashboard-page .lv .dist { 
+    font-family: 'JetBrains Mono', monospace; 
+    font-size: 12px; 
+    color: var(--muted); 
+    justify-self: end; 
+  }
+  
+  .xau-dashboard-page .lv.res { 
+    background: linear-gradient(90deg, rgba(239, 68, 68, 0.14), rgba(239, 68, 68, 0.04)); 
+    border-color: rgba(239, 68, 68, 0.3); 
+  }
+  
+  .xau-dashboard-page .lv.res .val { 
+    color: var(--red); 
+  }
+  
+  .xau-dashboard-page .lv.sup { 
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.14), rgba(16, 185, 129, 0.04)); 
+    border-color: rgba(16, 185, 129, 0.3); 
+  }
+  
+  .xau-dashboard-page .lv.sup .val { 
+    color: var(--green); 
+  }
+  
+  .xau-dashboard-page .lv.now { 
+    background: linear-gradient(90deg, rgba(59, 130, 246, 0.9), rgba(59, 130, 246, 0.55)); 
+    border-color: var(--gold); 
+  }
+  
+  .xau-dashboard-page .lv.now .deg,
+  .xau-dashboard-page .lv.now .val,
+  .xau-dashboard-page .lv.now .dist { 
+    color: #030712; 
+    font-weight: 700; 
+  }
+  
+  .xau-dashboard-page .lv.near { 
+    outline: 2px dashed rgba(255, 255, 255, 0.25); 
+  }
+  
+  .xau-dashboard-page .pill { 
+    font-family: 'JetBrains Mono', monospace; 
+    font-size: 9.5px; 
+    letter-spacing: 1px; 
+    padding: 2px 6px; 
+    border-radius: 5px; 
+    margin-left: 8px; 
+    vertical-align: middle; 
+  }
+  
+  .xau-dashboard-page .pill.k { 
+    background: var(--red); 
+    color: #fff; 
+  }
+  
+  .xau-dashboard-page .engine-row { 
+    display: flex; 
+    gap: 12px; 
+    flex-wrap: wrap; 
+    margin-bottom: 12px; 
+  }
+  
+  .xau-dashboard-page .engine-row .field input { 
+    width: 120px; 
+  }
+  
+  /* plan tags */
+  .xau-dashboard-page .planbox { 
+    margin-bottom: 12px; 
+  }
+  
+  .xau-dashboard-page .planbox .tag { 
+    display: inline-block; 
+    font-family: 'JetBrains Mono', monospace; 
+    font-size: 11px; 
+    letter-spacing: 1px;
+    padding: 3px 9px; 
+    border-radius: 6px; 
+    margin-bottom: 6px; 
+    font-weight: 600; 
+  }
+  
+  .xau-dashboard-page .tag.a { 
+    background: var(--greenbg); 
+    color: var(--green); 
+    border: 1px solid rgba(16, 185, 129, 0.4); 
+  }
+  
+  .xau-dashboard-page .tag.b { 
+    background: var(--redbg); 
+    color: var(--red); 
+    border: 1px solid rgba(239, 68, 68, 0.4); 
+  }
+  
+  .xau-dashboard-page .tag.c { 
+    background: #030712; 
+    color: var(--blue); 
+    border: 1px solid rgba(59, 130, 246, 0.4); 
+  }
+  
+  /* astro chips */
+  .xau-dashboard-page .chips { 
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 8px; 
+    margin-bottom: 12px; 
+  }
+  
+  .xau-dashboard-page .chip { 
+    border: 1px solid var(--line); 
+    background: #030712; 
+    border-radius: 20px; 
+    padding: 6px 12px; 
+    font-size: 12.5px; 
+    display: flex; 
+    gap: 7px; 
+    align-items: center; 
+  }
+  
+  .xau-dashboard-page .chip b { 
+    color: var(--gold); 
+    font-family: 'JetBrains Mono', monospace; 
+    font-size: 11px; 
+  }
+  
+  /* journal table */
+  .xau-dashboard-page table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    font-size: 13px; 
+  }
+  
+  .xau-dashboard-page th,
+  .xau-dashboard-page td { 
+    padding: 7px 8px; 
+    border-bottom: 1px solid var(--line); 
+    text-align: left; 
+  }
+  
+  .xau-dashboard-page th { 
+    font-family: 'JetBrains Mono', monospace; 
+    font-size: 10.5px; 
+    letter-spacing: 1px; 
+    text-transform: uppercase; 
+    color: var(--muted); 
+    font-weight: 600; 
+  }
+  
+  .xau-dashboard-page td .mono { 
+    font-size: 13px; 
+  }
+  
+  .xau-dashboard-page td input,
+  .xau-dashboard-page td select { 
+    padding: 5px 6px; 
+    font-size: 12.5px; 
+    width: 100%; 
+  }
+  
+  .xau-dashboard-page .win { 
+    color: var(--green); 
+  }
+  
+  .xau-dashboard-page .loss { 
+    color: var(--red); 
+  }
+  
+  .xau-dashboard-page .del { 
+    background: none; 
+    border: none; 
+    color: var(--muted); 
+    cursor: pointer; 
+    font-size: 15px; 
+    padding: 0 4px; 
+  }
+  
+  .xau-dashboard-page .del:hover { 
+    color: var(--red); 
+  }
+  
+  .xau-dashboard-page .stat { 
+    display: flex; 
+    gap: 18px; 
+    flex-wrap: wrap; 
+    margin: 12px 0 6px; 
+  }
+  
+  .xau-dashboard-page .stat div { 
+    font-family: 'JetBrains Mono', monospace; 
+    font-size: 13px; 
+    color: var(--muted); 
+  }
+  
+  .xau-dashboard-page .stat b { 
+    font-size: 19px; 
+    color: var(--cream); 
+    display: block; 
+  }
+  
+  .xau-dashboard-page .btn { 
+    cursor: pointer; 
+    border: 1px solid var(--line); 
+    background: #030712; 
+    color: var(--cream); 
+    border-radius: 9px;
+    padding: 8px 14px; 
+    font-family: 'JetBrains Mono', monospace; 
+    font-size: 12.5px; 
+    transition: .15s; 
+  }
+  
+  .xau-dashboard-page .btn:hover { 
+    border-color: var(--gold); 
+    color: var(--gold); 
+  }
+  
+  .xau-dashboard-page .btn.gold { 
+    background: var(--gold); 
+    color: #030712; 
+    border-color: var(--gold); 
+    font-weight: 600; 
+  }
+  
+  .xau-dashboard-page .btn.gold:hover { 
+    background: #5a9eff; 
+  }
+  
+  .xau-dashboard-page .actions { 
+    display: flex; 
+    gap: 10px; 
+    flex-wrap: wrap; 
+    align-items: center; 
+    margin-top: 6px; 
+  }
+  
+  .xau-dashboard-page .saved { 
+    font-family: 'JetBrains Mono', monospace; 
+    font-size: 11px; 
+    color: var(--green); 
+    opacity: 0; 
+  }
+  
+  .xau-dashboard-page .saved.show { 
+    opacity: 1; 
+    transition: opacity .2s; 
+  }
+  
+  .xau-dashboard-page .disc { 
+    color: var(--muted); 
+    font-size: 11.5px; 
+    line-height: 1.5; 
+    border-top: 1px solid var(--line); 
+    margin-top: 26px; 
+    padding-top: 14px; 
+  }
+  
+  .xau-dashboard-page canvas { 
+    width: 100%; 
+    height: 120px; 
+    display: block; 
+    margin-top: 8px; 
+    background: #030712; 
+    border: 1px solid var(--line); 
+    border-radius: 10px; 
+  }
+  
+  .xau-dashboard-page .addrow { 
+    margin-top: 8px; 
+  }
+</style>
+
+<script is:inline>
+  const KEY = "xau_dash_v1";
+  const $ = id => document.getElementById(id);
+  const FIELDS = ["tgl", "price", "bias", "note", "pivot", "step", "deadline", "planA", "planB", "planC", "timenote"];
+  const DEG_UP = [360, 270, 180, 90]; // Degree order as price rises
+  
+  function fmt(n) {
+    return (isFinite(n) ? n : 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function buildLadder() {
+    const priceInput = $("price");
+    const pivotInput = $("pivot");
+    const stepInput = $("step");
+    const deadInput = $("deadline");
+    if (!priceInput || !pivotInput || !stepInput) return;
+
+    const price = parseFloat(priceInput.value) || 0;
+    const pivot = parseFloat(pivotInput.value) || 0;
+    const step = parseFloat(stepInput.value) || 1;
+    const dead = deadInput ? parseFloat(deadInput.value) : NaN;
+    const L = $("ladder"); 
+    if (!L) return;
+    L.innerHTML = "";
+    
+    let rows = [];
+    for (let k = 6; k >= -6; k--) {
+      const val = pivot + k * step;
+      let deg;
+      if (k >= 0) deg = DEG_UP[k % 4];
+      else deg = DEG_UP[((k % 4) + 4) % 4];
+      rows.push({ k, val, deg });
+    }
+    
+    // Insert current price row
+    rows.push({ now: true, val: price });
+    rows.sort((a, b) => b.val - a.val);
+    
+    // Find closest support & resistance
+    let above = null, below = null;
+    rows.forEach(r => {
+      if (!r.now) {
+        if (r.val >= price) {
+          if (above === null || r.val < above.val) above = r;
+        } else {
+          if (below === null || r.val > below.val) below = r;
+        }
+      }
+    });
+
+    rows.forEach(r => {
+      const d = document.createElement("div");
+      if (r.now) {
+        d.className = "lv now";
+        d.innerHTML = `<span class="deg">HARGA</span><span class="val">${fmt(r.val)}</span><span class="dist">◄ sekarang</span>`;
+      } else {
+        const isRes = r.val > price;
+        d.className = "lv " + (isRes ? "res" : "sup");
+        if ((above && r.val === above.val) || (below && r.val === below.val)) d.className += " near";
+        const diff = (r.val - price);
+        const dk = (dead && Math.abs(r.val - dead) < 0.01) ? `<span class="pill k">GARIS MATI</span>` : "";
+        d.innerHTML = `<span class="deg">${r.deg}°</span><span class="val">${fmt(r.val)}${dk}</span>` +
+                      `<span class="dist">${diff > 0 ? '+' : ''}${diff.toFixed(1)}</span>`;
+      }
+      L.appendChild(d);
+    });
+  }
+
+  /* ---------- Journal ---------- */
+  let journal = [];
+  
+  function addRow(data) {
+    const tglInput = $("tgl");
+    const t = data || { tgl: (tglInput ? tglInput.value : ""), dir: "Buy", entry: "", sl: "", tp: "", pnl: "", note: "" };
+    journal.push(t);
+    renderJournal();
+    saveAll();
+  }
+
+  function renderJournal() {
+    const b = $("jbody"); 
+    if (!b) return;
+    b.innerHTML = "";
+    
+    journal.forEach((r, i) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><input value="${r.tgl || ''}" onchange="upd(${i},'tgl',this.value)" style="width:92px"></td>
+        <td><select onchange="upd(${i},'dir',this.value)">
+          <option${r.dir === 'Buy' ? ' selected' : ''}>Buy</option>
+          <option${r.dir === 'Sell' ? ' selected' : ''}>Sell</option>
+        </select></td>
+        <td><input class="mono" value="${r.entry || ''}" onchange="upd(${i},'entry',this.value)" style="width:74px"></td>
+        <td><input class="mono" value="${r.sl || ''}" onchange="upd(${i},'sl',this.value)" style="width:74px"></td>
+        <td><input class="mono" value="${r.tp || ''}" onchange="upd(${i},'tp',this.value)" style="width:74px"></td>
+        <td><input class="mono" value="${r.pnl || ''}" onchange="upd(${i},'pnl',this.value)" style="width:78px"></td>
+        <td><input value="${(r.note || '').replace(/"/g, '&quot;')}" onchange="upd(${i},'note',this.value)"></td>
+        <td><button class="del" onclick="delRow(${i})" title="hapus">✕</button></td>`;
+      b.appendChild(tr);
+    });
+    stats();
+  }
+
+  function upd(i, k, v) {
+    journal[i][k] = v;
+    if (k === 'pnl') {
+      stats();
+      drawEquity();
+    }
+    saveAll();
+  }
+
+  function delRow(i) {
+    journal.splice(i, 1);
+    renderJournal();
+    drawEquity();
+    saveAll();
+  }
+
+  function stats() {
+    let tot = 0, w = 0, l = 0, n = 0;
+    journal.forEach(r => {
+      const p = parseFloat(r.pnl);
+      if (!isNaN(p) && r.pnl !== "") {
+        tot += p;
+        n++;
+        if (p > 0) w++; else if (p < 0) l++;
+      }
+    });
+    
+    const plEl = $("pl");
+    const ntrEl = $("ntr");
+    const wrEl = $("wr");
+    const wlEl = $("wl");
+
+    if (plEl) {
+      plEl.textContent = (tot < 0 ? '-$' : '$') + Math.abs(tot).toFixed(2);
+      plEl.className = "mono " + (tot > 0 ? 'win' : tot < 0 ? 'loss' : '');
+    }
+    if (ntrEl) ntrEl.textContent = n;
+    if (wrEl) wrEl.textContent = (w + l) ? Math.round(w / (w + l) * 100) + '%' : '–';
+    if (wlEl) wlEl.textContent = w + " / " + l;
+    
+    drawEquity();
+  }
+
+  function drawEquity() {
+    const c = $("equity"); 
+    if (!c) return;
+    const ctx = c.getContext("2d"); 
+    if (!ctx) return;
+    const W = c.width, H = c.height;
+    ctx.clearRect(0, 0, W, H);
+    
+    let pts = [], run = 0;
+    journal.forEach(r => {
+      const p = parseFloat(r.pnl);
+      if (!isNaN(p) && r.pnl !== "") {
+        run += p;
+        pts.push(run);
+      }
+    });
+    
+    if (pts.length < 1) {
+      ctx.fillStyle = "#8b97b3";
+      ctx.font = "12px monospace";
+      ctx.fillText("Belum ada data P/L", 14, H / 2);
+      return;
+    }
+    
+    const arr = [0, ...pts];
+    const mn = Math.min(...arr), mx = Math.max(...arr);
+    const pad = 14;
+    const x = i => pad + i * (W - 2 * pad) / Math.max(1, arr.length - 1);
+    const y = v => H - pad - (v - mn) / ((mx - mn) || 1) * (H - 2 * pad);
+    
+    // zero baseline
+    ctx.strokeStyle = "#2a385c";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad, y(0));
+    ctx.lineTo(W - pad, y(0));
+    ctx.stroke();
+    
+    // fill area (electric blue theme)
+    ctx.beginPath();
+    ctx.moveTo(x(0), y(arr[0]));
+    arr.forEach((v, i) => ctx.lineTo(x(i), y(v)));
+    ctx.lineTo(x(arr.length - 1), y(0));
+    ctx.lineTo(x(0), y(0));
+    ctx.closePath();
+    ctx.fillStyle = "rgba(59, 130, 246, 0.12)";
+    ctx.fill();
+    
+    // line
+    ctx.beginPath();
+    ctx.moveTo(x(0), y(arr[0]));
+    arr.forEach((v, i) => ctx.lineTo(x(i), y(v)));
+    ctx.strokeStyle = "#60a5fa";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    
+    arr.forEach((v, i) => {
+      ctx.beginPath();
+      ctx.arc(x(i), y(v), 2.6, 0, 7);
+      ctx.fillStyle = v >= 0 ? "#10b981" : "#ef4444";
+      ctx.fill();
+    });
+  }
+
+  /* ---------- Persist ---------- */
+  let t0;
+  
+  function saveAll(flash) {
+    const o = {};
+    FIELDS.forEach(f => {
+      const el = $(f);
+      if (el) o[f] = el.value;
+    });
+    o.journal = journal;
+    localStorage.setItem(KEY, JSON.stringify(o));
+    
+    if (flash) {
+      const s = $("saved");
+      if (s) {
+        s.classList.add("show");
+        clearTimeout(t0);
+        t0 = setTimeout(() => s.classList.remove("show"), 1200);
+      }
+    }
+  }
+
+  function load() {
+    let o;
+    try {
+      o = JSON.parse(localStorage.getItem(KEY));
+    } catch(e) {}
+    
+    if (o) {
+      FIELDS.forEach(f => {
+        if (o[f] !== undefined && $(f)) $(f).value = o[f];
+      });
+      journal = o.journal || [];
+    }
+    
+    const tglEl = $("tgl");
+    if (tglEl && !tglEl.value) {
+      tglEl.value = new Date().toISOString().slice(0, 10);
+    }
+    
+    renderJournal();
+    buildLadder();
+  }
+
+  function exportJSON() {
+    const o = {};
+    FIELDS.forEach(f => {
+      const el = $(f);
+      if (el) o[f] = el.value;
+    });
+    o.journal = journal;
+    const blob = new Blob([JSON.stringify(o, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    
+    const tglEl = $("tgl");
+    a.download = "xauusd_dashboard_" + ((tglEl && tglEl.value) || "data") + ".json";
+    a.click();
+  }
+
+  function importJSON(e) {
+    const f = e.target.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try {
+        const o = JSON.parse(r.result);
+        FIELDS.forEach(k => {
+          if (o[k] !== undefined && $(k)) $(k).value = o[k];
+        });
+        journal = o.journal || [];
+        renderJournal();
+        buildLadder();
+        saveAll(true);
+      } catch(err) {
+        alert("File tidak valid");
+      }
+    };
+    r.readAsText(f);
+  }
+
+  function resetAll() {
+    if (confirm("Hapus semua data dashboard?")) {
+      localStorage.removeItem(KEY);
+      location.reload();
+    }
+  }
+
+  // Explicit window bindings for inline HTML triggers
+  window.addRow = addRow;
+  window.saveAll = saveAll;
+  window.exportJSON = exportJSON;
+  window.importJSON = importJSON;
+  window.resetAll = resetAll;
+  window.upd = upd;
+  window.delRow = delRow;
+
+  function init() {
+    load();
+    
+    // Set up level input change listeners
+    ["price", "pivot", "step", "deadline"].forEach(id => {
+      const el = $(id);
+      if (el) {
+        el.addEventListener("input", () => {
+          buildLadder();
+          saveAll();
+        });
+      }
+    });
+    
+    // Set up standard change listeners
+    FIELDS.forEach(f => {
+      const el = $(f);
+      if (el) el.addEventListener("change", () => saveAll(true));
+    });
+    
+    window.addEventListener("resize", () => {
+      buildLadder();
+      drawEquity();
+    });
+  }
+
+  // Execute initialization
+  init();
+  document.addEventListener('astro:after-swap', () => {
+    init();
+  });
+</script>
