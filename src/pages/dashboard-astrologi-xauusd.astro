@@ -4,7 +4,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 ---
 
-<Layout title="Almanak Astro XAUUSD — Panel Harian" description="Catat harga emas tiap hari — posisi planet terisi otomatis (model maju, tanpa retrograde) dan grafik ikut ter-update.">
+<Layout title="Almanak Astro XAUUSD — Panel Harian" description="Efemeris geosentris presisi (JPL) untuk XAUUSD — posisi planet harian, natal chart New York & Jakarta, dan riwayat harga.">
   <Header />
 
   <div class="astro-dashboard-page">
@@ -12,10 +12,10 @@ import Footer from '../components/Footer.astro';
 
       <header>
         <div class="eyebrow">Almanak Harian · Emas × Langit</div>
-        <h1>Panel Astro <span class="accent">XAUUSD</span> 2026</h1>
-        <p class="sub">Catat harga emas tiap hari — posisi planet terisi otomatis (model maju, tanpa retrograde) dan grafik ikut ter-update. Data tersimpan di browser Anda.</p>
+        <h1>Panel Astro <span class="accent">XAUUSD</span></h1>
+        <p class="sub">Efemeris geosentris presisi (elemen orbital JPL) — posisi planet, natal chart New York &amp; Jakarta, dan riwayat harga emas. Data tersimpan di browser Anda.</p>
         <div class="disclaimer">
-          <b>Perlu diketahui:</b> astrologi tidak punya dasar ilmiah untuk memprediksi harga. Posisi planet & tanggal di sini adalah astronomi (disederhanakan tanpa retrograde, sesuai permintaan) — <b>bukan sinyal beli/jual</b>. Ini bukan nasihat keuangan.
+          <b>Perlu diketahui:</b> overlay astro = interpretatif, <b>tidak tervalidasi</b> sebagai prediktor harga. Ini bukan nasihat keuangan.
         </div>
       </header>
 
@@ -48,7 +48,7 @@ import Footer from '../components/Footer.astro';
               </select>
             </div>
           </div>
-          <label>Posisi planet (otomatis, tanpa retrograde)</label>
+          <label>Posisi planet (efemeris presisi)</label>
           <div class="pos-grid" id="posGrid"></div>
           <label for="nInput">Catatan / sentimen (opsional)</label>
           <textarea id="nInput" placeholder="Catatan astrologi atau pasar Anda…"></textarea>
@@ -68,6 +68,32 @@ import Footer from '../components/Footer.astro';
         </section>
       </div>
 
+      <!-- Astro hari ini -->
+      <section class="card">
+        <h2><span class="ic">☾</span> Astro hari ini</h2>
+        <p class="hint">Efemeris geosentris pada tanggal terpilih di atas (tengah malam WIB).</p>
+        <div class="pos-grid astro-today" id="astroToday"></div>
+      </section>
+
+      <!-- Natal chart -->
+      <section class="card">
+        <h2><span class="ic">✷</span> Natal chart / efemeris — New York &amp; Jakarta</h2>
+        <div class="row2">
+          <div>
+            <label for="nDate">Tanggal natal</label>
+            <input type="date" id="nDate">
+          </div>
+          <div>
+            <label for="nTime">Jam lokal kota</label>
+            <input type="time" id="nTime" value="00:00">
+          </div>
+        </div>
+        <p class="hint" style="margin-top:10px">Planet geosentris identik di kedua kota pada instan yang sama; yang berbeda Ascendant/MC/rumah (whole-sign).</p>
+        <div class="natal-grid">
+          <div id="natalNY"></div><div id="natalJKT"></div>
+        </div>
+      </section>
+
       <!-- Table -->
       <section class="card table-card">
         <div class="chart-head" style="margin-bottom:8px">
@@ -86,28 +112,7 @@ import Footer from '../components/Footer.astro';
         </table>
       </section>
 
-      <!-- Research -->
-      <details class="research" open>
-        <summary>Riset &amp; kesimpulan</summary>
-        <div class="body">
-          <div class="kpi" id="kpi"></div>
-          <h3>Yang diklaim astrologi vs. yang terjadi</h3>
-          <p>Narasi lama makin bullish sejak awal April 2026 (“potensi rebound”, “akumulasi menuju 4.800”, “ultra bullish”). Kenyataannya emas justru <b>menurun</b>. Rekor tertinggi ~5.602/oz terjadi 29 Jan 2026 (sebelum jendela analisis), lalu turun hingga menyentuh terendah ~8 bulan di sekitar 3.960 pada akhir Juni, dan baru pulih tipis ke ~4.066 pada 2 Jul 2026 — turun sekitar 11% dalam sebulan. Skenario “menuju 4.800” tidak terkonfirmasi.</p>
-          <h3>Penggerak harga yang sebenarnya (Jun–Jul 2026)</h3>
-          <ul>
-            <li>Ekspektasi kenaikan suku bunga The Fed (~67% peluang di September; ketua baru bernada hawkish) — menaikkan opportunity cost memegang emas.</li>
-            <li>Inflasi masih panas (PCE inti ~3,4%, PCE utama ~4,1% yoy).</li>
-            <li>Data tenaga kerja kuat &amp; imbal hasil Treasury 10-thn di atas 4,5%.</li>
-            <li>Geopolitik AS–Iran / harga minyak.</li>
-          </ul>
-          <h3>Tentang model “tanpa retrograde”</h3>
-          <p>Sesuai permintaan, posisi planet dihitung maju terus memakai gerak rata-rata (mean motion) dari titik acuan 2 Jul 2026 — retrograde diabaikan. Konsekuensinya posisi bersifat perkiraan, terutama untuk planet dalam (Merkurius, Venus, Bulan) dan untuk tanggal yang jauh dari acuan. Untuk derajat presisi, tetap butuh efemeris harian.</p>
-          <h3>Kesimpulan</h3>
-          <p>Sebagai catatan posisi planet & harga harian, alat ini akurat dan rapi. Sebagai <b>prediksi arah</b> XAUUSD, astrologi tidak memiliki dasar dan pada periode ini berlawanan dengan pergerakan harga sebenarnya. Untuk keputusan nyata, andalkan kebijakan Fed & suku bunga, inflasi, imbal hasil obligasi, kekuatan dolar (DXY), dan geopolitik. Bukan nasihat keuangan.</p>
-        </div>
-      </details>
-
-      <footer class="astro-calc-footer">Dibuat 2 Juli 2026 · Data tersimpan lokal di browser (localStorage). Ekspor CSV untuk cadangan.</footer>
+      <footer class="astro-calc-footer">Data tersimpan lokal di browser (localStorage). Ekspor CSV untuk cadangan.</footer>
     </div>
     <div class="toast" id="toast"></div>
   </div>
@@ -116,19 +121,18 @@ import Footer from '../components/Footer.astro';
 </Layout>
 
 <style is:global>
-  /* Base wrapper to containerize original styles */
   .astro-dashboard-page {
-    --midnight: #030712; 
-    --midnight2: #090e1a; 
-    --panel: #111827; 
+    --midnight: #030712;
+    --midnight2: #090e1a;
+    --panel: #111827;
     --panel2: #1f2937;
-    --ivory: #f9fafb; 
-    --muted: #9ca3af; 
+    --ivory: #f9fafb;
+    --muted: #9ca3af;
     --line: rgba(255, 255, 255, 0.08);
-    --gold: #3b82f6; 
-    --gold-soft: #60a5fa; 
-    --teal: #5FB0B7; 
-    --crim: #C7566A; 
+    --gold: #3b82f6;
+    --gold-soft: #60a5fa;
+    --teal: #5FB0B7;
+    --crim: #C7566A;
     --green: #7FBF8A;
 
     background:
@@ -137,575 +141,232 @@ import Footer from '../components/Footer.astro';
       var(--midnight);
     color: var(--ivory);
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    line-height: 1.5; 
-    padding: 24px; 
+    line-height: 1.5;
+    padding: 24px;
     min-height: 100vh;
     position: relative;
     z-index: 10;
+    overflow-x: hidden;
   }
 
-  .astro-dashboard-page * {
-    box-sizing: border-box;
-  }
-
-  .astro-dashboard-page .wrap {
-    max-width: 1080px;
-    margin: 0 auto;
-  }
-
-  .astro-dashboard-page h1,
-  .astro-dashboard-page h2,
-  .astro-dashboard-page h3 {
+  .astro-dashboard-page * { box-sizing: border-box; }
+  .astro-dashboard-page .wrap { max-width: 1080px; margin: 0 auto; }
+  .astro-dashboard-page h1, .astro-dashboard-page h2, .astro-dashboard-page h3 {
     font-family: "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, serif;
-    font-weight: 600;
-    margin: 0;
+    font-weight: 600; margin: 0;
   }
+  .astro-dashboard-page h2 .ic { color: var(--gold); }
+  .astro-dashboard-page .num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
 
-  .astro-dashboard-page .num {
-    font-variant-numeric: tabular-nums;
-    font-feature-settings: "tnum";
-  }
-
-  /* Header */
-  .astro-dashboard-page header {
-    margin-bottom: 18px;
-  }
-  
-  .astro-dashboard-page .eyebrow {
-    letter-spacing: .28em;
-    text-transform: uppercase;
-    font-size: 11px;
-    color: var(--gold);
-    margin-bottom: 6px;
-  }
-  
-  .astro-dashboard-page h1 {
-    font-size: 30px;
-    line-height: 1.1;
-  }
-  
-  .astro-dashboard-page h1 .accent {
-    color: var(--gold);
-  }
-  
-  .astro-dashboard-page .sub {
-    color: var(--muted);
-    font-size: 14px;
-    margin-top: 6px;
-    max-width: 70ch;
-  }
-  
+  .astro-dashboard-page header { margin-bottom: 18px; }
+  .astro-dashboard-page .eyebrow { letter-spacing: .28em; text-transform: uppercase; font-size: 11px; color: var(--gold); margin-bottom: 6px; }
+  .astro-dashboard-page h1 { font-size: 30px; line-height: 1.1; }
+  .astro-dashboard-page h1 .accent { color: var(--gold); }
+  .astro-dashboard-page .sub { color: var(--muted); font-size: 14px; margin-top: 6px; max-width: 70ch; }
   .astro-dashboard-page .disclaimer {
-    margin-top: 14px;
-    border: 1px solid var(--line);
-    border-left: 3px solid var(--gold);
-    background: rgba(59, 130, 246, 0.06);
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 12.5px;
-    color: #cfd2ec;
+    margin-top: 14px; border: 1px solid var(--line); border-left: 3px solid var(--gold);
+    background: rgba(59, 130, 246, 0.06); border-radius: 8px; padding: 10px 14px; font-size: 12.5px; color: #cfd2ec;
   }
-  
-  .astro-dashboard-page .disclaimer b {
-    color: var(--gold-soft);
-  }
+  .astro-dashboard-page .disclaimer b { color: var(--gold-soft); }
 
-  /* Sky band (signature) */
   .astro-dashboard-page .sky {
-    margin: 22px 0;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    background: linear-gradient(180deg, var(--midnight2), var(--panel));
-    overflow: hidden;
+    margin: 22px 0; border: 1px solid var(--line); border-radius: 14px;
+    background: linear-gradient(180deg, var(--midnight2), var(--panel)); overflow: hidden;
   }
-  
-  .astro-dashboard-page .sky-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    padding: 12px 16px 4px;
-  }
-  
-  .astro-dashboard-page .sky-head .lbl {
-    font-size: 11px;
-    letter-spacing: .2em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-  
-  .astro-dashboard-page .sky-head .dt {
-    font-size: 13px;
-    color: var(--gold-soft);
-  }
-  
-  .astro-dashboard-page .band {
-    position: relative;
-    height: 92px;
-    margin: 6px 10px 14px;
-  }
-  
+  .astro-dashboard-page .sky-head { display: flex; justify-content: space-between; align-items: baseline; padding: 12px 16px 4px; }
+  .astro-dashboard-page .sky-head .lbl { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+  .astro-dashboard-page .sky-head .dt { font-size: 13px; color: var(--gold-soft); }
+  .astro-dashboard-page .band { position: relative; height: 92px; margin: 6px 10px 14px; }
   .astro-dashboard-page .band .zone {
-    position: absolute;
-    top: 34px;
-    height: 26px;
-    border-right: 1px solid var(--line);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: .04em;
+    position: absolute; top: 34px; height: 26px; border-right: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--muted); letter-spacing: .04em;
   }
-  
-  .astro-dashboard-page .band .zone:nth-child(odd) {
-    background: rgba(255, 255, 255, 0.02);
+  .astro-dashboard-page .band .zone:nth-child(odd) { background: rgba(255, 255, 255, 0.02); }
+  .astro-dashboard-page .band .glyph { position: absolute; top: 2px; transform: translateX(-50%); text-align: center; transition: left .5s cubic-bezier(.22,.61,.36,1); }
+  .astro-dashboard-page .band .glyph .g { font-size: 20px; line-height: 1; color: var(--gold); }
+  .astro-dashboard-page .band .glyph .g.slow { color: var(--teal); }
+  .astro-dashboard-page .band .glyph .p { font-size: 8.5px; color: var(--muted); margin-top: 1px; white-space: nowrap; }
+
+  .astro-dashboard-page .grid { display: grid; grid-template-columns: 1fr 1.15fr; gap: 18px; }
+  @media(max-width: 820px) { .astro-dashboard-page .grid { grid-template-columns: 1fr; } }
+
+  @media(max-width: 640px) {
+    .astro-dashboard-page { padding: 14px; }
+    .astro-dashboard-page h1 { font-size: 23px; }
+    .astro-dashboard-page .card { padding: 14px; }
+    .astro-dashboard-page .band { height: 112px; }
+    .astro-dashboard-page .band .glyph .p { display: none; }
+    .astro-dashboard-page .pos-grid { grid-template-columns: 1fr 1fr; }
+    .astro-dashboard-page canvas { height: 220px; }
+    .astro-dashboard-page .toolbar .btn { flex: 1 1 auto; justify-content: center; }
   }
-  
-  .astro-dashboard-page .band .glyph {
-    position: absolute;
-    top: 2px;
-    transform: translateX(-50%);
-    text-align: center;
-    transition: left .5s cubic-bezier(.22,.61,.36,1);
-  }
-  
-  .astro-dashboard-page .band .glyph .g {
-    font-size: 20px;
-    line-height: 1;
-    color: var(--gold);
-  }
-  
-  .astro-dashboard-page .band .glyph .g.slow {
-    color: var(--teal);
-  }
-  
-  .astro-dashboard-page .band .glyph .p {
-    font-size: 8.5px;
-    color: var(--muted);
-    margin-top: 1px;
-    white-space: nowrap;
+  @media(max-width: 380px) {
+    .astro-dashboard-page .pos-grid { grid-template-columns: 1fr; }
   }
 
-  /* Layout Grid */
-  .astro-dashboard-page .grid {
-    display: grid;
-    grid-template-columns: 1fr 1.15fr;
-    gap: 18px;
-  }
-  
-  @media(max-width: 820px) {
-    .astro-dashboard-page .grid {
-      grid-template-columns: 1fr;
-    }
-  }
-  
-  .astro-dashboard-page .card {
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    background: var(--panel);
-    padding: 16px 18px;
-  }
-  
-  .astro-dashboard-page .card h2 {
-    font-size: 17px;
-    margin-bottom: 4px;
-  }
-  
-  .astro-dashboard-page .card .hint {
-    color: var(--muted);
-    font-size: 12px;
-    margin-bottom: 12px;
-  }
+  .astro-dashboard-page .card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); padding: 16px 18px; margin-top: 18px; }
+  .astro-dashboard-page .grid .card { margin-top: 0; }
+  .astro-dashboard-page .card h2 { font-size: 17px; margin-bottom: 4px; }
+  .astro-dashboard-page .card .hint { color: var(--muted); font-size: 12px; margin-bottom: 12px; }
 
-  .astro-dashboard-page label {
-    display: block;
-    font-size: 12px;
-    color: var(--muted);
-    margin: 10px 0 4px;
+  .astro-dashboard-page label { display: block; font-size: 12px; color: var(--muted); margin: 10px 0 4px; }
+  .astro-dashboard-page input[type=date], .astro-dashboard-page input[type=number],
+  .astro-dashboard-page input[type=text], .astro-dashboard-page input[type=time],
+  .astro-dashboard-page textarea, .astro-dashboard-page select {
+    width: 100%; background: var(--midnight2); border: 1px solid var(--line); color: var(--ivory);
+    border-radius: 9px; padding: 9px 11px; font-size: 14px; font-family: inherit;
   }
-  
-  .astro-dashboard-page input[type=date],
-  .astro-dashboard-page input[type=number],
-  .astro-dashboard-page input[type=text],
-  .astro-dashboard-page textarea,
-  .astro-dashboard-page select {
-    width: 100%;
-    background: var(--midnight2);
-    border: 1px solid var(--line);
-    color: var(--ivory);
-    border-radius: 9px;
-    padding: 9px 11px;
-    font-size: 14px;
-    font-family: inherit;
+  .astro-dashboard-page input:focus, .astro-dashboard-page textarea:focus, .astro-dashboard-page select:focus {
+    outline: 2px solid var(--gold); outline-offset: 0; border-color: var(--gold);
   }
-  
-  .astro-dashboard-page input:focus,
-  .astro-dashboard-page textarea:focus,
-  .astro-dashboard-page select:focus {
-    outline: 2px solid var(--gold);
-    outline-offset: 0;
-    border-color: var(--gold);
-  }
-  
-  .astro-dashboard-page textarea {
-    resize: vertical;
-    min-height: 52px;
-  }
-  
-  .astro-dashboard-page .row2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
+  .astro-dashboard-page textarea { resize: vertical; min-height: 52px; }
+  .astro-dashboard-page .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media(max-width: 480px) { .astro-dashboard-page .row2 { grid-template-columns: 1fr; } }
 
-  .astro-dashboard-page .pos-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 6px;
-    margin-top: 8px;
-  }
-  
+  .astro-dashboard-page .pos-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-top: 8px; }
+  .astro-dashboard-page .pos-grid.astro-today { grid-template-columns: repeat(auto-fit,minmax(130px,1fr)); }
   .astro-dashboard-page .pos {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--midnight2);
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    padding: 7px 9px;
+    display: flex; align-items: center; gap: 8px; background: var(--midnight2);
+    border: 1px solid var(--line); border-radius: 8px; padding: 7px 9px;
   }
-  
-  .astro-dashboard-page .pos .pg {
-    font-size: 16px;
-    color: var(--gold);
-    width: 18px;
-    text-align: center;
-  }
-  
-  .astro-dashboard-page .pos .pg.slow {
-    color: var(--teal);
-  }
-  
-  .astro-dashboard-page .pos .pn {
-    font-size: 10.5px;
-    color: var(--muted);
-  }
-  
-  .astro-dashboard-page .pos .pv {
-    font-size: 12.5px;
-    font-weight: 600;
-  }
+  .astro-dashboard-page .pos .pg { font-size: 16px; color: var(--gold); width: 18px; text-align: center; }
+  .astro-dashboard-page .pos .pg.slow { color: var(--teal); }
+  .astro-dashboard-page .pos .pn { font-size: 10.5px; color: var(--muted); }
+  .astro-dashboard-page .pos .pv { font-size: 12.5px; font-weight: 600; }
 
-  /* Buttons */
   .astro-dashboard-page .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    border: none;
-    border-radius: 10px;
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 600;
-    padding: 11px 16px;
-    cursor: pointer;
+    display: inline-flex; align-items: center; gap: 8px; border: none; border-radius: 10px;
+    font-family: inherit; font-size: 14px; font-weight: 600; padding: 11px 16px; cursor: pointer;
     transition: transform .12s, filter .12s;
   }
-  
-  .astro-dashboard-page .btn:hover {
-    filter: brightness(1.08);
-  } 
-  
-  .astro-dashboard-page .btn:active {
-    transform: translateY(1px);
-  }
-  
-  .astro-dashboard-page .btn-gold {
-    background: linear-gradient(180deg, var(--gold-soft), var(--gold));
-    color: #2a2200;
-  }
-  
-  .astro-dashboard-page .btn-ghost {
-    background: transparent;
-    border: 1px solid var(--line);
-    color: var(--ivory);
-  }
-  
-  .astro-dashboard-page .btn-sm {
-    font-size: 12px;
-    padding: 7px 11px;
-  }
-  
-  .astro-dashboard-page .toolbar {
-    display: flex;
-    gap: 9px;
-    flex-wrap: wrap;
-    margin-top: 14px;
-  }
+  .astro-dashboard-page .btn:hover { filter: brightness(1.08); }
+  .astro-dashboard-page .btn:active { transform: translateY(1px); }
+  .astro-dashboard-page .btn-gold { background: linear-gradient(180deg, var(--gold-soft), var(--gold)); color: #04101f; }
+  .astro-dashboard-page .btn-ghost { background: transparent; border: 1px solid var(--line); color: var(--ivory); }
+  .astro-dashboard-page .btn-sm { font-size: 12px; padding: 7px 11px; }
+  .astro-dashboard-page .toolbar { display: flex; gap: 9px; flex-wrap: wrap; margin-top: 14px; }
 
-  /* Chart */
-  .astro-dashboard-page .chart-card {
-    margin-top: 18px;
-  }
-  
-  .astro-dashboard-page .chart-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  
-  .astro-dashboard-page .last {
-    font-size: 13px;
-    color: var(--muted);
-  }
-  
-  .astro-dashboard-page .last b {
-    color: var(--gold-soft);
-    font-size: 15px;
-  }
-  
-  .astro-dashboard-page canvas {
-    width: 100%;
-    height: 300px;
-    display: block;
-    margin-top: 8px;
-  }
+  .astro-dashboard-page .chart-card { margin-top: 18px; }
+  .astro-dashboard-page .chart-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; }
+  .astro-dashboard-page .last { font-size: 13px; color: var(--muted); }
+  .astro-dashboard-page .last b { color: var(--gold-soft); font-size: 15px; }
+  .astro-dashboard-page canvas { width: 100%; height: 300px; display: block; margin-top: 8px; }
 
-  /* Table */
-  .astro-dashboard-page .table-card {
-    margin-top: 18px;
-    overflow-x: auto;
+  .astro-dashboard-page .natal-grid { display: grid; grid-template-columns: 1fr; gap: 14px; margin-top: 10px; }
+  @media(min-width: 768px) {
+    .astro-dashboard-page .natal-grid { grid-template-columns: 1fr 1fr; }
   }
-  
-  .astro-dashboard-page table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12.5px;
-    min-width: 760px;
-  }
-  
-  .astro-dashboard-page th,
-  .astro-dashboard-page td {
-    text-align: left;
-    padding: 8px 9px;
-    border-bottom: 1px solid var(--line);
-    white-space: nowrap;
-  }
-  
-  .astro-dashboard-page th {
-    color: var(--gold-soft);
-    font-weight: 600;
-    font-size: 11px;
-    letter-spacing: .04em;
-    text-transform: uppercase;
-    position: sticky;
-    top: 0;
-    background: var(--panel);
-  }
-  
-  .astro-dashboard-page td.note {
-    white-space: normal;
-    min-width: 200px;
-    color: #cfd2ec;
-  }
-  
-  .astro-dashboard-page tr:hover td {
-    background: rgba(255, 255, 255, 0.03);
-  }
-  
-  .astro-dashboard-page .tag {
-    font-size: 10px;
-    padding: 2px 7px;
-    border-radius: 20px;
-    border: 1px solid;
-  }
-  
-  .astro-dashboard-page .tag.aktual {
-    color: var(--green);
-    border-color: rgba(127,191,138,.5);
-    background: rgba(127,191,138,.08);
-  }
-  
-  .astro-dashboard-page .tag.sheet {
-    color: var(--gold-soft);
-    border-color: rgba(59,130,246,.4);
-    background: rgba(59, 130, 246, 0.07);
-  }
-  
-  .astro-dashboard-page .tag.model {
-    color: var(--teal);
-    border-color: rgba(95,176,183,.4);
-    background: rgba(95,176,183,.07);
-  }
-  
-  .astro-dashboard-page .del {
-    background: none;
-    border: none;
-    color: var(--crim);
-    cursor: pointer;
-    font-size: 14px;
-    padding: 2px 6px;
-    border-radius: 6px;
-  }
-  
-  .astro-dashboard-page .del:hover {
-    background: rgba(199,86,106,.15);
-  }
+  .astro-dashboard-page .natal-grid > div { min-width: 0; }
+  .astro-dashboard-page .natal-card { background: var(--midnight2); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; max-width: 100%; min-width: 0; }
+  .astro-dashboard-page .natal-card h3 { color: var(--gold-soft); font-size: 15px; }
+  .astro-dashboard-page .natal-card .natal-table-wrap { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 8px; }
+  .astro-dashboard-page .natal-card table { width: 100%; min-width: 320px; border-collapse: collapse; font-size: 12.5px; }
+  .astro-dashboard-page .natal-card th, .astro-dashboard-page .natal-card td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  .astro-dashboard-page .natal-card th { color: var(--gold-soft); font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em; }
 
-  /* Research */
-  .astro-dashboard-page details.research {
-    margin-top: 18px;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    background: var(--panel);
-    overflow: hidden;
-  }
-  
-  .astro-dashboard-page details.research summary {
-    cursor: pointer;
-    padding: 15px 18px;
-    font-family: "Iowan Old Style", Palatino, Georgia, serif;
-    font-size: 17px;
-    color: var(--gold-soft);
-    list-style: none;
-  }
-  
-  .astro-dashboard-page details.research summary::-webkit-details-marker {
-    display: none;
-  }
-  
-  .astro-dashboard-page details.research summary::before {
-    content: "▸ ";
-    color: var(--gold);
-  }
-  
-  .astro-dashboard-page details.research[open] summary::before {
-    content: "▾ ";
-  }
-  
-  .astro-dashboard-page .research .body {
-    padding: 2px 20px 18px;
-    font-size: 13.5px;
-    color: #d7dbf2;
-  }
-  
-  .astro-dashboard-page .research .body h3 {
-    font-size: 14px;
-    color: var(--gold-soft);
-    margin: 16px 0 4px;
-  }
-  
-  .astro-dashboard-page .research .body p {
-    margin: 6px 0;
-  }
-  
-  .astro-dashboard-page .research .body ul {
-    margin: 6px 0;
-    padding-left: 18px;
-  } 
-  
-  .astro-dashboard-page .research .body li {
-    margin: 3px 0;
-  }
-  
-  .astro-dashboard-page .kpi {
-    display: flex;
-    gap: 14px;
-    flex-wrap: wrap;
-    margin: 10px 0;
-  }
-  
-  .astro-dashboard-page .kpi div {
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 9px 13px;
-    background: var(--midnight2);
-  }
-  
-  .astro-dashboard-page .kpi .k {
-    font-size: 11px;
-    color: var(--muted);
-  } 
-  
-  .astro-dashboard-page .kpi .v {
-    font-size: 18px;
-    font-weight: 700;
-  }
-  
-  .astro-dashboard-page .kpi .down {
-    color: var(--crim);
-  } 
-  
-  .astro-dashboard-page .kpi .up {
-    color: var(--green);
-  }
+  .astro-dashboard-page .table-card { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .astro-dashboard-page table { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 760px; }
+  .astro-dashboard-page th, .astro-dashboard-page td { text-align: left; padding: 8px 9px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  .astro-dashboard-page th { color: var(--gold-soft); font-weight: 600; font-size: 11px; letter-spacing: .04em; text-transform: uppercase; position: sticky; top: 0; background: var(--panel); }
+  .astro-dashboard-page td.note { white-space: normal; min-width: 200px; color: #cfd2ec; }
+  .astro-dashboard-page tr:hover td { background: rgba(255, 255, 255, 0.03); }
+  .astro-dashboard-page .tag { font-size: 10px; padding: 2px 7px; border-radius: 20px; border: 1px solid; }
+  .astro-dashboard-page .tag.aktual { color: var(--green); border-color: rgba(127,191,138,.5); background: rgba(127,191,138,.08); }
+  .astro-dashboard-page .tag.manual { color: var(--gold-soft); border-color: rgba(59,130,246,.4); background: rgba(59, 130, 246, 0.07); }
+  .astro-dashboard-page .del { background: none; border: none; color: var(--crim); cursor: pointer; font-size: 14px; padding: 2px 6px; border-radius: 6px; }
+  .astro-dashboard-page .del:hover { background: rgba(199,86,106,.15); }
 
-  .astro-dashboard-page footer.astro-calc-footer {
-    margin-top: 22px;
-    color: var(--muted);
-    font-size: 11.5px;
-    text-align: center;
-    border: none;
-    padding: 0;
-  }
-  
+  .astro-dashboard-page footer.astro-calc-footer { margin-top: 22px; color: var(--muted); font-size: 11.5px; text-align: center; border: none; padding: 0; }
   .astro-dashboard-page .toast {
-    position: fixed;
-    bottom: 22px;
-    left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: var(--gold);
-    color: #2a2200;
-    font-weight: 600;
-    font-size: 13px;
-    padding: 10px 18px;
-    border-radius: 10px;
-    opacity: 0;
-    pointer-events: none;
-    transition: .25s;
-    z-index: 1000;
+    position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--gold); color: #04101f; font-weight: 600; font-size: 13px; padding: 10px 18px;
+    border-radius: 10px; opacity: 0; pointer-events: none; transition: .25s; z-index: 1000;
   }
-  
-  .astro-dashboard-page .toast.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
+  .astro-dashboard-page .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 </style>
 
 <script is:inline>
-  /* ---------- No-retrograde mean-motion model (tropical) ---------- */
+  /* ---------- Efemeris geosentris presisi (elemen orbital JPL 1800–2050) ---------- */
   const SIGNS=["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
-  const EPOCH=Date.UTC(2026,6,2); // 2 Jul 2026
-  
-  // lon = absolute ecliptic longitude at epoch; rate = deg/day (forward only)
-  const BODIES=[
-    {key:"Sun",    g:"☉", lon:100.5, rate:0.98565, slow:false},
-    {key:"Moon",   g:"☽", lon:317.2, rate:13.1764, slow:false},
-    {key:"Venus",  g:"♀", lon:116.0, rate:1.10,    slow:false},
-    {key:"Mars",   g:"♂", lon:63.0,  rate:0.524,   slow:false},
-    {key:"Mercury",g:"☿", lon:110.0, rate:1.20,    slow:false},
-    {key:"Jupiter",g:"♃", lon:121.0, rate:0.0831,  slow:true},
-    {key:"Saturn", g:"♄", lon:14.0,  rate:0.0339,  slow:true},
-  ];
-
-  function lonOf(body,dateStr){
-    const d=(Date.parse(dateStr+"T00:00:00Z")-EPOCH)/86400000;
-    return ((body.lon+body.rate*d)%360+360)%360;
+  const EPOCH2=Date.UTC(2026,6,5,17,0,0); // anchor Optuma 2026-07-06 00:00 WIB
+  const D2R=Math.PI/180,R2D=180/Math.PI,nz=x=>((x%360)+360)%360;
+  const GLYPH={Sun:"☉",Moon:"☽",Mercury:"☿",Venus:"♀",Mars:"♂",Jupiter:"♃",Saturn:"♄",Uranus:"♅",Neptune:"♆",Pluto:"♇"};
+  const ORDER=["Sun","Moon","Mercury","Venus","Mars","Jupiter","Saturn","Uranus","Neptune","Pluto"];
+  const SLOW={Jupiter:1,Saturn:1,Uranus:1,Neptune:1,Pluto:1};
+  const EL={
+   Mercury:[[0.38709927,0.20563593,7.00497902,252.25032350,77.45779628,48.33076593],[0.00000037,0.00001906,-0.00594749,149472.67411175,0.16047689,-0.12534081]],
+   Venus:[[0.72333566,0.00677672,3.39467605,181.97909950,131.60246718,76.67984255],[0.00000390,-0.00004107,-0.00078890,58517.81538729,0.00268329,-0.27769418]],
+   Earth:[[1.00000261,0.01671123,-0.00001531,100.46457166,102.93768193,0.0],[0.00000562,-0.00004392,-0.01294668,35999.37244981,0.32327364,0.0]],
+   Mars:[[1.52371034,0.09339410,1.84969142,-4.55343205,-23.94362959,49.55953891],[0.00001847,0.00007882,-0.00813131,19140.30268499,0.44441088,-0.29257343]],
+   Jupiter:[[5.20288700,0.04838624,1.30439695,34.39644051,14.72847983,100.47390909],[-0.00011607,-0.00013253,-0.00183714,3034.74612775,0.21252668,0.20469106]],
+   Saturn:[[9.53667594,0.05386179,2.48599187,49.95424423,92.59887831,113.66242448],[-0.00125060,-0.00050991,0.00193609,1222.49362201,-0.41897216,-0.28867794]],
+   Uranus:[[19.18916464,0.04725744,0.77263783,313.23810451,170.95427630,74.01692503],[-0.00196176,-0.00004397,-0.00242939,428.48202785,0.40805281,0.04240589]],
+   Neptune:[[30.06992276,0.00859048,1.77004347,-55.12002969,44.96476227,131.78422574],[0.00026291,0.00005105,0.00035372,218.45945325,-0.32241464,-0.00508664]]};
+  function helioXYZ(name,T){const el=EL[name],e0=el[0],r=el[1];
+   let a=e0[0]+r[0]*T,e=e0[1]+r[1]*T,I=(e0[2]+r[2]*T)*D2R,L=e0[3]+r[3]*T,peri=e0[4]+r[4]*T,nod=(e0[5]+r[5]*T)*D2R;
+   let w=(peri-(e0[5]+r[5]*T))*D2R;let M=nz(L-peri);if(M>180)M-=360;M*=D2R;
+   let E=M;for(let i=0;i<8;i++)E=E-(E-e*Math.sin(E)-M)/(1-e*Math.cos(E));
+   let xp=a*(Math.cos(E)-e),yp=a*Math.sqrt(1-e*e)*Math.sin(E);
+   let cw=Math.cos(w),sw=Math.sin(w),cO=Math.cos(nod),sO=Math.sin(nod),ci=Math.cos(I),si=Math.sin(I);
+   return [(cw*cO-sw*sO*ci)*xp+(-sw*cO-cw*sO*ci)*yp,(cw*sO+sw*cO*ci)*xp+(-sw*sO+cw*cO*ci)*yp,(sw*si)*xp+(cw*si)*yp];}
+  function planetLon(name,ms){const T=(ms/86400000+2440587.5-2451545.0)/36525;
+   let p=helioXYZ(name,T),ea=helioXYZ("Earth",T);
+   return nz(Math.atan2(p[1]-ea[1],p[0]-ea[0])*R2D+1.396971*T+0.0003086*T*T);}
+  function sunMoon(ms){
+    const J=ms/86400000+2440587.5,T=(J-2451545.0)/36525;
+    let L0=nz(280.46646+36000.76983*T+0.0003032*T*T);
+    let M=nz(357.52911+35999.05029*T-0.0001537*T*T)*D2R;
+    let C=(1.914602-0.004817*T-0.000014*T*T)*Math.sin(M)+(0.019993-0.000101*T)*Math.sin(2*M)+0.000289*Math.sin(3*M);
+    let sun=nz(L0+C-0.00569);
+    let Lp=nz(218.3164477+481267.88123421*T-0.0015786*T*T+T*T*T/538841-T*T*T*T/65194000);
+    let Dm=nz(297.8501921+445267.1114034*T-0.0018819*T*T+T*T*T/545868-T*T*T*T/113065000);
+    let Ms=nz(357.5291092+35999.0502909*T-0.0001536*T*T+T*T*T/24490000);
+    let Mp=nz(134.9633964+477198.8675055*T+0.0087414*T*T+T*T*T/69699-T*T*T*T/14712000);
+    let F=nz(93.272095+483202.0175233*T-0.0036539*T*T-T*T*T/3526000+T*T*T*T/863310000);
+    let E=1-0.002516*T-0.0000074*T*T,s=x=>Math.sin(x*D2R),sum=0;
+    const tm=[[6288774,0,0,1,0],[1274027,2,0,-1,0],[658314,2,0,0,0],[213618,0,0,2,0],[-185116,0,1,0,0],[-114332,0,0,0,2],[58793,2,0,-2,0],[57066,2,-1,-1,0],[53322,2,0,1,0],[45758,2,-1,0,0],[-40923,0,1,-1,0],[-34720,1,0,0,0],[-30383,0,1,1,0],[15327,2,0,0,-2],[-12528,0,0,1,2],[10980,0,0,1,-2],[10675,4,0,-1,0],[10034,0,0,3,0],[8548,4,0,-2,0],[-7888,2,1,-1,0],[-6766,2,1,0,0],[-5163,1,0,-1,0],[4987,1,1,0,0],[4036,2,-1,1,0],[3994,2,0,2,0],[3861,4,0,0,0],[3665,2,0,-3,0],[-2689,0,1,-2,0],[-2602,2,0,-1,2]];
+    for(const[c,d,m,mp,f]of tm){let e=1;if(Math.abs(m)==1)e=E;else if(Math.abs(m)==2)e=E*E;sum+=c*e*s(d*Dm+m*Ms+mp*Mp+f*F);}
+    return {sun,moon:nz(Lp+sum/1e6)};
   }
-
-  function fmtPos(lon){
-    const s=Math.floor(lon/30)%12, deg=lon%30;
-    return Math.floor(deg)+"° "+SIGNS[s];
-  }
-
+  function lonOf(name,ms){if(name==="Sun")return sunMoon(ms).sun;if(name==="Moon")return sunMoon(ms).moon;
+    if(name==="Pluto")return nz(304.78-0.015*(ms-EPOCH2)/86400000);return planetLon(name,ms);}
+  function posAt(ms){return ORDER.map(n=>({name:n,g:GLYPH[n],lon:lonOf(n,ms),slow:!!SLOW[n]}));}
+  const fmtDMS=x=>{const d=x%30;return Math.floor(d)+"°"+String(Math.floor((d%1)*60)).padStart(2,"0")+"' "+SIGNS[Math.floor(x/30)%12];};
   function positionsFor(dateStr){
-    const o={};
-    BODIES.forEach(b=>o[b.key]=fmtPos(lonOf(b,dateStr)));
+    const ms=Date.parse(dateStr+"T00:00:00+07:00"),o={};
+    posAt(ms).forEach(p=>o[p.name]=fmtDMS(p.lon));
     return o;
   }
 
-  /* ---------- Storage ---------- */
+  /* ---------- Ascendant / Midheaven ---------- */
+  const OBLIQ=23.4366;
+  function ascmc(jd,lat,lonE){const T=(jd-2451545.0)/36525;
+    let g=280.46061837+360.98564736629*(jd-2451545.0)+0.000387933*T*T-T*T*T/38710000;
+    const lst=((g+lonE)%360+360)%360,r=lst*Math.PI/180,e=OBLIQ*Math.PI/180,p=lat*Math.PI/180;
+    let mc=Math.atan2(Math.sin(r),Math.cos(r)*Math.cos(e))*180/Math.PI;mc=(mc%360+360)%360;
+    let asc=Math.atan2(Math.cos(r),-(Math.sin(r)*Math.cos(e)+Math.tan(p)*Math.sin(e)))*180/Math.PI;asc=(asc%360+360)%360;
+    return {asc,mc};}
+  function natalPanel(title,tzName,tzOff,lat,lon){
+    const dd=$("nDate").value||new Date().toISOString().slice(0,10),tt=$("nTime").value||"00:00";
+    const off=(tzOff>=0?"+":"-")+String(Math.abs(tzOff)).padStart(2,"0")+":00";
+    const ms=Date.parse(dd+"T"+tt+":00"+off),jd=ms/86400000+2440587.5;
+    const mm=ascmc(jd,lat,lon),pls=posAt(ms),ascS=Math.floor(mm.asc/30)%12;
+    const rows=pls.map(p=>{const h=((Math.floor(p.lon/30)-ascS)%12+12)%12+1;
+      return `<tr><td><span class="pg ${p.slow?'slow':''}">${p.g}</span> ${p.name}</td><td class="num">${fmtDMS(p.lon)}</td><td>${h}</td></tr>`;}).join("");
+    const utc=new Date(ms).toISOString().slice(0,16).replace("T"," ");
+    return `<div class="natal-card"><h3>${title}</h3>
+     <div class="hint" style="margin:2px 0 8px">${dd} ${tt} ${tzName} · ${utc} UTC · ${lat.toFixed(2)}, ${lon.toFixed(2)}</div>
+     <div style="display:flex;gap:22px;margin-bottom:8px">
+       <div><div style="font-size:10px;color:var(--muted)">ASC</div><div style="font-weight:700;color:var(--gold-soft)">${fmtDMS(mm.asc)}</div></div>
+       <div><div style="font-size:10px;color:var(--muted)">MC</div><div style="font-weight:700;color:var(--gold-soft)">${fmtDMS(mm.mc)}</div></div></div>
+     <div class="natal-table-wrap"><table><thead><tr><th>Planet</th><th>Posisi</th><th>Rmh</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+  }
+  function renderNatal(){
+    $("natalNY").innerHTML=natalPanel("New York","EDT (GMT−4)",-4,40.7128,-74.0060);
+    $("natalJKT").innerHTML=natalPanel("Jakarta","WIB (GMT+7)",7,-6.2088,106.8456);
+  }
+
+  /* ---------- Storage: riwayat harga ---------- */
   const KEY="astro_xauusd_v1";
   let mem=null;
 
@@ -713,22 +374,15 @@ import Footer from '../components/Footer.astro';
     try{const r=localStorage.getItem(KEY); if(r) return JSON.parse(r);}catch(e){}
     return mem;
   }
-
   function save(data){
     try{localStorage.setItem(KEY,JSON.stringify(data));}catch(e){mem=data;}
   }
 
   const SEED=[
-    {date:"2026-01-29",close:5602,src:"aktual",note:"Rekor tertinggi sepanjang masa (ATH)."},
-    {date:"2026-03-19",close:4600,src:"sheet",note:"Range lebar; High 4.867 / Low 4.502 (klaim sheet, estimasi tengah)."},
-    {date:"2026-03-24",close:4474,src:"sheet",note:"Close 4.474 (klaim sheet). Sun masuk Aries."},
-    {date:"2026-03-31",close:4667,src:"sheet",note:"Close 4.667 (klaim sheet)."},
-    {date:"2026-04-19",close:null,src:"model",note:"Sun masuk Taurus; Mars sejajar Saturn di Aries."},
-    {date:"2026-06-21",close:null,src:"model",note:"Sun masuk Cancer (solstice)."},
     {date:"2026-06-28",close:3960,src:"aktual",note:"Terendah ~8 bulan."},
-    {date:"2026-06-30",close:null,src:"model",note:"Jupiter masuk Leo — perpindahan besar."},
     {date:"2026-07-01",close:4026,src:"aktual",note:"Rebound dari ~3.967."},
     {date:"2026-07-02",close:4066,src:"aktual",note:"Naik ~0,92% dari hari sebelumnya."},
+    {date:"2026-07-05",close:4175.7,src:"aktual",note:""},
   ];
 
   function seedRows(){return SEED.map(s=>({...s,pos:positionsFor(s.date)}));}
@@ -744,23 +398,21 @@ import Footer from '../components/Footer.astro';
   function renderBand(dateStr){
     const band=$("band"); if(!band) return;
     band.innerHTML="";
-    const W=band.clientWidth||band.offsetWidth||900;
     for(let i=0;i<12;i++){
       const z=document.createElement("div"); z.className="zone";
       z.style.left=(i/12*100)+"%"; z.style.width=(100/12)+"%";
       z.textContent=SIGNS[i].slice(0,3); band.appendChild(z);
     }
-    // stagger vertical to reduce overlap
-    const tops=[0,26,0,26,0,4,4];
-    BODIES.forEach((b,idx)=>{
-      const lon=lonOf(b,dateStr);
+    const ms=Date.parse(dateStr+"T00:00:00+07:00");
+    const tops=[0,26,0,26,0,4,4,26,4,26];
+    posAt(ms).forEach((p,idx)=>{
       const el=document.createElement("div"); el.className="glyph";
-      el.style.left=(lon/360*100)+"%";
+      el.style.left=(p.lon/360*100)+"%";
       el.style.top=(tops[idx]||0)+"px";
-      el.innerHTML=`<div class="g ${b.slow?'slow':''}">${b.g}</div><div class="p">${fmtPos(lon)}</div>`;
+      el.innerHTML=`<div class="g ${p.slow?'slow':''}">${p.g}</div><div class="p">${fmtDMS(p.lon)}</div>`;
       band.appendChild(el);
     });
-    
+
     const skyDate = $("skyDate");
     if(skyDate) {
       skyDate.textContent=new Date(dateStr+"T00:00:00").toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"});
@@ -768,13 +420,20 @@ import Footer from '../components/Footer.astro';
   }
 
   function renderPosGrid(dateStr){
-    const pos=positionsFor(dateStr); const g=$("posGrid"); if(!g) return;
+    const ms=Date.parse(dateStr+"T00:00:00+07:00");
+    const g=$("posGrid"); if(!g) return;
     g.innerHTML="";
-    BODIES.forEach(b=>{
+    posAt(ms).forEach(p=>{
       const d=document.createElement("div"); d.className="pos";
-      d.innerHTML=`<span class="pg ${b.slow?'slow':''}">${b.g}</span><div><div class="pn">${b.key}</div><div class="pv">${pos[b.key]}</div></div>`;
+      d.innerHTML=`<span class="pg ${p.slow?'slow':''}">${p.g}</span><div><div class="pn">${p.name}</div><div class="pv">${fmtDMS(p.lon)}</div></div>`;
       g.appendChild(d);
     });
+  }
+
+  function renderAstroToday(dateStr){
+    const ms=Date.parse(dateStr+"T00:00:00+07:00");
+    const g=$("astroToday"); if(!g) return;
+    g.innerHTML=posAt(ms).map(p=>`<div class="pos"><span class="pg ${p.slow?'slow':''}">${p.g}</span><div><div class="pn">${p.name}</div><div class="pv">${fmtDMS(p.lon)}</div></div></div>`).join("");
   }
 
   function renderTable(){
@@ -799,12 +458,12 @@ import Footer from '../components/Footer.astro';
     });
   }
 
-  /* ---------- Chart (custom canvas, no dependency) ---------- */
+  /* ---------- Chart (custom canvas) ---------- */
   function drawChart(){
     const cv=$("chart"); if(!cv) return;
     const ctx=cv.getContext("2d"); if(!ctx) return;
     const dpr=window.devicePixelRatio||1;
-    const w=cv.clientWidth, h=300; cv.width=w*dpr; cv.height=h*dpr; ctx.scale(dpr,dpr);
+    const w=cv.clientWidth, h=cv.clientHeight||300; cv.width=w*dpr; cv.height=h*dpr; ctx.scale(dpr,dpr);
     ctx.clearRect(0,0,w,h);
     const pts=rows.filter(r=>r.close!=null).map(r=>({t:Date.parse(r.date+"T00:00:00Z"),v:+r.close})).sort((a,b)=>a.t-b.t);
     const padL=54,padR=14,padT=14,padB=28;
@@ -815,32 +474,27 @@ import Footer from '../components/Footer.astro';
     const tmin=pts[0].t,tmax=pts[pts.length-1].t||tmin+1;
     const X=t=>padL+(tmax===tmin?0.5:(t-tmin)/(tmax-tmin))*cw;
     const Y=v=>padT+(1-(v-lo)/(hi-lo))*ch;
-    // gridlines + y labels
     ctx.strokeStyle="#33396E";ctx.fillStyle="#9AA0C8";ctx.font="11px system-ui";ctx.lineWidth=1;
     for(let i=0;i<=4;i++){
       const v=lo+(hi-lo)*i/4, y=Y(v);
       ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(w-padR,y);ctx.stroke();
       ctx.fillText(Math.round(v).toLocaleString("id-ID"),6,y+4);
     }
-    // area
     const grad=ctx.createLinearGradient(0,padT,0,padT+ch);
-    grad.addColorStop(0,"rgba(59, 130, 246, 0.35)");grad.addColorStop(1,"rgba(59, 130, 246, 0)"); // Swapped gold gradient for electric blue
+    grad.addColorStop(0,"rgba(59, 130, 246, 0.35)");grad.addColorStop(1,"rgba(59, 130, 246, 0)");
     ctx.beginPath();ctx.moveTo(X(pts[0].t),Y(pts[0].v));
     pts.forEach(p=>ctx.lineTo(X(p.t),Y(p.v)));
     ctx.lineTo(X(pts[pts.length-1].t),padT+ch);ctx.lineTo(X(pts[0].t),padT+ch);ctx.closePath();
     ctx.fillStyle=grad;ctx.fill();
-    // line
     ctx.beginPath();ctx.moveTo(X(pts[0].t),Y(pts[0].v));
     pts.forEach(p=>ctx.lineTo(X(p.t),Y(p.v)));
-    ctx.strokeStyle="#60a5fa";ctx.lineWidth=2.2;ctx.stroke(); // Swapped gold line for light blue
-    // points + date labels (first/last)
+    ctx.strokeStyle="#60a5fa";ctx.lineWidth=2.2;ctx.stroke();
     ctx.fillStyle="#60a5fa";
     pts.forEach(p=>{ctx.beginPath();ctx.arc(X(p.t),Y(p.v),3,0,7);ctx.fill();});
     ctx.fillStyle="#9AA0C8";ctx.font="10px system-ui";
     const f=new Date(pts[0].t),l=new Date(pts[pts.length-1].t);
     ctx.fillText(f.toLocaleDateString("id-ID",{day:"2-digit",month:"short"}),padL,h-8);
     ctx.textAlign="right";ctx.fillText(l.toLocaleDateString("id-ID",{day:"2-digit",month:"short"}),w-padR,h-8);ctx.textAlign="left";
-    // last box
     const last=pts[pts.length-1], prev=pts[pts.length-2];
     let chg="";
     if(prev){const d=last.v-prev.v,pct=d/prev.v*100;const up=d>=0;
@@ -851,32 +505,14 @@ import Footer from '../components/Footer.astro';
     }
   }
 
-  /* ---------- KPI ---------- */
-  function renderKPI(){
-    const priced=rows.filter(r=>r.close!=null).sort((a,b)=>a.date.localeCompare(b.date));
-    const box=$("kpi"); if(!box) return;
-    box.innerHTML="";
-    if(!priced.length)return;
-    const ath=Math.max(...priced.map(r=>+r.close));
-    const last=priced[priced.length-1];
-    const first=priced[0];
-    const chg=((last.close-first.close)/first.close*100);
-    const items=[
-      ["Terakhir (USD/oz)",idr(last.close),""],
-      ["Tertinggi tercatat",idr(ath),""],
-      ["Perubahan periode",chg.toFixed(1)+"%",chg>=0?"up":"down"],
-    ];
-    items.forEach(([k,v,c])=>{const d=document.createElement("div");d.innerHTML=`<div class="k">${k}</div><div class="v ${c}">${v}</div>`;box.appendChild(d);});
-  }
-
   /* ---------- Commit / events ---------- */
-  function commit(){sortRows();save(rows);renderTable();drawChart();renderKPI();}
+  function commit(){sortRows();save(rows);renderTable();drawChart();}
   function toast(m){const t=$("toast"); if(!t) return; t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1800);}
 
   function refreshInputPreview(){
     const dInput = $("dInput"); if(!dInput) return;
     const d=dInput.value; if(!d) return;
-    renderBand(d);renderPosGrid(d);
+    renderBand(d);renderPosGrid(d);renderAstroToday(d);
   }
 
   /* ---------- Init ---------- */
@@ -886,8 +522,11 @@ import Footer from '../components/Footer.astro';
     if (dInput) {
       dInput.value=new Date().toISOString().slice(0,10);
     }
-    
+    const nDateEl = $("nDate");
+    if (nDateEl && !nDateEl.value) nDateEl.value=new Date().toISOString().slice(0,10);
+
     refreshInputPreview();
+    renderNatal();
     commit();
 
     const todayBtn = $("todayBtn");
@@ -900,6 +539,11 @@ import Footer from '../components/Footer.astro';
       };
     }
 
+    if(dInput) dInput.onchange=refreshInputPreview;
+    if(nDateEl) nDateEl.onchange=renderNatal;
+    const nTimeEl = $("nTime");
+    if(nTimeEl) nTimeEl.onchange=renderNatal;
+
     const saveBtn = $("saveBtn");
     if(saveBtn) {
       saveBtn.onclick=()=>{
@@ -910,13 +554,13 @@ import Footer from '../components/Footer.astro';
         const nInput = $("nInput");
         const pv=pInput?pInput.value:"";
         const close=pv===""?null:parseFloat(pv);
-        const src=close==null?"model":(sInput?sInput.value:"aktual");
+        const src=close==null?"manual":(sInput?sInput.value:"aktual");
         const note=nInput?nInput.value.trim():"";
         const pos=positionsFor(date);
         const ex=rows.findIndex(r=>r.date===date);
         const rec={date,close,src,note:note||(ex>=0?rows[ex].note:""),pos};
         if(ex>=0) rows[ex]=rec; else rows.push(rec);
-        commit(); 
+        commit();
         if(pInput) pInput.value="";
         if(nInput) nInput.value="";
         toast(ex>=0?"Data "+date+" diperbarui":"Data "+date+" disimpan");
@@ -944,7 +588,6 @@ import Footer from '../components/Footer.astro';
     window.addEventListener("resize",()=>{drawChart();refreshInputPreview();});
   }
 
-  // Handle load & Astro swapping
   init();
   document.addEventListener('astro:after-swap', () => {
     init();

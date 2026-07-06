@@ -4,961 +4,463 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 ---
 
-<Layout title="Dashboard Harian XAUUSD — Gann · Time · Astro" description="Buku Harian Trader - Gann, Time, and Astrofinancial analytics dashboard.">
-  <!-- Dynamic Font loading for this specific page layout -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-
+<Layout title="XAUUSD — Dashboard Astro-Gann (Auto-update + Live)" description="Dashboard hitung Gann Fan, Gann Box, Square of Nine, Fibo-Gann dan Gann Time XAUUSD — auto-update, tersimpan lokal, plus chart live TradingView.">
   <Header />
 
-  <div class="xau-dashboard-page">
+  <div class="xaug-dashboard-page">
     <div class="wrap">
+      <header>
+        <div class="eyebrow">Trade Plan Mingguan · XAUUSD</div>
+        <h1>Dashboard Astro-Gann — Auto-update &amp; Live</h1>
+        <p class="sub">Ubah pivot / harga → semua level Gann (Fan, Box, Square of 9, Fibo) hitung ulang otomatis &amp; tersimpan. Tab "Live" menampilkan chart TradingView.</p>
+        <div class="disc"><b>Disclaimer:</b> level Gann bergantung asumsi pivot/skala. Probabilitas = heuristik dari posisi harga. <b>Bukan nasihat keuangan.</b></div>
+      </header>
 
-      <div class="hero">
-        <div class="eyebrow">Buku Harian Trader · Gann · Time · Astrofinancial</div>
-        <h1>Dashboard Harian <span class="g">XAUUSD</span></h1>
-        <div class="hbar">
-          <div class="field"><label>Tanggal</label><input id="tgl" type="date"></div>
-          <div class="field"><label>Harga sekarang</label><input id="price" class="price-in mono" type="number" step="0.01" value="4177"></div>
-          <div class="field"><label>Bias hari ini</label>
-            <select id="bias">
-              <option>Netral / Wait</option>
-              <option>Bullish (ikut momentum)</option>
-              <option>Bearish (fade rally)</option>
-            </select>
-          </div>
-          <div class="field"><label>Catatan cepat</label><input id="note" type="text" placeholder="mis. libur AS, tunggu 5–6 Jul" style="width:220px;font-family:'Inter'"></div>
-        </div>
+      <div class="tabs">
+        <button class="tab on" id="tabCalc">Dashboard hitung</button>
+        <button class="tab" id="tabLive">Live TradingView</button>
       </div>
 
-      <div class="grid">
-        <!-- LEFT: Gann engine -->
-        <div>
-          <div class="card">
-            <h2><span class="num">01</span> Mesin Level Gann (Square of Nine)</h2>
-            <p class="hint">Masukkan <b>pivot</b> (level 360°) and <b>langkah per 90°</b> dari chart Anda. Tangga level dibuat otomatis, jarak ke harga dihitung, level terdekat &amp; "garis mati" ditandai.</p>
-            <div class="engine-row">
-              <div class="field"><label>Pivot (360°)</label><input id="pivot" type="number" step="0.01" value="4126.63"></div>
-              <div class="field"><label>Langkah / 90°</label><input id="step" type="number" step="0.01" value="20.2"></div>
-              <div class="field"><label>Garis mati (opsional)</label><input id="deadline" type="number" step="0.01" placeholder="mis. 4188"></div>
-            </div>
-            <div id="ladder" class="ladder"></div>
-          </div>
+      <section class="view on" id="viewCalc">
+        <div class="inputs">
+          <div><label>Pivot low</label><input type="number" id="iPivot" step="1"></div>
+          <div><label>Swing high</label><input type="number" id="iHigh" step="1"></div>
+          <div><label>Skala 1x1 H4</label><input type="number" id="iH4" step="1"></div>
+          <div><label>Skala 1x1 H1</label><input type="number" id="iH1" step="0.5"></div>
+          <div><label>Harga sekarang</label><input type="number" id="iPrice" step="0.01"></div>
+          <div><label>Tanggal</label><input type="date" id="iDate"></div>
+        </div>
+        <div class="btnrow">
+          <button class="btn btn-gold" id="save">Simpan harga hari ini</button>
+          <button class="btn btn-ghost" id="recalc">Hitung ulang level</button>
+          <button class="btn btn-ghost" id="reset">Reset</button>
         </div>
 
-        <!-- RIGHT: plan + astro -->
-        <div>
-          <div class="card">
-            <h2><span class="num">02</span> Rencana Hari Ini</h2>
-            <p class="hint">Tiga skenario. Edit bebas — tersimpan otomatis.</p>
-            <div class="planbox"><span class="tag a">A · LONG</span>
-              <textarea id="planA">Ikut momentum bila close H1 tahan &gt; 4188. Target 4208 → 4229. SL &lt; 4167. Ukuran kecil (libur AS).</textarea></div>
-            <div class="planbox"><span class="tag b">B · SHORT</span>
-              <textarea id="planB">Fade bila tolak di 4181–4195 + candle reversal &amp; close H1 &lt; 4167. Target 4147 → 4127. SL &gt; 4196. Hanya dengan konfirmasi.</textarea></div>
-            <div class="planbox"><span class="tag c">C · WAIT</span>
-              <textarea id="planC">Paling mungkin hari ini: range 4147–4188. Tahan diri, simpan modal untuk jendela 5–6 Juli / Senin 6 Juli. Jangan revenge trade.</textarea></div>
-          </div>
+        <div class="cards" id="cards"></div>
 
-          <div class="card">
-            <h2><span class="num">03</span> Waktu &amp; Astro</h2>
-            <p class="hint">Penanda waktu pekan ini (menandai <i>kapan</i> &amp; <i>intensitas</i>, bukan arah).</p>
-            <div class="chips">
-              <div class="chip">Mars ☌ Uranus <b>3 Jul · persis</b></div>
-              <div class="chip">Matahari □ Saturnus <b>5–6 Jul</b></div>
-              <div class="chip">AS kembali <b>6 Jul</b></div>
-              <div class="chip">Deadline MOU <b>~mid-Agu</b></div>
-            </div>
-            <textarea id="timenote">Jendela pivot intraday: 11:00–13:00 &amp; 19:00–21:00 WIB. Reversal utama diincar 5–6 Juli. Keputusan berbasis close M15/H1 di level.</textarea>
-          </div>
+        <h2><span class="ic">◆</span> Riwayat harga (tersimpan)</h2>
+        <figure><canvas id="hist"></canvas><figcaption id="histcap">Isi harga tiap hari untuk membangun grafik.</figcaption></figure>
+
+        <h2><span class="ic">◆</span> Probabilitas skenario</h2>
+        <div class="scn" id="scn"></div>
+
+        <h2><span class="ic">◆</span> Tabel konfluensi level (auto)</h2>
+        <div class="table-wrap">
+          <table><thead><tr><th>Harga</th><th>Gann Fan</th><th>Gann Box</th><th>Fibo-Gann</th><th>Square of 9</th><th>Peran</th></tr></thead><tbody id="confl"></tbody></table>
         </div>
-      </div>
 
-      <!-- Journal -->
-      <div class="card">
-        <h2><span class="num">04</span> Jurnal Trade &amp; P/L</h2>
-        <p class="hint">Catat tiap transaksi. Total P/L, win-rate, dan kurva ekuitas dihitung otomatis.</p>
-        <table id="jtable">
-          <thead>
-            <tr>
-              <th>Tgl</th>
-              <th>Arah</th>
-              <th>Entry</th>
-              <th>SL</th>
-              <th>TP</th>
-              <th>Hasil ($)</th>
-              <th>Catatan</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="jbody"></tbody>
-        </table>
-        <button class="btn addrow" onclick="addRow()">+ Tambah baris</button>
-        <div class="stat">
-          <div>Total P/L<b id="pl" class="mono">$0.00</b></div>
-          <div>Jumlah trade<b id="ntr" class="mono">0</b></div>
-          <div>Win rate<b id="wr" class="mono">–</b></div>
-          <div>Menang / Kalah<b id="wl" class="mono">0 / 0</b></div>
+        <h2><span class="ic">◆</span> Gann Fan — H4 &amp; H1 (auto)</h2>
+        <figure><div id="fan"></div><figcaption>Garis 1x1 (emas) sudut utama; ujung kanan = 100/50/25/12,5% swing.</figcaption></figure>
+
+        <h2><span class="ic">◆</span> Gann Box &amp; Fibo-Gann (auto)</h2>
+        <figure><div id="box"></div><figcaption>Pembagian 1/8 &amp; Fibo-Gann 25/30/50/75/100%. Marker emas = harga sekarang.</figcaption></figure>
+
+        <h2><span class="ic">◆</span> Square of Nine (auto dari pivot)</h2>
+        <figure><div id="wheel"></div><figcaption>Cardinal cross (90°) = S/R terkuat; nilai dihitung dari pivot.</figcaption></figure>
+        <div class="table-wrap">
+          <table><thead><tr><th>Rotasi</th><th>Tipe</th><th>Harga</th></tr></thead><tbody id="sq9"></tbody></table>
         </div>
-        <canvas id="equity" width="1000" height="120"></canvas>
-      </div>
 
-      <div class="actions">
-        <button class="btn gold" onclick="saveAll(true)">Simpan</button>
-        <button class="btn" onclick="exportJSON()">Ekspor data (JSON)</button>
-        <label class="btn" style="display:inline-block">Impor data<input id="imp" type="file" accept="application/json" style="display:none" onchange="importJSON(event)"></label>
-        <button class="btn" onclick="resetAll()">Reset</button>
-        <span id="saved" class="saved">✓ tersimpan</span>
-      </div>
+        <h2><span class="ic">◷</span> Sesi pasar dunia (WIB)</h2>
+        <div class="table-wrap">
+          <table><thead><tr><th>Sesi</th><th>Lokal</th><th>WIB</th></tr></thead><tbody>
+            <tr><td>Sydney</td><td>07–16 AEST</td><td class="num">04:00–13:00</td></tr>
+            <tr><td>Tokyo</td><td>09–18 JST</td><td class="num">07:00–16:00</td></tr>
+            <tr><td>London</td><td>08–17 BST</td><td class="num">14:00–23:00</td></tr>
+            <tr><td>New York</td><td>08–17 EDT</td><td class="num">19:00–04:00</td></tr>
+            <tr class="now-row"><td>Overlap London–NY (emas paling aktif)</td><td>08–12 EDT</td><td class="num">19:00–23:00</td></tr>
+          </tbody></table>
+        </div>
 
-      <p class="disc">Dashboard ini alat bantu edukasi untuk keputusan Anda sendiri — <b>bukan nasihat keuangan</b>. Semua data tersimpan lokal di browser Anda (localStorage) dan tidak dikirim ke mana pun. Gunakan tombol "Ekspor data" untuk mencadangkan. Level, waktu, dan probabilitas bersifat perkiraan yang dapat meleset; astrologi dipakai sebagai kerangka simbolik/timing, bukan penentu hasil. Trading emas berisiko tinggi.</p>
+        <h2><span class="ic">◷</span> Gann Time — proyeksi putaran intraday (WIB)</h2>
+        <div class="inputs" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
+          <div><label>Pivot (waktu swing)</label><input type="datetime-local" id="gtPivot"></div>
+          <div><label>Timeframe</label><select id="gtTF">
+            <option value="15">M15</option><option value="30">M30</option>
+            <option value="60" selected>H1</option><option value="240">H4</option>
+            <option value="1440">Harian (D1)</option><option value="10080">Mingguan (W1)</option><option value="43200">Bulanan (MN)</option>
+          </select></div>
+          <div><label>Skala 1x1 (poin/bar)</label><input type="number" id="gtScale" value="8" step="1"></div>
+          <div><label>Jendela (bar)</label><input type="number" id="gtWin" value="50" step="5"></div>
+        </div>
+        <p class="sub"><b>Cara baca:</b> "bar" = jumlah bar dari pivot (H1: 1 bar=1 jam · Harian: 1 bar=1 hari · Mingguan: 1 minggu, dst). Kolom Waktu = kapan siklus itu jatuh (WIB). Tanda <b>★</b> = saat siklus waktu bertepatan dengan harga (secara geometri) menyentuh garis Gann/Sq9 → kandidat putaran terkuat. Pilih timeframe M15→Bulanan di atas.</p>
+        <figure><div id="gtStrip"></div><figcaption>Garis vertikal = siklus waktu Gann. Segitiga teal = persilangan geometri (garis Gann menyentuh level). ★ emas = konfluensi price×time (siklus waktu bertemu persilangan). Pita = power window 19–23 WIB.</figcaption></figure>
+        <div class="table-wrap">
+          <table><thead><tr><th>Bar</th><th>≈ Sudut</th><th>Waktu WIB</th><th>Sesi</th><th>Kekuatan</th><th>Konfluensi price×time</th></tr></thead><tbody id="gtTable"></tbody></table>
+        </div>
+        <p class="sub" style="margin-top:12px">Persilangan geometri (garis Gann 1x1/1x2 menyentuh level Box/Sq9) — titik <b>price × time</b> dalam jendela:</p>
+        <div class="table-wrap">
+          <table><thead><tr><th>Waktu WIB</th><th>Bar</th><th>Garis × Level</th><th>Harga</th><th>Sesi</th></tr></thead><tbody id="gtCross"></tbody></table>
+        </div>
+        <p class="sub" style="margin-top:12px">Baris ★ = siklus waktu Gann bertemu titik price×time (garis Gann/Sq9) — kandidat putaran terkuat. Level dari input Pivot/Swing; skala 1x1 dari input "Skala" (ganti timeframe → skala menyesuaikan otomatis, tetap bisa Anda ubah). Semua waktu dihitung otomatis dari pivot &amp; timeframe. Bukan nasihat keuangan.</p>
+
+        <div class="scn" style="margin-top:16px" id="exec"></div>
+        <div class="final" id="final"></div>
+      </section>
+
+      <section class="view" id="viewLive">
+        <div class="live-note">Chart live TradingView (OANDA:XAUUSD). Butuh internet. Ganti timeframe H1/H4 di toolbar chart.</div>
+        <figure style="padding:0;overflow:hidden">
+          <div class="tradingview-widget-container tv-wrap"><div id="tvchart" style="height:100%"></div></div>
+        </figure>
+      </section>
     </div>
+    <div class="toast" id="toast"></div>
   </div>
 
   <Footer />
 </Layout>
 
 <style is:global>
-  /* Containerized layout matching user's CSS definitions and using electric blue dark theme */
-  .xau-dashboard-page {
-    --ink: #030712; 
-    --panel: #0b0f19; 
-    --panel2: #111827; 
-    --line: rgba(255, 255, 255, 0.08);
-    --gold: #3b82f6; 
-    --goldsoft: #60a5fa; 
-    --cream: #f9fafb;
-    --muted: #9ca3af; 
-    --green: #10b981; 
-    --greenbg: rgba(16, 185, 129, 0.1); 
-    --red: #ef4444; 
-    --redbg: rgba(239, 68, 68, 0.1);
-    --blue: #3b82f6;
-    
-    background:
-       radial-gradient(1200px 600px at 80% -10%, #0d1e3d 0%, transparent 60%),
-       linear-gradient(180deg,#030712 0%, #090e1a 100%);
-    background-color: #030712;
-    color: var(--cream);
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 15px;
-    line-height: 1.55;
-    -webkit-font-smoothing: antialiased;
-    min-height: 100vh;
-    position: relative;
-    z-index: 10;
-  }
-  
-  .xau-dashboard-page * { 
-    box-sizing: border-box; 
-  }
-  
-  .xau-dashboard-page .wrap { 
-    max-width: 1080px; 
-    margin: 0 auto; 
-    padding: 22px 18px 60px; 
-  }
-  
-  .xau-dashboard-page h1,
-  .xau-dashboard-page h2,
-  .xau-dashboard-page h3 { 
-    font-family: 'Cormorant Garamond', serif; 
-    font-weight: 600; 
-    letter-spacing: .3px; 
-    margin: 0; 
-  }
-  
-  .xau-dashboard-page .mono { 
-    font-family: 'JetBrains Mono', monospace; 
-  }
-  
-  .xau-dashboard-page .eyebrow { 
-    font-family: 'JetBrains Mono', monospace; 
-    font-size: 11px; 
-    letter-spacing: 2.5px; 
-    text-transform: uppercase; 
-    color: var(--gold); 
-  }
-  
-  /* Hero section */
-  .xau-dashboard-page .hero { 
-    border: 1px solid var(--line); 
-    border-radius: 16px; 
-    background: linear-gradient(180deg, var(--panel) 0%, #090e1a 100%);
-    padding: 20px 22px; 
-    margin-bottom: 18px; 
-    position: relative; 
-    overflow: hidden; 
-  }
-  
-  .xau-dashboard-page .hero:before { 
-    content: ""; 
-    position: absolute; 
-    inset: 0; 
-    background-image:
-      linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
-    background-size: 34px 34px; 
-    opacity: .12; 
-    pointer-events: none;
-    -webkit-mask: radial-gradient(400px 220px at 85% 0%,#000,transparent 75%); 
-    mask: radial-gradient(400px 220px at 85% 0%,#000,transparent 75%); 
-  }
-  
-  .xau-dashboard-page .hero h1 { 
-    font-size: 34px; 
-    line-height: 1.05; 
-    color: var(--cream); 
-  }
-  
-  .xau-dashboard-page .hero h1 .g { 
-    color: var(--gold); 
-  }
-  
-  .xau-dashboard-page .hbar { 
-    display: flex; 
-    flex-wrap: wrap; 
-    gap: 14px; 
-    align-items: flex-end; 
-    justify-content: space-between; 
-    margin-top: 14px; 
-    position: relative; 
-  }
-  
-  .xau-dashboard-page .field { 
-    display: flex; 
-    flex-direction: column; 
-    gap: 4px; 
-  }
-  
-  .xau-dashboard-page .field label { 
-    font-size: 11px; 
-    letter-spacing: 1.5px; 
-    text-transform: uppercase; 
-    color: var(--muted); 
-    font-family: 'JetBrains Mono', monospace; 
-  }
-  
-  .xau-dashboard-page input,
-  .xau-dashboard-page select,
-  .xau-dashboard-page textarea { 
-    background: #030712; 
-    border: 1px solid var(--line); 
-    color: var(--cream); 
-    border-radius: 9px;
-    padding: 9px 11px; 
-    font-family: 'JetBrains Mono', monospace; 
-    font-size: 14px; 
-    outline: none; 
-  }
-  
-  .xau-dashboard-page input:focus,
-  .xau-dashboard-page select:focus,
-  .xau-dashboard-page textarea:focus { 
-    border-color: var(--gold); 
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.18); 
-  }
-  
-  .xau-dashboard-page textarea { 
-    font-family: 'Inter', sans-serif; 
-    line-height: 1.5; 
-    resize: vertical; 
-    min-height: 74px; 
-    width: 100%; 
-  }
-  
-  .xau-dashboard-page .price-in { 
-    font-size: 22px; 
-    font-weight: 600; 
-    width: 140px; 
-    color: var(--gold); 
-  }
-  
-  .xau-dashboard-page .grid { 
-    display: grid; 
-    grid-template-columns: 1.15fr .85fr; 
-    gap: 18px; 
-  }
-  
-  @media(max-width: 840px) { 
-    .xau-dashboard-page .grid { 
-      grid-template-columns: 1fr; 
-    } 
-    .xau-dashboard-page .hero h1 { 
-      font-size: 27px; 
-    } 
-  }
-  
-  .xau-dashboard-page .card { 
-    border: 1px solid var(--line); 
-    border-radius: 14px; 
-    background: var(--panel); 
-    padding: 18px 18px 16px; 
-    margin-bottom: 18px; 
-  }
-  
-  .xau-dashboard-page .card h2 { 
-    font-size: 22px; 
-    color: var(--cream); 
-    display: flex; 
-    align-items: center; 
-    gap: 10px; 
-  }
-  
-  .xau-dashboard-page .card h2 .num { 
-    font-family: 'JetBrains Mono', monospace; 
-    font-size: 12px; 
-    color: var(--gold); 
-    border: 1px solid var(--gold);
-    border-radius: 6px; 
-    padding: 2px 7px; 
-    font-weight: 600; 
-  }
-  
-  .xau-dashboard-page .hint { 
-    color: var(--muted); 
-    font-size: 12.5px; 
-    margin: 2px 0 14px; 
-  }
-  
-  /* ladder */
-  .xau-dashboard-page .ladder { 
-    display: flex; 
-    flex-direction: column; 
-    gap: 4px; 
-  }
-  
-  .xau-dashboard-page .lv { 
-    display: grid; 
-    grid-template-columns: 64px 1fr auto; 
-    align-items: center; 
-    gap: 10px; 
-    padding: 7px 12px; 
-    border-radius: 9px;
-    border: 1px solid transparent; 
-    background: #030712; 
-  }
-  
-  .xau-dashboard-page .lv .deg { 
-    font-family: 'JetBrains Mono', monospace; 
-    font-size: 11px; 
-    color: var(--muted); 
-    text-align: center; 
-  }
-  
-  .xau-dashboard-page .lv .val { 
-    font-family: 'JetBrains Mono', monospace; 
-    font-size: 16px; 
-    font-weight: 600; 
-  }
-  
-  .xau-dashboard-page .lv .dist { 
-    font-family: 'JetBrains Mono', monospace; 
-    font-size: 12px; 
-    color: var(--muted); 
-    justify-self: end; 
-  }
-  
-  .xau-dashboard-page .lv.res { 
-    background: linear-gradient(90deg, rgba(239, 68, 68, 0.14), rgba(239, 68, 68, 0.04)); 
-    border-color: rgba(239, 68, 68, 0.3); 
-  }
-  
-  .xau-dashboard-page .lv.res .val { 
-    color: var(--red); 
-  }
-  
-  .xau-dashboard-page .lv.sup { 
-    background: linear-gradient(90deg, rgba(16, 185, 129, 0.14), rgba(16, 185, 129, 0.04)); 
-    border-color: rgba(16, 185, 129, 0.3); 
-  }
-  
-  .xau-dashboard-page .lv.sup .val { 
-    color: var(--green); 
-  }
-  
-  .xau-dashboard-page .lv.now { 
-    background: linear-gradient(90deg, rgba(59, 130, 246, 0.9), rgba(59, 130, 246, 0.55)); 
-    border-color: var(--gold); 
-  }
-  
-  .xau-dashboard-page .lv.now .deg,
-  .xau-dashboard-page .lv.now .val,
-  .xau-dashboard-page .lv.now .dist { 
-    color: #030712; 
-    font-weight: 700; 
-  }
-  
-  .xau-dashboard-page .lv.near { 
-    outline: 2px dashed rgba(255, 255, 255, 0.25); 
-  }
-  
-  .xau-dashboard-page .pill { 
-    font-family: 'JetBrains Mono', monospace; 
-    font-size: 9.5px; 
-    letter-spacing: 1px; 
-    padding: 2px 6px; 
-    border-radius: 5px; 
-    margin-left: 8px; 
-    vertical-align: middle; 
-  }
-  
-  .xau-dashboard-page .pill.k { 
-    background: var(--red); 
-    color: #fff; 
-  }
-  
-  .xau-dashboard-page .engine-row { 
-    display: flex; 
-    gap: 12px; 
-    flex-wrap: wrap; 
-    margin-bottom: 12px; 
-  }
-  
-  .xau-dashboard-page .engine-row .field input { 
-    width: 120px; 
-  }
-  
-  /* plan tags */
-  .xau-dashboard-page .planbox { 
-    margin-bottom: 12px; 
-  }
-  
-  .xau-dashboard-page .planbox .tag { 
-    display: inline-block; 
-    font-family: 'JetBrains Mono', monospace; 
-    font-size: 11px; 
-    letter-spacing: 1px;
-    padding: 3px 9px; 
-    border-radius: 6px; 
-    margin-bottom: 6px; 
-    font-weight: 600; 
-  }
-  
-  .xau-dashboard-page .tag.a { 
-    background: var(--greenbg); 
-    color: var(--green); 
-    border: 1px solid rgba(16, 185, 129, 0.4); 
-  }
-  
-  .xau-dashboard-page .tag.b { 
-    background: var(--redbg); 
-    color: var(--red); 
-    border: 1px solid rgba(239, 68, 68, 0.4); 
-  }
-  
-  .xau-dashboard-page .tag.c { 
-    background: #030712; 
-    color: var(--blue); 
-    border: 1px solid rgba(59, 130, 246, 0.4); 
-  }
-  
-  /* astro chips */
-  .xau-dashboard-page .chips { 
-    display: flex; 
-    flex-wrap: wrap; 
-    gap: 8px; 
-    margin-bottom: 12px; 
-  }
-  
-  .xau-dashboard-page .chip { 
-    border: 1px solid var(--line); 
-    background: #030712; 
-    border-radius: 20px; 
-    padding: 6px 12px; 
-    font-size: 12.5px; 
-    display: flex; 
-    gap: 7px; 
-    align-items: center; 
-  }
-  
-  .xau-dashboard-page .chip b { 
-    color: var(--gold); 
-    font-family: 'JetBrains Mono', monospace; 
-    font-size: 11px; 
-  }
-  
-  /* journal table */
-  .xau-dashboard-page table { 
-    width: 100%; 
-    border-collapse: collapse; 
-    font-size: 13px; 
-  }
-  
-  .xau-dashboard-page th,
-  .xau-dashboard-page td { 
-    padding: 7px 8px; 
-    border-bottom: 1px solid var(--line); 
-    text-align: left; 
-  }
-  
-  .xau-dashboard-page th { 
-    font-family: 'JetBrains Mono', monospace; 
-    font-size: 10.5px; 
-    letter-spacing: 1px; 
-    text-transform: uppercase; 
-    color: var(--muted); 
-    font-weight: 600; 
-  }
-  
-  .xau-dashboard-page td .mono { 
-    font-size: 13px; 
-  }
-  
-  .xau-dashboard-page td input,
-  .xau-dashboard-page td select { 
-    padding: 5px 6px; 
-    font-size: 12.5px; 
-    width: 100%; 
-  }
-  
-  .xau-dashboard-page .win { 
-    color: var(--green); 
-  }
-  
-  .xau-dashboard-page .loss { 
-    color: var(--red); 
-  }
-  
-  .xau-dashboard-page .del { 
-    background: none; 
-    border: none; 
-    color: var(--muted); 
-    cursor: pointer; 
-    font-size: 15px; 
-    padding: 0 4px; 
-  }
-  
-  .xau-dashboard-page .del:hover { 
-    color: var(--red); 
-  }
-  
-  .xau-dashboard-page .stat { 
-    display: flex; 
-    gap: 18px; 
-    flex-wrap: wrap; 
-    margin: 12px 0 6px; 
-  }
-  
-  .xau-dashboard-page .stat div { 
-    font-family: 'JetBrains Mono', monospace; 
-    font-size: 13px; 
-    color: var(--muted); 
-  }
-  
-  .xau-dashboard-page .stat b { 
-    font-size: 19px; 
-    color: var(--cream); 
-    display: block; 
-  }
-  
-  .xau-dashboard-page .btn { 
-    cursor: pointer; 
-    border: 1px solid var(--line); 
-    background: #030712; 
-    color: var(--cream); 
-    border-radius: 9px;
-    padding: 8px 14px; 
-    font-family: 'JetBrains Mono', monospace; 
-    font-size: 12.5px; 
-    transition: .15s; 
-  }
-  
-  .xau-dashboard-page .btn:hover { 
-    border-color: var(--gold); 
-    color: var(--gold); 
-  }
-  
-  .xau-dashboard-page .btn.gold { 
-    background: var(--gold); 
-    color: #030712; 
-    border-color: var(--gold); 
-    font-weight: 600; 
-  }
-  
-  .xau-dashboard-page .btn.gold:hover { 
-    background: #5a9eff; 
-  }
-  
-  .xau-dashboard-page .actions { 
-    display: flex; 
-    gap: 10px; 
-    flex-wrap: wrap; 
-    align-items: center; 
-    margin-top: 6px; 
-  }
-  
-  .xau-dashboard-page .saved { 
-    font-family: 'JetBrains Mono', monospace; 
-    font-size: 11px; 
-    color: var(--green); 
-    opacity: 0; 
-  }
-  
-  .xau-dashboard-page .saved.show { 
-    opacity: 1; 
-    transition: opacity .2s; 
-  }
-  
-  .xau-dashboard-page .disc { 
-    color: var(--muted); 
-    font-size: 11.5px; 
-    line-height: 1.5; 
-    border-top: 1px solid var(--line); 
-    margin-top: 26px; 
-    padding-top: 14px; 
-  }
-  
-  .xau-dashboard-page canvas { 
-    width: 100%; 
-    height: 120px; 
-    display: block; 
-    margin-top: 8px; 
-    background: #030712; 
-    border: 1px solid var(--line); 
-    border-radius: 10px; 
-  }
-  
-  .xau-dashboard-page .addrow { 
-    margin-top: 8px; 
+  .xaug-dashboard-page {
+    --bg2:#161B3E;--panel:#1C2350;--panel2:#232B60;--ivory:#EDE8DA;--muted:#9AA0C8;
+    --line:#33396E;--gold:#3b82f6;--goldS:#60a5fa;--teal:#5FB0B7;--blue:#6AA9E9;--crim:#C7566A;--green:#7FBF8A;
+    background:radial-gradient(1000px 500px at 85% -10%,rgba(59,130,246,.10),transparent 60%),
+      radial-gradient(800px 450px at 8% 0%,rgba(95,176,183,.08),transparent 55%),#030712;
+    color:var(--ivory);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5;padding:24px;
+    min-height:100vh;position:relative;z-index:10;
+  }
+  .xaug-dashboard-page *{box-sizing:border-box}
+  .xaug-dashboard-page .wrap{max-width:1000px;margin:0 auto}
+  .xaug-dashboard-page h1,.xaug-dashboard-page h2,.xaug-dashboard-page h3{font-family:"Iowan Old Style",Palatino,Georgia,serif;font-weight:600;margin:0}
+  .xaug-dashboard-page h1{font-size:26px} .xaug-dashboard-page h2{font-size:18px;margin:26px 0 10px;color:var(--goldS)} .xaug-dashboard-page h2 .ic{color:var(--gold)}
+  .xaug-dashboard-page .num{font-variant-numeric:tabular-nums}
+  .xaug-dashboard-page .eyebrow{letter-spacing:.26em;text-transform:uppercase;font-size:11px;color:var(--gold);margin-bottom:6px}
+  .xaug-dashboard-page .sub{color:var(--muted);font-size:13.5px;margin-top:6px}
+  .xaug-dashboard-page .disc{margin-top:14px;border:1px solid var(--line);border-left:3px solid var(--gold);
+    background:rgba(59,130,246,.06);border-radius:8px;padding:11px 15px;font-size:12.5px;color:#cfd2ec}
+  .xaug-dashboard-page .disc b{color:var(--goldS)}
+  .xaug-dashboard-page .tabs{display:flex;gap:8px;margin:16px 0 4px}
+  .xaug-dashboard-page .tab{border:1px solid var(--line);background:var(--panel);color:var(--ivory);border-radius:10px;
+    padding:9px 16px;font:600 14px system-ui;cursor:pointer}
+  .xaug-dashboard-page .tab.on{background:linear-gradient(180deg,var(--goldS),var(--gold));color:#04101f;border-color:transparent}
+  .xaug-dashboard-page .view{display:none} .xaug-dashboard-page .view.on{display:block}
+  .xaug-dashboard-page .inputs{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;background:var(--panel);
+    border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:8px}
+  .xaug-dashboard-page label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
+  .xaug-dashboard-page input,.xaug-dashboard-page select{width:100%;background:var(--bg2);border:1px solid var(--line);color:var(--ivory);border-radius:9px;
+    padding:9px 10px;font-size:14px;font-family:inherit}
+  .xaug-dashboard-page input:focus,.xaug-dashboard-page select:focus{outline:2px solid var(--gold);border-color:var(--gold)}
+  .xaug-dashboard-page .btnrow{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+  .xaug-dashboard-page .btn{border:none;border-radius:10px;font:600 14px system-ui;padding:10px 16px;cursor:pointer}
+  .xaug-dashboard-page .btn-gold{background:linear-gradient(180deg,var(--goldS),var(--gold));color:#04101f}
+  .xaug-dashboard-page .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--ivory)}
+  .xaug-dashboard-page .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:14px}
+  .xaug-dashboard-page .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+  .xaug-dashboard-page .card .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .xaug-dashboard-page .card .v{font-size:21px;font-weight:700;margin-top:3px} .xaug-dashboard-page .card .s{font-size:11px;color:var(--muted);margin-top:2px}
+  .xaug-dashboard-page .v.up{color:var(--green)} .xaug-dashboard-page .v.down{color:var(--crim)} .xaug-dashboard-page .v.gold{color:var(--goldS)}
+  .xaug-dashboard-page .scn{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:6px}
+  @media(max-width:760px){.xaug-dashboard-page .scn{grid-template-columns:1fr}}
+  .xaug-dashboard-page .sc{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .xaug-dashboard-page .sc.bull{border-top:3px solid var(--green)}.xaug-dashboard-page .sc.range{border-top:3px solid var(--goldS)}.xaug-dashboard-page .sc.bear{border-top:3px solid var(--crim)}
+  .xaug-dashboard-page .sc h3{font-size:15px} .xaug-dashboard-page .sc .pct{font-size:28px;font-weight:700;margin:4px 0}
+  .xaug-dashboard-page .bull .pct{color:var(--green)}.xaug-dashboard-page .range .pct{color:var(--goldS)}.xaug-dashboard-page .bear .pct{color:var(--crim)}
+  .xaug-dashboard-page .bar{height:7px;border-radius:4px;background:var(--bg2);overflow:hidden;margin:6px 0 10px}.xaug-dashboard-page .bar>i{display:block;height:100%}
+  .xaug-dashboard-page .bull .bar>i{background:var(--green)}.xaug-dashboard-page .range .bar>i{background:var(--goldS)}.xaug-dashboard-page .bear .bar>i{background:var(--crim)}
+  .xaug-dashboard-page .sc p{font-size:12.5px;color:#d3d7f2;margin:4px 0}
+  .xaug-dashboard-page table{width:100%;border-collapse:collapse;font-size:12.8px;margin-top:8px}
+  .xaug-dashboard-page th,.xaug-dashboard-page td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  .xaug-dashboard-page th{color:var(--goldS);font-size:11px;text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+
+  .xaug-dashboard-page .table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--panel);
+    margin-top: 8px;
+  }
+  .xaug-dashboard-page .table-wrap table {
+    margin-top: 0;
+    min-width: 600px;
+  }
+  .xaug-dashboard-page .table-wrap th, .xaug-dashboard-page .table-wrap td {
+    white-space: nowrap;
+  }
+  .xaug-dashboard-page #sq9, .xaug-dashboard-page #sq9 ~ * table {
+    min-width: unset; /* smaller width tables can scale down */
+  }
+
+  .xaug-dashboard-page .tv-wrap { height: 560px; width: 100%; }
+
+  .xaug-dashboard-page tbody tr:hover td{background:rgba(255,255,255,.03)}
+  .xaug-dashboard-page .tag{font-size:10.5px;padding:2px 8px;border-radius:20px;border:1px solid;white-space:nowrap}
+  .xaug-dashboard-page .t-res{color:var(--crim);border-color:rgba(199,86,106,.5)}.xaug-dashboard-page .t-sup{color:var(--green);border-color:rgba(127,191,138,.5)}
+  .xaug-dashboard-page .t-dec{color:var(--goldS);border-color:rgba(59,130,246,.5)}.xaug-dashboard-page .t-key{color:var(--blue);border-color:rgba(106,169,233,.5)}
+  .xaug-dashboard-page .now-row td{background:rgba(59,130,246,.08)}
+  .xaug-dashboard-page figure{margin:10px 0 0;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 8px 6px}
+  .xaug-dashboard-page figcaption{font-size:11.5px;color:var(--muted);padding:4px 10px 2px}
+  .xaug-dashboard-page svg{width:100%;height:auto;display:block} .xaug-dashboard-page canvas{width:100%;height:230px;display:block}
+  .xaug-dashboard-page .st{fill:#C9CCE8;font:12px system-ui}.xaug-dashboard-page .sm{fill:#8B90B8;font:11px system-ui}
+  .xaug-dashboard-page .sg{fill:#60a5fa;font:12px system-ui;font-weight:600}.xaug-dashboard-page .sh{fill:#93c5fd;font:13px system-ui;font-weight:600}.xaug-dashboard-page .sb{fill:#6AA9E9;font:11px system-ui}
+  .xaug-dashboard-page .final{margin-top:20px;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+  .xaug-dashboard-page .final .d{font-size:24px;font-weight:700;color:var(--goldS);font-family:"Iowan Old Style",Georgia,serif}
+  .xaug-dashboard-page .final p{font-size:13px;color:#d3d7f2;margin:8px 0 0}
+  .xaug-dashboard-page .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--gold);
+    color:#04101f;font-weight:600;font-size:13px;padding:10px 18px;border-radius:10px;opacity:0;pointer-events:none;transition:.25s;z-index:1000}
+  .xaug-dashboard-page .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .xaug-dashboard-page .live-note{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 15px;font-size:12.5px;color:#cfd2ec;margin-top:8px}
+
+  /* Responsive Media Queries */
+  @media (max-width: 768px) {
+    .xaug-dashboard-page {
+      padding: 16px;
+    }
+    .xaug-dashboard-page h1 {
+      font-size: 22px;
+    }
+    .xaug-dashboard-page h2 {
+      font-size: 16px;
+      margin: 20px 0 8px;
+    }
+    .xaug-dashboard-page .eyebrow {
+      font-size: 10px;
+    }
+    .xaug-dashboard-page .inputs {
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      padding: 12px;
+    }
+    .xaug-dashboard-page .cards {
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 8px;
+    }
+    .xaug-dashboard-page .card .v {
+      font-size: 18px;
+    }
+    .xaug-dashboard-page canvas {
+      height: 200px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .xaug-dashboard-page {
+      padding: 12px;
+    }
+    .xaug-dashboard-page h1 {
+      font-size: 20px;
+    }
+    .xaug-dashboard-page .inputs {
+      grid-template-columns: 1fr;
+    }
+    .xaug-dashboard-page .btnrow {
+      flex-direction: column;
+      gap: 8px;
+    }
+    .xaug-dashboard-page .btn {
+      width: 100%;
+      text-align: center;
+      justify-content: center;
+    }
+    .xaug-dashboard-page .cards {
+      grid-template-columns: 1fr 1fr;
+    }
+    .xaug-dashboard-page .tv-wrap {
+      height: 400px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .xaug-dashboard-page .cards {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
 
 <script is:inline>
-  const KEY = "xau_dash_v1";
-  const $ = id => document.getElementById(id);
-  const FIELDS = ["tgl", "price", "bias", "note", "pivot", "step", "deadline", "planA", "planB", "planC", "timenote"];
-  const DEG_UP = [360, 270, 180, 90]; // Degree order as price rises
-  
-  function fmt(n) {
-    return (isFinite(n) ? n : 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  }
+const $=id=>document.getElementById(id);
+const idr=(n,d=0)=>n==null?"—":Number(n).toLocaleString("id-ID",{minimumFractionDigits:d,maximumFractionDigits:d});
 
-  function buildLadder() {
-    const priceInput = $("price");
-    const pivotInput = $("pivot");
-    const stepInput = $("step");
-    const deadInput = $("deadline");
-    if (!priceInput || !pivotInput || !stepInput) return;
+const KEY="xau_astrogann_v2";let mem=null;
+const DEF={pivot:3960,high:4400,h4:25,h1:8,history:[{date:"2026-07-05",price:4175.7}]};
+function load(){try{const r=localStorage.getItem(KEY);if(r)return JSON.parse(r);}catch(e){}return mem?JSON.parse(JSON.stringify(mem)):JSON.parse(JSON.stringify(DEF));}
+function save(s){try{localStorage.setItem(KEY,JSON.stringify(s));}catch(e){mem=s;}}
+let S=load();
 
-    const price = parseFloat(priceInput.value) || 0;
-    const pivot = parseFloat(pivotInput.value) || 0;
-    const step = parseFloat(stepInput.value) || 1;
-    const dead = deadInput ? parseFloat(deadInput.value) : NaN;
-    const L = $("ladder"); 
-    if (!L) return;
-    L.innerHTML = "";
-    
-    let rows = [];
-    for (let k = 6; k >= -6; k--) {
-      const val = pivot + k * step;
-      let deg;
-      if (k >= 0) deg = DEG_UP[k % 4];
-      else deg = DEG_UP[((k % 4) + 4) % 4];
-      rows.push({ k, val, deg });
-    }
-    
-    // Insert current price row
-    rows.push({ now: true, val: price });
-    rows.sort((a, b) => b.val - a.val);
-    
-    // Find closest support & resistance
-    let above = null, below = null;
-    rows.forEach(r => {
-      if (!r.now) {
-        if (r.val >= price) {
-          if (above === null || r.val < above.val) above = r;
-        } else {
-          if (below === null || r.val > below.val) below = r;
-        }
-      }
-    });
+function curPrice(){return S.history.length?S.history[S.history.length-1].price:S.pivot;}
+function sq9(base,deg){return Math.pow(Math.sqrt(base)+deg/180,2);}
+function levels(){
+  const p=S.pivot,h=S.high,rng=h-p;
+  const fib={"0%":p,"25%":p+.25*rng,"30%":p+.30*rng,"50%":p+.5*rng,"75%":p+.75*rng,"100%":h};
+  const box={};for(let k=0;k<=8;k++)box[k]=p+k/8*rng;
+  const sq={};[45,90,135,180,225,270,315,360,630].forEach(dg=>sq[dg]=sq9(p,dg));
+  const fan={"1x1":h,"1x2":p+rng/2,"1x4":p+rng/4,"1x8":p+rng/8};
+  return {p,h,rng,fib,box,sq,fan};
+}
 
-    rows.forEach(r => {
-      const d = document.createElement("div");
-      if (r.now) {
-        d.className = "lv now";
-        d.innerHTML = `<span class="deg">HARGA</span><span class="val">${fmt(r.val)}</span><span class="dist">◄ sekarang</span>`;
-      } else {
-        const isRes = r.val > price;
-        d.className = "lv " + (isRes ? "res" : "sup");
-        if ((above && r.val === above.val) || (below && r.val === below.val)) d.className += " near";
-        const diff = (r.val - price);
-        const dk = (dead && Math.abs(r.val - dead) < 0.01) ? `<span class="pill k">GARIS MATI</span>` : "";
-        d.innerHTML = `<span class="deg">${r.deg}°</span><span class="val">${fmt(r.val)}${dk}</span>` +
-                      `<span class="dist">${diff > 0 ? '+' : ''}${diff.toFixed(1)}</span>`;
-      }
-      L.appendChild(d);
-    });
-  }
+function fanPanel(label,scale,yTop,yBot){
+  const p=S.pivot,h=S.high,x0=110,x1=780;const Tmax=(h-p)/scale;
+  const X=t=>x0+t/Tmax*(x1-x0), Y=v=>yBot-(v-p)/(h-p)*(yBot-yTop);
+  let s=`<text class="sh" x="110" y="${yTop-16}">${label} · 1x1 = ${scale} USD/bar · pivot ${idr(p)}</text>`;
+  for(let k=0;k<=4;k++){const v=p+k/4*(h-p),y=Y(v);
+    s+=`<line x1="${x0}" y1="${y}" x2="${x1}" y2="${y}" stroke="${k==0||k==4?'#33396E':'#262b52'}"/>`;
+    s+=`<text class="sm" x="100" y="${y+4}" text-anchor="end">${idr(v)}</text>`;}
+  s+=`<line x1="${x0}" y1="${yTop}" x2="${x0}" y2="${yBot}" stroke="#33396E"/>`;
+  const lines=[["2x1",2*scale,"#8A8FB0",1],["1x1",scale,"#60a5fa",2],["1x2",scale/2,"#8A8FB0",1],["1x4",scale/4,"#8A8FB0",1],["1x8",scale/8,"#8A8FB0",1]];
+  lines.forEach(L=>{const slope=L[1];let ex,ey,pr=p+slope*Tmax;
+    if(pr>h){const tc=(h-p)/slope;ex=X(tc);ey=yTop;}else{ex=x1;ey=Y(pr);}
+    s+=`<line x1="${x0}" y1="${yBot}" x2="${ex.toFixed(1)}" y2="${ey.toFixed(1)}" stroke="${L[2]}" stroke-width="${L[3]}"/>`;
+    s+=`<text class="${L[0]=='1x1'?'sg':'sm'}" x="${(ex>=x1-2?786:ex+6).toFixed(0)}" y="${(ey+4).toFixed(1)}">${L[0]}</text>`;});
+  const cp=curPrice();if(cp>=p&&cp<=h){const y=Y(cp);
+    s+=`<line x1="${x0}" y1="${y}" x2="${x1}" y2="${y}" stroke="#6AA9E9" stroke-width="1" stroke-dasharray="4 3"/>`;
+    s+=`<text class="sb" x="${x0+6}" y="${y-4}">now ${idr(cp,1)}</text>`;}
+  s+=`<circle cx="${x0}" cy="${yBot}" r="3" fill="#60a5fa"/>`;
+  s+=`<text class="sm" x="${x0}" y="${yBot+16}" text-anchor="middle">0</text><text class="sm" x="${x1}" y="${yBot+16}" text-anchor="middle">${Tmax.toFixed(0)} bar</text>`;
+  return s;
+}
+function drawFan(){$("fan").innerHTML=`<svg viewBox="0 0 900 620" role="img" aria-label="Gann fan XAUUSD">${fanPanel("H4",S.h4,60,280)}${fanPanel("H1",S.h1,360,580)}</svg>`;}
+function drawBox(){
+  const L=levels(),p=S.pivot,h=S.high;const x0=140,x1=780,yT=60,yB=360;
+  const Y=v=>yB-(v-p)/(h-p)*(yB-yT);const cp=curPrice();
+  let s=`<svg viewBox="0 0 900 400" role="img" aria-label="Gann box XAUUSD">`;
+  s+=`<rect x="${x0}" y="${yT}" width="${x1-x0}" height="${yB-yT}" fill="none" stroke="#33396E"/>`;
+  s+=`<rect x="${x0}" y="${Y((p+h)/2)}" width="${x1-x0}" height="${(yB-Y((p+h)/2)).toFixed(1)}" fill="rgba(95,176,183,.06)"/>`;
+  s+=`<rect x="${x0}" y="${yT}" width="${x1-x0}" height="${(Y((p+h)/2)-yT).toFixed(1)}" fill="rgba(59,130,246,.05)"/>`;
+  for(let k=0;k<=8;k++){const v=L.box[k],y=Y(v),mid=k==4;
+    s+=`<line x1="${x0}" y1="${y}" x2="${x1}" y2="${y}" stroke="${mid?'#60a5fa':(k%8==0?'#33396E':'#262b52')}" stroke-width="${mid?1.5:1}"/>`;
+    s+=`<text class="${mid?'sg':'sm'}" x="786" y="${y+4}">${idr(v)} · ${k}/8</text>`;}
+  Object.entries(L.fib).forEach(([k,v])=>{const y=Y(v);s+=`<text class="sm" x="${x0-8}" y="${y+4}" text-anchor="end">${k}</text>`;});
+  s+=`<text class="sm" x="${x0-8}" y="${yT-6}" text-anchor="end">Fibo</text>`;
+  if(cp>=p&&cp<=h){const y=Y(cp);s+=`<circle cx="${(x0+(x1-x0)*0.72).toFixed(0)}" cy="${y}" r="4" fill="#60a5fa"/><text class="sb" x="${(x0+(x1-x0)*0.72+8).toFixed(0)}" y="${y+4}">now ${idr(cp,1)}</text>`;}
+  s+=`</svg>`;$("box").innerHTML=s;
+}
+function drawWheel(){
+  const p=S.pivot,val=dg=>idr(sq9(p,dg));
+  const cx=300,cy=240,r=175,rt=205,d=r*0.7071,dl=rt*0.7071;
+  const g=(x,y,t,c,a="middle")=>`<text class="${c}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${a}">${t}</text>`;
+  let s=`<svg viewBox="0 0 900 470" role="img" aria-label="Square of Nine">`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#33396E"/><circle cx="${cx}" cy="${cy}" r="117" fill="none" stroke="#262b52"/><circle cx="${cx}" cy="${cy}" r="59" fill="none" stroke="#262b52"/>`;
+  s+=`<line x1="${cx}" y1="${cy-r}" x2="${cx}" y2="${cy+r}" stroke="#60a5fa" stroke-width="1.5"/><line x1="${cx-r}" y1="${cy}" x2="${cx+r}" y2="${cy}" stroke="#60a5fa" stroke-width="1.5"/>`;
+  s+=`<line x1="${cx+d}" y1="${cy-d}" x2="${cx-d}" y2="${cy+d}" stroke="#8A8FB0"/><line x1="${cx-d}" y1="${cy-d}" x2="${cx+d}" y2="${cy+d}" stroke="#8A8FB0"/>`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="4" fill="#60a5fa"/>`+g(cx,cy+22,idr(p)+" · base","sg");
+  s+=g(cx,cy-rt+5,"360° "+val(360),"sg")+g(cx+rt,cy+4,"90° "+val(90),"sg","start")+g(cx,cy+rt,"180° "+val(180),"sg")+g(cx-rt,cy+4,"270° "+val(270),"sg","end");
+  s+=g(cx+dl,cy-dl-6,"45° "+val(45),"sm","start")+g(cx+dl,cy+dl+12,"135° "+val(135),"sm","start")+g(cx-dl,cy+dl+12,"225° "+val(225),"sm","end")+g(cx-dl,cy-dl-6,"315° "+val(315),"sm","end");
+  s+=`<text class="sh" x="560" y="120">Cardinal (S/R terkuat)</text><text class="sm" x="560" y="146">90°·${val(90)}  180°·${val(180)}</text><text class="sm" x="560" y="166">270°·${val(270)}  360°·${val(360)}</text>`;
+  s+=`<text class="st" x="560" y="206">Rotasi lanjut</text><text class="sm" x="560" y="230">630° · ${val(630)}</text>`;
+  s+=`</svg>`;$("wheel").innerHTML=s;
+}
+function drawHist(){
+  const cv=$("hist"),ctx=cv.getContext("2d"),dpr=devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight||230;
+  cv.width=w*dpr;cv.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
+  const pts=S.history.map(r=>({t:Date.parse(r.date),v:r.price})).sort((a,b)=>a.t-b.t);
+  const pL=54,pR=12,pT=12,pB=24,cw=w-pL-pR,ch=h-pT-pB;
+  if(pts.length<1){ctx.fillStyle="#8B90B8";ctx.font="12px system-ui";ctx.fillText("Belum ada data.",pL,h/2);return;}
+  const vs=pts.map(p=>p.v),lo=Math.min(...vs)-20,hi=Math.max(...vs)+20;
+  const X=t=>pL+(pts.length<2?.5:(t-pts[0].t)/((pts[pts.length-1].t-pts[0].t)||1))*cw;
+  const Y=v=>pT+(1-(v-lo)/((hi-lo)||1))*ch;
+  ctx.strokeStyle="#33396E";ctx.fillStyle="#8B90B8";ctx.font="11px system-ui";
+  for(let i=0;i<=4;i++){const v=lo+(hi-lo)*i/4,y=Y(v);ctx.beginPath();ctx.moveTo(pL,y);ctx.lineTo(w-pR,y);ctx.stroke();ctx.fillText(Math.round(v).toLocaleString("id-ID"),4,y+4);}
+  if(pts.length>1){ctx.beginPath();ctx.moveTo(X(pts[0].t),Y(pts[0].v));pts.forEach(p=>ctx.lineTo(X(p.t),Y(p.v)));ctx.strokeStyle="#60a5fa";ctx.lineWidth=2;ctx.stroke();}
+  ctx.fillStyle="#60a5fa";pts.forEach(p=>{ctx.beginPath();ctx.arc(X(p.t),Y(p.v),3,0,7);ctx.fill();});
+  $("histcap").textContent=`${pts.length} titik · terakhir ${idr(pts[pts.length-1].v,1)} USD/oz`;
+}
+function role(v){const L=levels(),cp=curPrice();
+  if(Math.abs(v-cp)<(L.rng*0.02))return['t-dec','Keputusan'];
+  if(v>cp)return['t-res','Resistensi'];return['t-sup','Support'];}
+function render(){
+  const L=levels(),cp=curPrice(),h=S.history;
+  let delta=null;
+  if(h.length>1){const last=h[h.length-1];const ref=h.find(x=>(Date.parse(last.date)-Date.parse(x.date))>=6*864e5)||h[0];if(ref&&ref.price)delta=(last.price-ref.price)/ref.price*100;}
+  const pos=(cp-L.p)/L.rng;
+  const bias=pos>=0.625?"Bullish":pos>=0.5?"Bull ringan":pos<0.25?"Bearish":"Netral";
+  $("cards").innerHTML=`
+    <div class="card"><div class="k">Harga</div><div class="v gold num">${idr(cp,1)}</div><div class="s">USD/oz</div></div>
+    <div class="card"><div class="k">Δ ~mingguan</div><div class="v ${delta==null?'':(delta>=0?'up':'down')} num">${delta==null?'—':(delta>=0?'+':'')+delta.toFixed(1)+'%'}</div><div class="s">dari data tersimpan</div></div>
+    <div class="card"><div class="k">Posisi swing</div><div class="v num">${(pos*100).toFixed(0)}%</div><div class="s">pivot→high</div></div>
+    <div class="card"><div class="k">Bias</div><div class="v gold">${bias}</div><div class="s">acuan 50%/62,5%</div></div>
+    <div class="card"><div class="k">Keputusan</div><div class="v gold">WAIT</div><div class="s">tunggu konfirmasi</div></div>`;
+  let bull=Math.round(Math.max(15,Math.min(60,30+(pos-0.5)*60)));
+  let bear=Math.round(Math.max(15,Math.min(60,30-(pos-0.5)*60)));
+  let rng=100-bull-bear;
+  $("scn").innerHTML=`
+    <div class="sc bull"><h3>Bullish</h3><div class="pct">${bull}%</div><div class="bar"><i style="width:${bull}%"></i></div><p>Terima di atas ${idr(L.box[5])} → ${idr(L.box[6])} / 1x1.</p></div>
+    <div class="sc range"><h3>Range</h3><div class="pct">${rng}%</div><div class="bar"><i style="width:${rng}%"></i></div><p>Kisaran ${idr(L.box[3])}–${idr(L.box[5])}.</p></div>
+    <div class="sc bear"><h3>Bearish</h3><div class="pct">${bear}%</div><div class="bar"><i style="width:${bear}%"></i></div><p>Hilang ${idr(L.box[3])} → ${idr(L.box[2])} / ${idr(L.box[1])}.</p></div>`;
+  const rows=[[L.fan["1x1"],"1x1","8/8","100%","630°→"+idr(L.sq[630])],
+    [L.box[6],"—","6/8","75%","—"],[L.box[5],"—","5/8","—","360°→"+idr(L.sq[360])],
+    [L.fan["1x2"],"1x2","4/8","50%","270°→"+idr(L.sq[270])],
+    [L.box[3],"—","3/8","30%","225°→"+idr(L.sq[225])],
+    [L.fan["1x4"],"1x4","2/8","25%","180°→"+idr(L.sq[180])],
+    [L.fan["1x8"],"1x8","1/8","—","135°→"+idr(L.sq[135])],
+    [L.p,"pivot","0/8","0%","base"]];
+  $("confl").innerHTML=rows.map(r=>{const rl=role(r[0]);const nowc=Math.abs(r[0]-cp)<L.rng*0.02?' class="now-row"':'';
+    return `<tr${nowc}><td class="num">${idr(r[0])}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td><span class="tag ${rl[0]}">${rl[1]}</span></td></tr>`;}).join("");
+  const sqrows=[[0,"base",L.p],[135,"diagonal",L.sq[135]],[180,"cardinal",L.sq[180]],[225,"diagonal",L.sq[225]],[270,"cardinal",L.sq[270]],[315,"diagonal",L.sq[315]],[360,"cardinal",L.sq[360]],[630,"cardinal",L.sq[630]]];
+  $("sq9").innerHTML=sqrows.map(r=>`<tr><td>${r[0]}°</td><td>${r[1]}</td><td class="num">${idr(r[2])}</td></tr>`).join("");
+  $("exec").innerHTML=`
+    <div class="sc bull"><h3>Bullish</h3><p>Entry: retest &gt; ${idr(L.box[5])}<br>SL: &lt; ${idr(L.box[4]-25)}<br>TP: ${idr(L.box[5])} → ${idr(L.box[6])} → ${idr(L.fan["1x1"])}</p></div>
+    <div class="sc bear"><h3>Bearish</h3><p>Entry: break &lt; ${idr(L.box[3])}<br>SL: &gt; ${idr(L.box[3]+40)}<br>TP: ${idr(L.box[2])} → ${idr(L.box[1])} → ${idr(L.p)}</p></div>
+    <div class="sc range"><h3>Range</h3><p>Jual dekat ${idr(L.box[5])}, beli dekat ${idr(L.box[3])}. RR ketat.</p></div>`;
+  $("final").innerHTML=`<div class="d">Keputusan: WAIT</div><p>Harga di ${(pos*100).toFixed(0)}% swing (dekat 50% = garis keputusan). Break bersih &gt; ${idr(L.box[5])} → bullish; kehilangan ${idr(L.box[3])} → bearish. Confidence Low–Medium.</p>`;
+  drawFan();drawBox();drawWheel();drawHist();renderGannTime();
+}
 
-  /* ---------- Journal ---------- */
-  let journal = [];
-  
-  function addRow(data) {
-    const tglInput = $("tgl");
-    const t = data || { tgl: (tglInput ? tglInput.value : ""), dir: "Buy", entry: "", sl: "", tp: "", pnl: "", note: "" };
-    journal.push(t);
-    renderJournal();
-    saveAll();
-  }
+const GT_BARS=[8,15,21,24,30,45,60,90,120,144,180,270,360];
+const GT_STRONG=[90,144,180,270,360];
+function sessionWIB(h){h=((h%24)+24)%24;
+  if(h>=19&&h<23)return"Overlap Ldn–NY";if(h>=19||h<4)return"New York";
+  if(h>=14)return"London";if(h>=7)return"Tokyo";if(h>=4)return"Sydney";return"—";}
+const fmtWIB=ms=>new Date(ms+7*3600000).toISOString().slice(0,16).replace("T"," ");
+function renderGannTime(){
+  const pv=$("gtPivot").value;if(!pv)return;
+  const tf=+$("gtTF").value||60,winBars=+$("gtWin").value||50,pms=Date.parse(pv+":00+07:00");
+  const P0=S.pivot,rng=S.high-S.pivot,scale=+$("gtScale").value||8,winMs=winBars*tf*60000,tol=2,intraday=tf<1440;
+  const lv=[];for(let k=1;k<=8;k++)lv.push({p:P0+k/8*rng,tag:k+"/8"});
+  [90,180,270,360,630].forEach(dg=>lv.push({p:Math.pow(Math.sqrt(P0)+dg/180,2),tag:dg+"°"}));
+  const cross=[];[["1x1",scale],["1x2",scale/2]].forEach(([an,sl])=>lv.forEach(L=>{const bar=(L.p-P0)/sl;
+    if(bar>0)cross.push({bar,ms:pms+bar*tf*60000,label:an+"×"+L.tag,price:L.p});}));
+  cross.sort((a,b)=>a.bar-b.bar);
+  const wd=ms=>new Date(ms+7*3600000).toLocaleDateString("id-ID",{weekday:"short",day:"numeric",month:"short",timeZone:"UTC"});
+  const ctx=ms=>intraday?sessionWIB(new Date(ms+7*3600000).getUTCHours()):wd(ms);
+  $("gtTable").innerHTML=GT_BARS.map(b=>{const ms=pms+b*tf*60000,strong=GT_STRONG.includes(b);
+    let best=null,bd=1e9;cross.forEach(c=>{const d=Math.abs(c.bar-b);if(d<bd){bd=d;best=c;}});
+    const conf=best&&bd<=tol;
+    return `<tr${conf?' class="now-row"':''}><td>${b}</td><td>${b%360||360}°</td><td class="num">${fmtWIB(ms)}</td><td>${ctx(ms)}</td><td>${strong?'<span class="tag t-res">kuat</span>':'minor'}</td><td>${conf?'<span class="tag t-dec">★ '+best.label+' @'+idr(best.price)+'</span>':'—'}</td></tr>`;}).join("");
+  const inWin=cross.filter(c=>c.ms<=pms+winMs).slice(0,10);
+  $("gtCross").innerHTML=inWin.map(c=>`<tr><td class="num">${fmtWIB(c.ms)}</td><td>${c.bar.toFixed(1)}</td><td>${c.label}</td><td class="num">${idr(c.price)}</td><td>${ctx(c.ms)}</td></tr>`).join("")||'<tr><td colspan="5" style="color:var(--muted)">Tak ada persilangan dalam jendela ini.</td></tr>';
+  const x0=70,x1=860,yT=40,yB=150,W=x1-x0,X=ms=>x0+(ms-pms)/winMs*W;
+  let s=`<svg viewBox="0 0 900 200" role="img" aria-label="Gann time strip">`;
+  if(intraday){const hrs=winMs/3600000;for(let hh=0;hh<hrs;hh++){const ms=pms+hh*3600000,wh=new Date(ms+7*3600000).getUTCHours();
+    if(wh>=19&&wh<23){const xa=X(ms),xb=X(ms+3600000);s+=`<rect x="${xa.toFixed(1)}" y="${yT}" width="${(xb-xa).toFixed(1)}" height="${yB-yT}" fill="rgba(59,130,246,.09)"/>`;}}}
+  s+=`<line x1="${x0}" y1="${yB}" x2="${x1}" y2="${yB}" stroke="#33396E"/>`;
+  inWin.forEach(c=>{const x=X(c.ms);s+=`<path d="M ${(x-4).toFixed(1)},${yB} L ${(x+4).toFixed(1)},${yB} L ${x.toFixed(1)},${(yB-7).toFixed(1)} Z" fill="#5FB0B7" opacity="0.7"/>`;});
+  s+=`<line x1="${x0}" y1="${yT}" x2="${x0}" y2="${yB}" stroke="#6AA9E9"/><text class="sb" x="${x0}" y="${yT-6}" text-anchor="middle">pivot</text>`;
+  GT_BARS.forEach(b=>{const ms=pms+b*tf*60000;if(ms>pms+winMs)return;const x=X(ms),strong=GT_STRONG.includes(b);
+    let bd=1e9;cross.forEach(c=>{const d=Math.abs(c.bar-b);if(d<bd)bd=d;});const conf=bd<=tol;
+    const col=conf?"#60a5fa":strong?"#3b82f6":"#8A8FB0",wdt=conf?2.5:strong?2:1,dash=(!conf&&!strong)?'stroke-dasharray="4 3"':'';
+    s+=`<line x1="${x.toFixed(1)}" y1="${yT}" x2="${x.toFixed(1)}" y2="${yB}" stroke="${col}" stroke-width="${wdt}" ${dash}/>`;
+    if(conf)s+=`<text class="sg" x="${x.toFixed(1)}" y="${yT-2}" text-anchor="middle">★</text>`;
+    s+=`<text class="${strong||conf?'sg':'sm'}" x="${x.toFixed(1)}" y="${yB+14}" text-anchor="middle">${b}</text>`;});
+  s+=`<text class="sm" x="${x0}" y="${yB+30}" text-anchor="middle">${fmtWIB(pms).slice(5)}</text><text class="sm" x="${x1}" y="${yB+30}" text-anchor="middle">${fmtWIB(pms+winMs).slice(5)}</text>`;
+  s+=`</svg>`;$("gtStrip").innerHTML=s;
+}
 
-  function renderJournal() {
-    const b = $("jbody"); 
-    if (!b) return;
-    b.innerHTML = "";
-    
-    journal.forEach((r, i) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td><input value="${r.tgl || ''}" onchange="upd(${i},'tgl',this.value)" style="width:92px"></td>
-        <td><select onchange="upd(${i},'dir',this.value)">
-          <option${r.dir === 'Buy' ? ' selected' : ''}>Buy</option>
-          <option${r.dir === 'Sell' ? ' selected' : ''}>Sell</option>
-        </select></td>
-        <td><input class="mono" value="${r.entry || ''}" onchange="upd(${i},'entry',this.value)" style="width:74px"></td>
-        <td><input class="mono" value="${r.sl || ''}" onchange="upd(${i},'sl',this.value)" style="width:74px"></td>
-        <td><input class="mono" value="${r.tp || ''}" onchange="upd(${i},'tp',this.value)" style="width:74px"></td>
-        <td><input class="mono" value="${r.pnl || ''}" onchange="upd(${i},'pnl',this.value)" style="width:78px"></td>
-        <td><input value="${(r.note || '').replace(/"/g, '&quot;')}" onchange="upd(${i},'note',this.value)"></td>
-        <td><button class="del" onclick="delRow(${i})" title="hapus">✕</button></td>`;
-      b.appendChild(tr);
-    });
-    stats();
-  }
-
-  function upd(i, k, v) {
-    journal[i][k] = v;
-    if (k === 'pnl') {
-      stats();
-      drawEquity();
-    }
-    saveAll();
-  }
-
-  function delRow(i) {
-    journal.splice(i, 1);
-    renderJournal();
-    drawEquity();
-    saveAll();
-  }
-
-  function stats() {
-    let tot = 0, w = 0, l = 0, n = 0;
-    journal.forEach(r => {
-      const p = parseFloat(r.pnl);
-      if (!isNaN(p) && r.pnl !== "") {
-        tot += p;
-        n++;
-        if (p > 0) w++; else if (p < 0) l++;
-      }
-    });
-    
-    const plEl = $("pl");
-    const ntrEl = $("ntr");
-    const wrEl = $("wr");
-    const wlEl = $("wl");
-
-    if (plEl) {
-      plEl.textContent = (tot < 0 ? '-$' : '$') + Math.abs(tot).toFixed(2);
-      plEl.className = "mono " + (tot > 0 ? 'win' : tot < 0 ? 'loss' : '');
-    }
-    if (ntrEl) ntrEl.textContent = n;
-    if (wrEl) wrEl.textContent = (w + l) ? Math.round(w / (w + l) * 100) + '%' : '–';
-    if (wlEl) wlEl.textContent = w + " / " + l;
-    
-    drawEquity();
-  }
-
-  function drawEquity() {
-    const c = $("equity"); 
-    if (!c) return;
-    const ctx = c.getContext("2d"); 
-    if (!ctx) return;
-    const W = c.width, H = c.height;
-    ctx.clearRect(0, 0, W, H);
-    
-    let pts = [], run = 0;
-    journal.forEach(r => {
-      const p = parseFloat(r.pnl);
-      if (!isNaN(p) && r.pnl !== "") {
-        run += p;
-        pts.push(run);
-      }
-    });
-    
-    if (pts.length < 1) {
-      ctx.fillStyle = "#8b97b3";
-      ctx.font = "12px monospace";
-      ctx.fillText("Belum ada data P/L", 14, H / 2);
-      return;
-    }
-    
-    const arr = [0, ...pts];
-    const mn = Math.min(...arr), mx = Math.max(...arr);
-    const pad = 14;
-    const x = i => pad + i * (W - 2 * pad) / Math.max(1, arr.length - 1);
-    const y = v => H - pad - (v - mn) / ((mx - mn) || 1) * (H - 2 * pad);
-    
-    // zero baseline
-    ctx.strokeStyle = "#2a385c";
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(pad, y(0));
-    ctx.lineTo(W - pad, y(0));
-    ctx.stroke();
-    
-    // fill area (electric blue theme)
-    ctx.beginPath();
-    ctx.moveTo(x(0), y(arr[0]));
-    arr.forEach((v, i) => ctx.lineTo(x(i), y(v)));
-    ctx.lineTo(x(arr.length - 1), y(0));
-    ctx.lineTo(x(0), y(0));
-    ctx.closePath();
-    ctx.fillStyle = "rgba(59, 130, 246, 0.12)";
-    ctx.fill();
-    
-    // line
-    ctx.beginPath();
-    ctx.moveTo(x(0), y(arr[0]));
-    arr.forEach((v, i) => ctx.lineTo(x(i), y(v)));
-    ctx.strokeStyle = "#60a5fa";
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    
-    arr.forEach((v, i) => {
-      ctx.beginPath();
-      ctx.arc(x(i), y(v), 2.6, 0, 7);
-      ctx.fillStyle = v >= 0 ? "#10b981" : "#ef4444";
-      ctx.fill();
-    });
-  }
-
-  /* ---------- Persist ---------- */
-  let t0;
-  
-  function saveAll(flash) {
-    const o = {};
-    FIELDS.forEach(f => {
-      const el = $(f);
-      if (el) o[f] = el.value;
-    });
-    o.journal = journal;
-    localStorage.setItem(KEY, JSON.stringify(o));
-    
-    if (flash) {
-      const s = $("saved");
-      if (s) {
-        s.classList.add("show");
-        clearTimeout(t0);
-        t0 = setTimeout(() => s.classList.remove("show"), 1200);
-      }
-    }
-  }
-
-  function load() {
-    let o;
-    try {
-      o = JSON.parse(localStorage.getItem(KEY));
-    } catch(e) {}
-    
-    if (o) {
-      FIELDS.forEach(f => {
-        if (o[f] !== undefined && $(f)) $(f).value = o[f];
-      });
-      journal = o.journal || [];
-    }
-    
-    const tglEl = $("tgl");
-    if (tglEl && !tglEl.value) {
-      tglEl.value = new Date().toISOString().slice(0, 10);
-    }
-    
-    renderJournal();
-    buildLadder();
-  }
-
-  function exportJSON() {
-    const o = {};
-    FIELDS.forEach(f => {
-      const el = $(f);
-      if (el) o[f] = el.value;
-    });
-    o.journal = journal;
-    const blob = new Blob([JSON.stringify(o, null, 2)], { type: "application/json" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    
-    const tglEl = $("tgl");
-    a.download = "xauusd_dashboard_" + ((tglEl && tglEl.value) || "data") + ".json";
-    a.click();
-  }
-
-  function importJSON(e) {
-    const f = e.target.files[0];
-    if (!f) return;
-    const r = new FileReader();
-    r.onload = () => {
-      try {
-        const o = JSON.parse(r.result);
-        FIELDS.forEach(k => {
-          if (o[k] !== undefined && $(k)) $(k).value = o[k];
-        });
-        journal = o.journal || [];
-        renderJournal();
-        buildLadder();
-        saveAll(true);
-      } catch(err) {
-        alert("File tidak valid");
-      }
-    };
-    r.readAsText(f);
-  }
-
-  function resetAll() {
-    if (confirm("Hapus semua data dashboard?")) {
-      localStorage.removeItem(KEY);
-      location.reload();
-    }
-  }
-
-  // Explicit window bindings for inline HTML triggers
-  window.addRow = addRow;
-  window.saveAll = saveAll;
-  window.exportJSON = exportJSON;
-  window.importJSON = importJSON;
-  window.resetAll = resetAll;
-  window.upd = upd;
-  window.delRow = delRow;
-
-  function init() {
-    load();
-    
-    // Set up level input change listeners
-    ["price", "pivot", "step", "deadline"].forEach(id => {
-      const el = $(id);
-      if (el) {
-        el.addEventListener("input", () => {
-          buildLadder();
-          saveAll();
-        });
-      }
-    });
-    
-    // Set up standard change listeners
-    FIELDS.forEach(f => {
-      const el = $(f);
-      if (el) el.addEventListener("change", () => saveAll(true));
-    });
-    
-    window.addEventListener("resize", () => {
-      buildLadder();
-      drawEquity();
-    });
-  }
-
-  // Execute initialization
-  init();
-  document.addEventListener('astro:after-swap', () => {
-    init();
-  });
+function syncInputs(){$("iPivot").value=S.pivot;$("iHigh").value=S.high;$("iH4").value=S.h4;$("iH1").value=S.h1;
+  $("iPrice").value=curPrice();if(!$("iDate").value)$("iDate").value=S.history.length?S.history[S.history.length-1].date:new Date().toISOString().slice(0,10);
+  if(!$("gtPivot").value)$("gtPivot").value=new Date().toISOString().slice(0,10)+"T00:00";}
+function readInputs(){S.pivot=+$("iPivot").value||S.pivot;S.high=+$("iHigh").value||S.high;S.h4=+$("iH4").value||S.h4;S.h1=+$("iH1").value||S.h1;}
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1600);}
+function init(){
+  syncInputs();render();
+  $("recalc").onclick=()=>{readInputs();save(S);render();toast("Level dihitung ulang");};
+  $("save").onclick=()=>{readInputs();const date=$("iDate").value||new Date().toISOString().slice(0,10);const price=+$("iPrice").value;
+    if(!price){toast("Isi harga dulu");return;}const i=S.history.findIndex(x=>x.date===date);
+    if(i>=0)S.history[i].price=price;else S.history.push({date,price});S.history.sort((a,b)=>a.date.localeCompare(b.date));
+    save(S);render();toast("Tersimpan "+date);};
+  $("reset").onclick=()=>{if(confirm("Reset ke data awal?")){S=JSON.parse(JSON.stringify(DEF));save(S);syncInputs();render();toast("Direset");}};
+  let tvLoaded=false;
+  function loadTV(){if(tvLoaded)return;tvLoaded=true;const sc=document.createElement("script");sc.src="https://s3.tradingview.com/tv.js";
+    sc.onload=()=>{try{new TradingView.widget({container_id:"tvchart",symbol:"OANDA:XAUUSD",interval:"60",timezone:"Asia/Jakarta",theme:"dark",style:"1",locale:"id",autosize:true,hide_side_toolbar:false,studies:[]});}catch(e){$("tvchart").innerHTML='<div class="live-note">Gagal memuat TradingView.</div>';}};
+    sc.onerror=()=>{$("tvchart").innerHTML='<div class="live-note">TradingView tidak dapat dimuat (offline/diblokir). Buka dengan internet.</div>';};
+    document.body.appendChild(sc);}
+  $("tabCalc").onclick=()=>{$("tabCalc").classList.add("on");$("tabLive").classList.remove("on");$("viewCalc").classList.add("on");$("viewLive").classList.remove("on");};
+  $("tabLive").onclick=()=>{$("tabLive").classList.add("on");$("tabCalc").classList.remove("on");$("viewLive").classList.add("on");$("viewCalc").classList.remove("on");loadTV();};
+  const GT_SCALE_PRESET={15:3,30:5,60:8,240:25,1440:55,10080:130,43200:280};
+  $("gtTF").onchange=()=>{$("gtScale").value=GT_SCALE_PRESET[$("gtTF").value]||$("gtScale").value;renderGannTime();};
+  $("gtPivot").onchange=renderGannTime;$("gtScale").onchange=renderGannTime;$("gtWin").onchange=renderGannTime;
+  window.addEventListener("resize",()=>{drawFan();drawHist();});
+}
+init();
+document.addEventListener('astro:after-swap',()=>{S=load();init();});
 </script>
