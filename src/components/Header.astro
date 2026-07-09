@@ -43,6 +43,18 @@ const isActive = (path: string) => {
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><path d="M12 3a6.36 6.36 0 0 1 9 9 9.75 9.75 0 0 0-9-9Z"/><path d="M11.3 12.7a5 5 0 1 1-7.1-7.1 9.75 9.75 0 0 0 7.1 7.1Z"/><path d="M12 22a9.75 9.75 0 0 0 9-9 9.75 9.75 0 0 0-9 9Z"/></svg>
         Dashboard Astrologi
       </a>
+      <a href="/dashboard-crypto" class={`nav-item crypto-hover ${isActive('/dashboard-crypto') ? 'active crypto-active' : ''}`}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><circle cx="12" cy="12" r="10"/><path d="M9.5 8.5h3a1.75 1.75 0 0 1 0 3.5h-3m0 0h3.5a1.75 1.75 0 0 1 0 3.5h-4m1-11v11m3-11v1.5m0 8v1.5"/></svg>
+        Dashboard Crypto
+      </a>
+      <a href="/dashboard-forex" class={`nav-item forex-hover ${isActive('/dashboard-forex') ? 'active forex-active' : ''}`}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><path d="M2 12h20M12 2c2.5 2.7 4 6.2 4 10s-1.5 7.3-4 10c-2.5-2.7-4-6.2-4-10s1.5-7.3 4-10Z"/></svg>
+        Dashboard Forex
+      </a>
+      <a href="/dashboard-saham" class={`nav-item saham-hover ${isActive('/dashboard-saham') ? 'active saham-active' : ''}`}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><path d="M3 3v18h18"/><path d="M18.7 8 12 14.7l-3.5-3.5L3 16.5"/></svg>
+        Dashboard Saham
+      </a>
     </nav>
 
     <!-- Mobile Navigation Actions -->
@@ -70,6 +82,18 @@ const isActive = (path: string) => {
       <a href="/dashboard-astrologi-xauusd" class={`nav-item astro-hover ${isActive('/dashboard-astrologi-xauusd') ? 'active astro-active' : ''}`}>
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><path d="M12 3a6.36 6.36 0 0 1 9 9 9.75 9.75 0 0 0-9-9Z"/><path d="M11.3 12.7a5 5 0 1 1-7.1-7.1 9.75 9.75 0 0 0 7.1 7.1Z"/><path d="M12 22a9.75 9.75 0 0 0 9-9 9.75 9.75 0 0 0-9 9Z"/></svg>
         Dashboard Astrologi
+      </a>
+      <a href="/dashboard-crypto" class={`nav-item crypto-hover ${isActive('/dashboard-crypto') ? 'active crypto-active' : ''}`}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><circle cx="12" cy="12" r="10"/><path d="M9.5 8.5h3a1.75 1.75 0 0 1 0 3.5h-3m0 0h3.5a1.75 1.75 0 0 1 0 3.5h-4m1-11v11m3-11v1.5m0 8v1.5"/></svg>
+        Dashboard Crypto
+      </a>
+      <a href="/dashboard-forex" class={`nav-item forex-hover ${isActive('/dashboard-forex') ? 'active forex-active' : ''}`}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><path d="M2 12h20M12 2c2.5 2.7 4 6.2 4 10s-1.5 7.3-4 10c-2.5-2.7-4-6.2-4-10s1.5-7.3 4-10Z"/></svg>
+        Dashboard Forex
+      </a>
+      <a href="/dashboard-saham" class={`nav-item saham-hover ${isActive('/dashboard-saham') ? 'active saham-active' : ''}`}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><path d="M3 3v18h18"/><path d="M18.7 8 12 14.7l-3.5-3.5L3 16.5"/></svg>
+        Dashboard Saham
       </a>
     </nav>
   </div>
@@ -186,6 +210,45 @@ const isActive = (path: string) => {
   .active {
     color: var(--text-primary);
     background: rgba(255, 255, 255, 0.08);
+  }
+
+  /* Crypto Hover & Active styles */
+  .crypto-hover:hover {
+    color: #f7931a;
+    border-color: rgba(247, 147, 26, 0.2);
+    background: rgba(247, 147, 26, 0.05);
+  }
+
+  .crypto-active {
+    color: #f7931a !important;
+    background: rgba(247, 147, 26, 0.1) !important;
+    border-color: rgba(247, 147, 26, 0.3) !important;
+  }
+
+  /* Forex Hover & Active styles */
+  .forex-hover:hover {
+    color: #10b981;
+    border-color: rgba(16, 185, 129, 0.2);
+    background: rgba(16, 185, 129, 0.05);
+  }
+
+  .forex-active {
+    color: #10b981 !important;
+    background: rgba(16, 185, 129, 0.1) !important;
+    border-color: rgba(16, 185, 129, 0.3) !important;
+  }
+
+  /* Saham Hover & Active styles */
+  .saham-hover:hover {
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.2);
+    background: rgba(239, 68, 68, 0.05);
+  }
+
+  .saham-active {
+    color: #ef4444 !important;
+    background: rgba(239, 68, 68, 0.1) !important;
+    border-color: rgba(239, 68, 68, 0.3) !important;
   }
   
   /* Mobile header features */

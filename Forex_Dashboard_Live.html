@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forex — Dashboard Astro-Gann (Auto-update + Live)</title>
+<style>
+  :root{--bg:#0E1230;--bg2:#161B3E;--panel:#1C2350;--panel2:#232B60;--ivory:#EDE8DA;--muted:#9AA0C8;
+    --line:#33396E;--gold:#D4AF37;--goldS:#E7C868;--teal:#5FB0B7;--blue:#6AA9E9;--crim:#C7566A;--green:#7FBF8A;}
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1000px 500px at 85% -10%,rgba(212,175,55,.10),transparent 60%),
+    radial-gradient(800px 450px at 8% 0%,rgba(95,176,183,.08),transparent 55%),var(--bg);
+    color:var(--ivory);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5;padding:24px}
+  .wrap{max-width:1000px;margin:0 auto}
+  h1,h2,h3{font-family:"Iowan Old Style",Palatino,Georgia,serif;font-weight:600;margin:0}
+  h1{font-size:26px} h2{font-size:18px;margin:26px 0 10px;color:var(--goldS)} h2 .ic{color:var(--gold)}
+  .num{font-variant-numeric:tabular-nums}
+  .eyebrow{letter-spacing:.26em;text-transform:uppercase;font-size:11px;color:var(--gold);margin-bottom:6px}
+  .sub{color:var(--muted);font-size:13.5px;margin-top:6px}
+  .disc{margin-top:14px;border:1px solid var(--line);border-left:3px solid var(--gold);
+    background:rgba(212,175,55,.06);border-radius:8px;padding:11px 15px;font-size:12.5px;color:#cfd2ec}
+  .disc b{color:var(--goldS)}
+  .tabs{display:flex;gap:8px;margin:16px 0 4px}
+  .tab{border:1px solid var(--line);background:var(--panel);color:var(--ivory);border-radius:10px;
+    padding:9px 16px;font:600 14px system-ui;cursor:pointer}
+  .tab.on{background:linear-gradient(180deg,var(--goldS),var(--gold));color:#2a2200;border-color:transparent}
+  .view{display:none} .view.on{display:block}
+  .inputs{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;background:var(--panel);
+    border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:8px}
+  label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
+  input,select{width:100%;background:var(--bg2);border:1px solid var(--line);color:var(--ivory);border-radius:9px;
+    padding:9px 10px;font-size:14px;font-family:inherit}
+  input:focus,select:focus{outline:2px solid var(--gold);border-color:var(--gold)}
+  .btnrow{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+  .btn{border:none;border-radius:10px;font:600 14px system-ui;padding:10px 16px;cursor:pointer}
+  .btn-gold{background:linear-gradient(180deg,var(--goldS),var(--gold));color:#2a2200}
+  .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--ivory)}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+  .card .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .card .v{font-size:21px;font-weight:700;margin-top:3px} .card .s{font-size:11px;color:var(--muted);margin-top:2px}
+  .v.up{color:var(--green)} .v.down{color:var(--crim)} .v.gold{color:var(--goldS)}
+  .scn{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:6px}
+  @media(max-width:760px){.scn{grid-template-columns:1fr}}
+  .sc{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .sc.bull{border-top:3px solid var(--green)}.sc.range{border-top:3px solid var(--goldS)}.sc.bear{border-top:3px solid var(--crim)}
+  .sc h3{font-size:15px} .sc .pct{font-size:28px;font-weight:700;margin:4px 0}
+  .bull .pct{color:var(--green)}.range .pct{color:var(--goldS)}.bear .pct{color:var(--crim)}
+  .bar{height:7px;border-radius:4px;background:var(--bg2);overflow:hidden;margin:6px 0 10px}.bar>i{display:block;height:100%}
+  .bull .bar>i{background:var(--green)}.range .bar>i{background:var(--goldS)}.bear .bar>i{background:var(--crim)}
+  .sc p{font-size:12.5px;color:#d3d7f2;margin:4px 0}
+  table{width:100%;border-collapse:collapse;font-size:12.8px;margin-top:8px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--goldS);font-size:11px;text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+  tbody tr:hover td{background:rgba(255,255,255,.03)}
+  .tag{font-size:10.5px;padding:2px 8px;border-radius:20px;border:1px solid;white-space:nowrap}
+  .t-res{color:var(--crim);border-color:rgba(199,86,106,.5)}.t-sup{color:var(--green);border-color:rgba(127,191,138,.5)}
+  .t-dec{color:var(--goldS);border-color:rgba(212,175,55,.5)}.t-key{color:var(--blue);border-color:rgba(106,169,233,.5)}
+  .now-row td{background:rgba(212,175,55,.08)}
+  figure{margin:10px 0 0;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 8px 6px}
+  figcaption{font-size:11.5px;color:var(--muted);padding:4px 10px 2px}
+  svg{width:100%;height:auto;display:block} canvas{width:100%;height:230px;display:block}
+  .st{fill:#C9CCE8;font:12px system-ui}.sm{fill:#8B90B8;font:11px system-ui}
+  .sg{fill:#D4AF37;font:12px system-ui;font-weight:600}.sh{fill:#E7C868;font:13px system-ui;font-weight:600}.sb{fill:#6AA9E9;font:11px system-ui}
+  .glyph{color:var(--gold);font-size:15px}
+  ul.asp{margin:8px 0;padding-left:0;list-style:none}ul.asp li{padding:7px 0;border-bottom:1px solid var(--line);font-size:13px}ul.asp b{color:var(--goldS)}
+  .final{margin-top:20px;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+  .final .d{font-size:24px;font-weight:700;color:var(--goldS);font-family:"Iowan Old Style",Georgia,serif}
+  .final p{font-size:13px;color:#d3d7f2;margin:8px 0 0}
+  footer{margin-top:22px;color:var(--muted);font-size:11.5px;border-top:1px solid var(--line);padding-top:12px}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--gold);
+    color:#2a2200;font-weight:600;font-size:13px;padding:10px 18px;border-radius:10px;opacity:0;pointer-events:none;transition:.25s}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .live-note{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 15px;font-size:12.5px;color:#cfd2ec;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Trade Plan Mingguan · Forex</div>
+    <h1>Dashboard Astro-Gann — Auto-update &amp; Live (Forex)</h1>
+    <p class="sub">Pilih pasangan forex, lalu ubah pivot/harga → semua level Gann hitung ulang otomatis &amp; tersimpan per pasangan. Tab "Live" menampilkan chart TradingView.</p>
+    <div class="disc"><b>Disclaimer:</b> overlay astro = interpretatif, <b>tidak tervalidasi</b> sebagai prediktor. Level Gann bergantung asumsi pivot/skala. Probabilitas = heuristik dari posisi harga. <b>Bukan nasihat keuangan.</b></div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab on" id="tabCalc">Dashboard hitung</button>
+    <button class="tab" id="tabLive">Live TradingView</button>
+  </div>
+
+  <section class="view on" id="viewCalc">
+    <div class="live-note">
+      <label style="margin-bottom:4px">Pilih pasangan forex</label>
+      <select id="symbolPicker" style="font-size:16px;font-weight:700"></select>
+      <p class="sub" style="margin:8px 0 0">Ganti pasangan → seluruh data (pivot, riwayat, level Gann, chart) beralih ke penyimpanan terpisah milik pasangan itu.</p>
+    </div>
+    <div class="inputs">
+      <div><label>Pivot low</label><input type="number" id="iPivot" step="1"></div>
+      <div><label>Swing high</label><input type="number" id="iHigh" step="1"></div>
+      <div><label>Skala 1x1 H4</label><input type="number" id="iH4" step="1"></div>
+      <div><label>Skala 1x1 H1</label><input type="number" id="iH1" step="0.5"></div>
+      <div><label>Harga sekarang</label><input type="number" id="iPrice" step="0.01"></div>
+      <div><label>Tanggal</label><input type="date" id="iDate"></div>
+    </div>
+    <div class="live-note" style="margin-top:10px">
+      <b>📐 Isi otomatis Pivot Low &amp; Swing High dari data histori:</b>
+      <p class="sub" style="margin:6px 0">Ambil High/Low sungguhan dari rentang waktu pilihan — pakai data histori yang sudah dimuat (tombol ⚡ di bawah) + tick live. Kalau data belum menjangkau rentang yang diminta, tetap dipakai apa adanya dan cakupan aslinya akan disebutkan jujur.</p>
+      <div class="btnrow">
+        <button class="btn btn-ghost" id="pivotAuto1D">Kemarin (1 hari)</button>
+        <button class="btn btn-ghost" id="pivotAuto7D">1 Minggu</button>
+        <button class="btn btn-ghost" id="pivotAuto30D">1 Bulan</button>
+        <button class="btn btn-ghost" id="pivotAuto365D">1 Tahun</button>
+      </div>
+      <div class="sub" id="pivotAutoStatus" style="margin-top:6px">Belum diisi otomatis.</div>
+    </div>
+    <div class="btnrow">
+      <button class="btn btn-gold" id="save">Simpan harga hari ini</button>
+      <button class="btn btn-ghost" id="recalc">Hitung ulang level</button>
+      <button class="btn btn-ghost" id="reset">Reset</button>
+    </div>
+
+    <div class="live-note" style="margin-top:14px">
+      <b>📡 Data live (live-rates.com — gratis, tanpa key untuk harga real-time):</b>
+      <div class="btnrow" style="margin-top:8px">
+        <button class="btn btn-gold" id="fetchLive">Ambil harga live sekarang</button>
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ivory)"><input type="checkbox" id="autoRefresh" style="width:auto"> Auto-refresh tiap 60 detik</label>
+      </div>
+      <div class="sub" id="liveStatus" style="margin-top:6px">Belum diambil.</div>
+    </div>
+    <div class="live-note" style="margin-top:10px">
+      <b>⚡ Muat histori candle (untuk Fibonacci Harian akurat):</b>
+      <p class="sub" style="margin:6px 0">Tarik candle harian masa lalu dari <b>metalpriceapi.com</b> (tier gratis, butuh API key — daftar ~30 detik) untuk pasangan yang sedang dipilih, supaya <b>Fibonacci Harian</b> di bawah langsung dapat High/Low kemarin &amp; Close (harga sekarang) yang akurat. <i>Tier gratis = candle harian; dukungan tiap pasangan bisa berbeda.</i></p>
+      <div class="inputs" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
+        <div><label>API Key metalpriceapi</label><input type="text" id="histKey" placeholder="tempel API key"></div>
+        <div><label>Rentang histori (hari)</label><select id="histDays"><option value="7">7 hari</option><option value="14" selected>14 hari</option><option value="30">30 hari</option><option value="60">60 hari</option></select></div>
+      </div>
+      <div class="btnrow">
+        <button class="btn btn-gold" id="fetchHistory">Muat histori &amp; gambar grid</button>
+        <a href="https://metalpriceapi.com" target="_blank" style="align-self:center;font-size:12px;color:var(--goldS)">Daftar API key gratis →</a>
+      </div>
+      <div class="sub" id="histStatus" style="margin-top:6px">Belum dimuat.</div>
+    </div>
+    <div class="live-note" style="margin-top:10px">
+      <b>🔎 Deteksi swing otomatis (dari data terkumpul, gratis):</b>
+      <p class="sub" style="margin:6px 0">Dashboard mengumpulkan harga live jadi candle sendiri selama auto-refresh aktif — makin lama dinyalakan, makin akurat.</p>
+      <div class="inputs" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
+        <div><label>Ukuran candle (menit)</label><input type="number" id="barMin" value="15" step="5"></div>
+      </div>
+      <div class="btnrow">
+        <button class="btn btn-gold" id="detectSwingFree">Deteksi dari data terkumpul (gratis)</button>
+      </div>
+      <div class="sub" id="swingStatus" style="margin-top:6px">Belum dideteksi.</div>
+    </div>
+
+    <div class="cards" id="cards"></div>
+
+    <h2><span class="ic">◆</span> Riwayat harga (tersimpan)</h2>
+    <figure><canvas id="hist"></canvas><figcaption id="histcap">Isi harga tiap hari untuk membangun grafik.</figcaption></figure>
+
+    <h2><span class="ic">◆</span> Probabilitas skenario</h2>
+    <div class="scn" id="scn"></div>
+
+    <h2><span class="ic">◆</span> Tabel konfluensi level (auto)</h2>
+    <table><thead><tr><th>Harga</th><th>Gann Fan</th><th>Gann Box</th><th>Fibo-Gann</th><th>Square of 9</th><th>Peran</th></tr></thead><tbody id="confl"></tbody></table>
+
+    <h2><span class="ic">◆</span> Gann Fan — H4 &amp; H1 (auto)</h2>
+    <figure><div id="fan"></div><figcaption>Garis 1x1 (emas) sudut utama; ujung kanan = 100/50/25/12,5% swing.</figcaption></figure>
+
+    <h2><span class="ic">◆</span> Fibonacci Harian (Daily Fib) — otomatis dari data live hari ini</h2>
+    <p class="sub">Rumus Pine Anda: <b>Range = High−Low kemarin</b>, titik <b>0% = Close kemarin</b>, level = Close ± rasio×Range (25/30/50/61.8/75/100%) ke <b>dua arah</b>.</p>
+    <div class="live-note">
+      <b>✍️ Isi manual (selalu diprioritaskan kalau diisi):</b>
+      <p class="sub" style="margin:6px 0">Deteksi otomatis dari data live kadang belum akurat. Isi 3 kotak ini dengan angka sungguhan dari chart Anda sendiri untuk hasil yang pasti benar — kosongkan untuk kembali ke deteksi otomatis.</p>
+      <div class="inputs" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
+        <div><label>High kemarin (manual)</label><input type="number" id="fibManHi" step="0.01" placeholder="kosongkan = otomatis"></div>
+        <div><label>Low kemarin (manual)</label><input type="number" id="fibManLo" step="0.01" placeholder="kosongkan = otomatis"></div>
+        <div><label>Close kemarin (manual)</label><input type="number" id="fibManClose" step="0.01" placeholder="kosongkan = otomatis"></div>
+      </div>
+    </div>
+    <div class="cards" id="dailyFibCards"></div>
+    <table><thead><tr><th>Rasio</th><th>Atas (Close + r×Range)</th><th>Bawah (Close − r×Range)</th></tr></thead><tbody id="dailyFibTable"></tbody></table>
+    <p class="sub" id="dailyFibNote"></p>
+
+    <h2><span class="ic">◆</span> Square of Nine (auto dari pivot — dua arah)</h2>
+    <figure><div id="wheel"></div><figcaption>Cardinal cross (90°) = S/R terkuat. ↑ = arah naik (resistensi, akar ditambah), ↓ = arah turun (support, akar dikurangi) — dua-duanya dihitung dari pivot yang sama.</figcaption></figure>
+    <table><thead><tr><th>Rotasi</th><th>Tipe</th><th>Arah</th><th>Harga</th></tr></thead><tbody id="sq9"></tbody></table>
+
+    <h2><span class="ic">◆</span> Rotasi dari titik referensi tertinggi — konfluensi Price × Time</h2>
+    <p class="sub">Menghitung rotasi Gann (Square of 9) dari titik referensi tertinggi (swing high signifikan pilihan Anda) ke harga sekarang. <b>Nilai di bawah cuma contoh placeholder untuk skala EUR/USD</b> — ganti dengan swing high &amp; tanggal sungguhan sesuai pasangan &amp; skala yang sedang aktif.</p>
+    <div class="inputs" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
+      <div><label>Harga referensi tertinggi</label><input type="number" id="athPrice" value="1.1550" step="0.0001"></div>
+      <div><label>Tanggal referensi</label><input type="date" id="athDate" value="2026-04-01"></div>
+    </div>
+    <div class="cards" id="athCards"></div>
+    <table><thead><tr><th>Harga (cardinal 90°)</th><th>Peran</th></tr></thead><tbody id="athPriceTable"></tbody></table>
+    <table style="margin-top:10px"><thead><tr><th>Tanggal (cardinal 90 hari)</th><th>Status</th></tr></thead><tbody id="athTimeTable"></tbody></table>
+    <p class="sub" id="athSummary"></p>
+    <figure><div id="athChart"></div><figcaption>Garis oranye = harga aktual (ATH → sekarang). Putus-putus abu = arah menuju tanggal target (bukan prediksi). Amber/teal putus = level cardinal harga. Garis vertikal emas = cardinal waktu. ★ = konfluensi price×time.</figcaption></figure>
+
+    <h2><span class="ic">☾</span> Astro hari ini (efemeris — cocok Optuma, +7 WIB)</h2>
+    <div class="cards" id="astro"></div>
+    <ul class="asp">
+      <li><b>Mars ☌ Uranus</b> (Gemini, awal pekan) — volatilitas/kejutan.</li>
+      <li><b>Sun □ Saturn</b> (~6 Jul, 17:46 WIB) — tekanan/tertahan.</li>
+      <li><b>Moon ☌ Mars/Uranus</b> (~9–10 Jul) — lonjakan intraday.</li>
+      <li><b>Venus masuk Virgo</b> (10 Jul, 00:22 WIB) — pergeseran nada nilai.</li>
+      <li><b>New Moon Cancer</b> (14 Jul, 16:43 WIB) — energi meredup.</li>
+    </ul>
+
+    <h2><span class="ic">✷</span> Natal chart / efemeris — New York &amp; Jakarta</h2>
+    <div class="inputs" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr))">
+      <div><label>Tanggal natal</label><input type="date" id="nDate"></div>
+      <div><label>Jam lokal kota</label><input type="time" id="nTime" value="00:00"></div>
+    </div>
+    <p class="sub">Planet geosentris identik di kedua kota pada instan yang sama; yang berbeda Ascendant/MC/rumah (whole-sign). Jakarta 00:00 WIB = persis data Optuma. New York memakai tengah malam lokalnya (11 jam setelah Jakarta → Bulan bergeser).</p>
+    <div class="scn" style="grid-template-columns:1fr 1fr">
+      <div id="natalNY"></div><div id="natalJKT"></div>
+    </div>
+
+    <h2><span class="ic">◷</span> Sesi pasar dunia (WIB) &amp; waktu aspek</h2>
+    <table><thead><tr><th>Sesi</th><th>Lokal</th><th>WIB</th></tr></thead><tbody>
+      <tr><td>Sydney</td><td>07–16 AEST</td><td class="num">04:00–13:00</td></tr>
+      <tr><td>Tokyo</td><td>09–18 JST</td><td class="num">07:00–16:00</td></tr>
+      <tr><td>London</td><td>08–17 BST</td><td class="num">14:00–23:00</td></tr>
+      <tr><td>New York</td><td>08–17 EDT</td><td class="num">19:00–04:00</td></tr>
+      <tr class="now-row"><td>Overlap London–NY (paling aktif)</td><td>08–12 EDT</td><td class="num">19:00–23:00</td></tr>
+    </tbody></table>
+    <table><thead><tr><th>WIB</th><th>New York (EDT)</th><th>Peristiwa</th></tr></thead><tbody>
+      <tr><td>Sen 6 · 17:46</td><td>06:46</td><td>Sun □ Saturn (tekanan)</td></tr>
+      <tr class="now-row"><td>Kam 9 · 01:00</td><td>Rab 14:00</td><td>Risalah FOMC (kunci)</td></tr>
+      <tr><td>Kam 9 · 19:30</td><td>08:30</td><td>Klaim pengangguran</td></tr>
+      <tr><td>Jum 10 · 00:22</td><td>Kam 13:22</td><td>Venus masuk Virgo</td></tr>
+    </tbody></table>
+    <p class="sub">Konversi: EDT (New York) + 11 jam = WIB.</p>
+
+    <h2><span class="ic">◷</span> Gann Time — proyeksi putaran intraday (WIB)</h2>
+    <div class="inputs" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
+      <div><label>Pivot (waktu swing)</label><input type="datetime-local" id="gtPivot"></div>
+      <div><label>Timeframe</label><select id="gtTF">
+        <option value="15">M15</option><option value="30">M30</option>
+        <option value="60" selected>H1</option><option value="240">H4</option>
+        <option value="1440">Harian (D1)</option><option value="10080">Mingguan (W1)</option><option value="43200">Bulanan (MN)</option>
+      </select></div>
+      <div><label>Skala 1x1 (poin/bar)</label><input type="number" id="gtScale" value="8" step="1"></div>
+      <div><label>Jendela (bar)</label><input type="number" id="gtWin" value="50" step="5"></div>
+    </div>
+    <p class="sub"><b>Cara baca:</b> "bar" = jumlah bar dari pivot (H1: 1 bar=1 jam · Harian: 1 bar=1 hari · Mingguan: 1 minggu, dst). Kolom Waktu = kapan siklus itu jatuh (WIB). Tanda <b>★</b> = saat siklus waktu bertepatan dengan harga (secara geometri) menyentuh garis Gann/Sq9 → kandidat putaran terkuat. Pilih timeframe M15→Bulanan di atas.</p>
+    <figure><div id="gtStrip"></div><figcaption>Garis vertikal = siklus waktu Gann. Segitiga teal = persilangan geometri (garis Gann menyentuh level). ★ emas = konfluensi price×time (siklus waktu bertemu persilangan). Pita = power window 19–23 WIB.</figcaption></figure>
+    <table><thead><tr><th>Bar</th><th>≈ Sudut</th><th>Waktu WIB</th><th>Sesi</th><th>Kekuatan</th><th>Konfluensi price×time</th></tr></thead><tbody id="gtTable"></tbody></table>
+    <p class="sub" style="margin-top:12px">Persilangan geometri (garis Gann 1x1/1x2 menyentuh level Box/Sq9) — titik <b>price × time</b> dalam jendela:</p>
+    <table><thead><tr><th>Waktu WIB</th><th>Bar</th><th>Garis × Level</th><th>Harga</th><th>Sesi</th></tr></thead><tbody id="gtCross"></tbody></table>
+    <p class="sub">Baris ★ = siklus waktu Gann bertemu titik price×time (garis Gann/Sq9) — kandidat putaran terkuat. Level dari input Pivot/Swing; skala 1x1 dari input "Skala" (ganti timeframe → skala menyesuaikan otomatis, tetap bisa Anda ubah). Semua waktu dihitung otomatis dari pivot &amp; timeframe. Bukan nasihat keuangan.</p>
+
+    <h2><span class="ic">◆</span> Backtest ★ — validasi terhadap data harga sungguhan</h2>
+    <p class="sub">Menghitung berapa persen titik ★ (di masa lalu) yang benar-benar diikuti pembalikan arah harga dalam ±2 jam, berdasarkan tick harga yang tersimpan (bukan simulasi). Makin lama auto-refresh dinyalakan, makin banyak titik yang bisa divalidasi.</p>
+    <div class="btnrow"><button class="btn btn-gold" id="runBacktest">Jalankan backtest</button></div>
+    <div class="sub" id="backtestResult" style="margin-top:8px">Belum dijalankan.</div>
+    <table><thead><tr><th>Waktu ★</th><th>Garis×Level</th><th>Harga</th><th>Hasil</th></tr></thead><tbody id="backtestTable"></tbody></table>
+
+    <div class="scn" style="margin-top:16px" id="exec"></div>
+    <div class="final" id="final"></div>
+  </section>
+
+  <section class="view" id="viewLive">
+    <div class="live-note" id="liveNote">Chart live TradingView. Butuh internet; buka file ini di browser. Ganti timeframe H1/H4 di toolbar chart.</div>
+    <figure style="padding:0;overflow:hidden">
+      <div class="tradingview-widget-container" style="height:560px"><div id="tvchart" style="height:100%"></div></div>
+    </figure>
+  </section>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const SIGNS=["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+const idr=(n,d)=>{if(d==null)d=FX_SYMBOLS[curSym].dec;return n==null?"—":Number(n).toLocaleString("id-ID",{minimumFractionDigits:d,maximumFractionDigits:d});};
+// Efemeris geosentris tropikal — anchor ke OPTUMA 2026-07-06 00:00 WIB (= Jul 5 17:00 UTC)
+const EPOCH2=Date.UTC(2026,6,5,17,0,0);
+const D2R=Math.PI/180,R2D=180/Math.PI,nz=x=>((x%360)+360)%360;
+const GLYPH={Sun:"☉",Moon:"☽",Mercury:"☿",Venus:"♀",Mars:"♂",Jupiter:"♃",Saturn:"♄",Uranus:"♅",Neptune:"♆",Pluto:"♇"};
+const ORDER=["Sun","Moon","Mercury","Venus","Mars","Jupiter","Saturn","Uranus","Neptune","Pluto"];
+// Elemen aproksimasi JPL 1800–2050: [a,e,I,L,ϖ,Ω] + laju per abad
+const EL={
+ Mercury:[[0.38709927,0.20563593,7.00497902,252.25032350,77.45779628,48.33076593],[0.00000037,0.00001906,-0.00594749,149472.67411175,0.16047689,-0.12534081]],
+ Venus:[[0.72333566,0.00677672,3.39467605,181.97909950,131.60246718,76.67984255],[0.00000390,-0.00004107,-0.00078890,58517.81538729,0.00268329,-0.27769418]],
+ Earth:[[1.00000261,0.01671123,-0.00001531,100.46457166,102.93768193,0.0],[0.00000562,-0.00004392,-0.01294668,35999.37244981,0.32327364,0.0]],
+ Mars:[[1.52371034,0.09339410,1.84969142,-4.55343205,-23.94362959,49.55953891],[0.00001847,0.00007882,-0.00813131,19140.30268499,0.44441088,-0.29257343]],
+ Jupiter:[[5.20288700,0.04838624,1.30439695,34.39644051,14.72847983,100.47390909],[-0.00011607,-0.00013253,-0.00183714,3034.74612775,0.21252668,0.20469106]],
+ Saturn:[[9.53667594,0.05386179,2.48599187,49.95424423,92.59887831,113.66242448],[-0.00125060,-0.00050991,0.00193609,1222.49362201,-0.41897216,-0.28867794]],
+ Uranus:[[19.18916464,0.04725744,0.77263783,313.23810451,170.95427630,74.01692503],[-0.00196176,-0.00004397,-0.00242939,428.48202785,0.40805281,0.04240589]],
+ Neptune:[[30.06992276,0.00859048,1.77004347,-55.12002969,44.96476227,131.78422574],[0.00026291,0.00005105,0.00035372,218.45945325,-0.32241464,-0.00508664]]};
+function helioXYZ(name,T){const el=EL[name],e0=el[0],r=el[1];
+ let a=e0[0]+r[0]*T,e=e0[1]+r[1]*T,I=(e0[2]+r[2]*T)*D2R,L=e0[3]+r[3]*T,peri=e0[4]+r[4]*T,nod=(e0[5]+r[5]*T)*D2R;
+ let w=(peri-(e0[5]+r[5]*T))*D2R;let M=nz(L-peri);if(M>180)M-=360;M*=D2R;
+ let E=M;for(let i=0;i<8;i++)E=E-(E-e*Math.sin(E)-M)/(1-e*Math.cos(E));
+ let xp=a*(Math.cos(E)-e),yp=a*Math.sqrt(1-e*e)*Math.sin(E);
+ let cw=Math.cos(w),sw=Math.sin(w),cO=Math.cos(nod),sO=Math.sin(nod),ci=Math.cos(I),si=Math.sin(I);
+ return [(cw*cO-sw*sO*ci)*xp+(-sw*cO-cw*sO*ci)*yp,(cw*sO+sw*cO*ci)*xp+(-sw*sO+cw*cO*ci)*yp,(sw*si)*xp+(cw*si)*yp];}
+function planetLon(name,ms){const T=(ms/86400000+2440587.5-2451545.0)/36525;
+ let p=helioXYZ(name,T),ea=helioXYZ("Earth",T);
+ return nz(Math.atan2(p[1]-ea[1],p[0]-ea[0])*R2D+1.396971*T+0.0003086*T*T);}
+function sunMoon(ms){
+  const D2R=Math.PI/180,J=ms/86400000+2440587.5,T=(J-2451545.0)/36525,nz=x=>((x%360)+360)%360;
+  let L0=nz(280.46646+36000.76983*T+0.0003032*T*T);
+  let M=nz(357.52911+35999.05029*T-0.0001537*T*T)*D2R;
+  let C=(1.914602-0.004817*T-0.000014*T*T)*Math.sin(M)+(0.019993-0.000101*T)*Math.sin(2*M)+0.000289*Math.sin(3*M);
+  let sun=nz(L0+C-0.00569);
+  let Lp=nz(218.3164477+481267.88123421*T-0.0015786*T*T+T*T*T/538841-T*T*T*T/65194000);
+  let Dm=nz(297.8501921+445267.1114034*T-0.0018819*T*T+T*T*T/545868-T*T*T*T/113065000);
+  let Ms=nz(357.5291092+35999.0502909*T-0.0001536*T*T+T*T*T/24490000);
+  let Mp=nz(134.9633964+477198.8675055*T+0.0087414*T*T+T*T*T/69699-T*T*T*T/14712000);
+  let F=nz(93.272095+483202.0175233*T-0.0036539*T*T-T*T*T/3526000+T*T*T*T/863310000);
+  let E=1-0.002516*T-0.0000074*T*T,s=x=>Math.sin(x*D2R),sum=0;
+  const tm=[[6288774,0,0,1,0],[1274027,2,0,-1,0],[658314,2,0,0,0],[213618,0,0,2,0],[-185116,0,1,0,0],[-114332,0,0,0,2],[58793,2,0,-2,0],[57066,2,-1,-1,0],[53322,2,0,1,0],[45758,2,-1,0,0],[-40923,0,1,-1,0],[-34720,1,0,0,0],[-30383,0,1,1,0],[15327,2,0,0,-2],[-12528,0,0,1,2],[10980,0,0,1,-2],[10675,4,0,-1,0],[10034,0,0,3,0],[8548,4,0,-2,0],[-7888,2,1,-1,0],[-6766,2,1,0,0],[-5163,1,0,-1,0],[4987,1,1,0,0],[4036,2,-1,1,0],[3994,2,0,2,0],[3861,4,0,0,0],[3665,2,0,-3,0],[-2689,0,1,-2,0],[-2602,2,0,-1,2]];
+  for(const[c,d,m,mp,f]of tm){let e=1;if(Math.abs(m)==1)e=E;else if(Math.abs(m)==2)e=E*E;sum+=c*e*s(d*Dm+m*Ms+mp*Mp+f*F);}
+  return {sun,moon:nz(Lp+sum/1e6)};
+}
+function lonOf(name,ms){if(name==="Sun")return sunMoon(ms).sun;if(name==="Moon")return sunMoon(ms).moon;
+  if(name==="Pluto")return nz(304.78-0.015*(ms-EPOCH2)/86400000);return planetLon(name,ms);}
+function posAt(ms){return ORDER.map(n=>({name:n,g:GLYPH[n],lon:lonOf(n,ms)}));}
+const fmtLon=l=>Math.floor(l%30)+"° "+SIGNS[Math.floor(l/30)%12];
+const fmtDMS=x=>{const d=x%30;return Math.floor(d)+"°"+String(Math.floor((d%1)*60)).padStart(2,"0")+"' "+SIGNS[Math.floor(x/30)%12];};
+function astroFor(ds){return posAt(Date.parse(ds+"T00:00:00+07:00"));} // tengah malam WIB
+// --- Ascendant / Midheaven (murni astronomi, akurat semua lokasi/waktu) ---
+const OBLIQ=23.4366;
+function ascmc(jd,lat,lonE){const T=(jd-2451545.0)/36525;
+  let g=280.46061837+360.98564736629*(jd-2451545.0)+0.000387933*T*T-T*T*T/38710000;
+  const lst=((g+lonE)%360+360)%360,r=lst*Math.PI/180,e=OBLIQ*Math.PI/180,p=lat*Math.PI/180;
+  let mc=Math.atan2(Math.sin(r),Math.cos(r)*Math.cos(e))*180/Math.PI;mc=(mc%360+360)%360;
+  let asc=Math.atan2(Math.cos(r),-(Math.sin(r)*Math.cos(e)+Math.tan(p)*Math.sin(e)))*180/Math.PI;asc=(asc%360+360)%360;
+  return {asc,mc};}
+function natalPanel(title,tzName,tzOff,lat,lon){
+  const dd=$("nDate").value||"2026-07-06",tt=$("nTime").value||"00:00";
+  const off=(tzOff>=0?"+":"-")+String(Math.abs(tzOff)).padStart(2,"0")+":00";
+  const ms=Date.parse(dd+"T"+tt+":00"+off),jd=ms/86400000+2440587.5;
+  const mm=ascmc(jd,lat,lon),pls=posAt(ms),ascS=Math.floor(mm.asc/30)%12;
+  const rows=pls.map(p=>{const h=((Math.floor(p.lon/30)-ascS)%12+12)%12+1;
+    return `<tr><td><span class="glyph">${p.g}</span> ${p.name}${p.rx?' <span style="color:var(--crim);font-size:9px">Rx</span>':''}</td><td class="num">${fmtDMS(p.lon)}</td><td>${h}</td></tr>`;}).join("");
+  const utc=new Date(ms).toISOString().slice(0,16).replace("T"," ");
+  return `<div class="card"><h3 style="color:var(--goldS)">${title}</h3>
+   <div class="sub" style="margin:2px 0 8px">${dd} ${tt} ${tzName} · ${utc} UTC · ${lat.toFixed(2)}, ${lon.toFixed(2)}</div>
+   <div style="display:flex;gap:22px;margin-bottom:8px">
+     <div><div style="font-size:10px;color:var(--muted)">ASC</div><div style="font-weight:700;color:var(--goldS)">${fmtDMS(mm.asc)}</div></div>
+     <div><div style="font-size:10px;color:var(--muted)">MC</div><div style="font-weight:700;color:var(--goldS)">${fmtDMS(mm.mc)}</div></div></div>
+   <table><thead><tr><th>Planet</th><th>Posisi</th><th>Rmh</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+function renderNatal(){
+  $("natalNY").innerHTML=natalPanel("New York","EDT (GMT−4)",-4,40.7128,-74.0060);
+  $("natalJKT").innerHTML=natalPanel("Jakarta","WIB (GMT+7)",7,-6.2088,106.8456);
+}
+// --- Gann Time intraday ---
+const GT_BARS=[8,15,21,24,30,45,60,90,120,144,180,270,360];
+const GT_STRONG=[90,144,180,270,360];
+function sessionWIB(h){h=((h%24)+24)%24;
+  if(h>=19&&h<23)return"Overlap Ldn–NY";if(h>=19||h<4)return"New York";
+  if(h>=14)return"London";if(h>=7)return"Tokyo";if(h>=4)return"Sydney";return"—";}
+const fmtWIB=ms=>new Date(ms+7*3600000).toISOString().slice(0,16).replace("T"," ");
+function crossPoints(pms,tf,scale,P0,rng){
+  const lv=[];for(let k=1;k<=8;k++)lv.push({p:P0+k/8*rng,tag:k+"/8"});
+  [90,180,270,360,630].forEach(dg=>lv.push({p:Math.pow(Math.sqrt(P0)+dg/180,2),tag:dg+"°"}));
+  const cross=[];[["1x1",scale],["1x2",scale/2]].forEach(([an,sl])=>lv.forEach(L=>{const bar=(L.p-P0)/sl;
+    if(bar>0)cross.push({bar,ms:pms+bar*tf*60000,label:an+"×"+L.tag,price:L.p});}));
+  return cross.sort((a,b)=>a.bar-b.bar);
+}
+function renderGannTime(){
+  const pv=$("gtPivot").value;if(!pv)return;
+  const tf=+$("gtTF").value||60,winBars=+$("gtWin").value||50,pms=Date.parse(pv+":00+07:00");
+  const P0=S.pivot,rng=S.high-S.pivot,scale=+$("gtScale").value||8,winMs=winBars*tf*60000,tol=2,intraday=tf<1440;
+  const cross=crossPoints(pms,tf,scale,P0,rng);
+  const wd=ms=>new Date(ms+7*3600000).toLocaleDateString("id-ID",{weekday:"short",day:"numeric",month:"short",timeZone:"UTC"});
+  const ctx=ms=>intraday?sessionWIB(new Date(ms+7*3600000).getUTCHours()):wd(ms);
+  $("gtTable").innerHTML=GT_BARS.map(b=>{const ms=pms+b*tf*60000,strong=GT_STRONG.includes(b);
+    let best=null,bd=1e9;cross.forEach(c=>{const d=Math.abs(c.bar-b);if(d<bd){bd=d;best=c;}});
+    const conf=best&&bd<=tol;
+    return `<tr${conf?' class="now-row"':''}><td>${b}</td><td>${b%360||360}°</td><td class="num">${fmtWIB(ms)}</td><td>${ctx(ms)}</td><td>${strong?'<span class="tag t-res">kuat</span>':'minor'}</td><td>${conf?'<span class="tag t-dec">★ '+best.label+' @'+idr(best.price)+'</span>':'—'}</td></tr>`;}).join("");
+  const inWin=cross.filter(c=>c.ms<=pms+winMs).slice(0,10);
+  $("gtCross").innerHTML=inWin.map(c=>`<tr><td class="num">${fmtWIB(c.ms)}</td><td>${c.bar.toFixed(1)}</td><td>${c.label}</td><td class="num">${idr(c.price)}</td><td>${ctx(c.ms)}</td></tr>`).join("")||'<tr><td colspan="5" style="color:var(--muted)">Tak ada persilangan dalam jendela ini.</td></tr>';
+  const x0=70,x1=860,yT=40,yB=150,W=x1-x0,X=ms=>x0+(ms-pms)/winMs*W;
+  let s=`<svg viewBox="0 0 900 200" role="img" aria-label="Gann time strip">`;
+  if(intraday){const hrs=winMs/3600000;for(let hh=0;hh<hrs;hh++){const ms=pms+hh*3600000,wh=new Date(ms+7*3600000).getUTCHours();
+    if(wh>=19&&wh<23){const xa=X(ms),xb=X(ms+3600000);s+=`<rect x="${xa.toFixed(1)}" y="${yT}" width="${(xb-xa).toFixed(1)}" height="${yB-yT}" fill="rgba(212,175,55,.09)"/>`;}}}
+  s+=`<line x1="${x0}" y1="${yB}" x2="${x1}" y2="${yB}" stroke="#33396E"/>`;
+  inWin.forEach(c=>{const x=X(c.ms);s+=`<path d="M ${(x-4).toFixed(1)},${yB} L ${(x+4).toFixed(1)},${yB} L ${x.toFixed(1)},${(yB-7).toFixed(1)} Z" fill="#5FB0B7" opacity="0.7"/>`;});
+  s+=`<line x1="${x0}" y1="${yT}" x2="${x0}" y2="${yB}" stroke="#6AA9E9"/><text class="sb" x="${x0}" y="${yT-6}" text-anchor="middle">pivot</text>`;
+  GT_BARS.forEach(b=>{const ms=pms+b*tf*60000;if(ms>pms+winMs)return;const x=X(ms),strong=GT_STRONG.includes(b);
+    let bd=1e9;cross.forEach(c=>{const d=Math.abs(c.bar-b);if(d<bd)bd=d;});const conf=bd<=tol;
+    const col=conf?"#E7C868":strong?"#D4AF37":"#8A8FB0",wdt=conf?2.5:strong?2:1,dash=(!conf&&!strong)?'stroke-dasharray="4 3"':'';
+    s+=`<line x1="${x.toFixed(1)}" y1="${yT}" x2="${x.toFixed(1)}" y2="${yB}" stroke="${col}" stroke-width="${wdt}" ${dash}/>`;
+    if(conf)s+=`<text class="sg" x="${x.toFixed(1)}" y="${yT-2}" text-anchor="middle">★</text>`;
+    s+=`<text class="${strong||conf?'sg':'sm'}" x="${x.toFixed(1)}" y="${yB+14}" text-anchor="middle">${b}</text>`;});
+  s+=`<text class="sm" x="${x0}" y="${yB+30}" text-anchor="middle">${fmtWIB(pms).slice(5)}</text><text class="sm" x="${x1}" y="${yB+30}" text-anchor="middle">${fmtWIB(pms+winMs).slice(5)}</text>`;
+  s+=`</svg>`;$("gtStrip").innerHTML=s;
+}
+
+const FX_SYMBOLS={
+ EURUSD:{label:"EUR/USD",tv:"OANDA:EURUSD",lr:"EUR/USD",pivot:1.1200,high:1.1600,h4:0.0040,h1:0.0012,dec:4},
+ GBPUSD:{label:"GBP/USD",tv:"OANDA:GBPUSD",lr:"GBP/USD",pivot:1.2400,high:1.3200,h4:0.0060,h1:0.0018,dec:4},
+ USDJPY:{label:"USD/JPY",tv:"OANDA:USDJPY",lr:"USD/JPY",pivot:140,high:162,h4:0.60,h1:0.20,dec:2},
+ AUDUSD:{label:"AUD/USD",tv:"OANDA:AUDUSD",lr:"AUD/USD",pivot:0.6000,high:0.6700,h4:0.0035,h1:0.0010,dec:4},
+ USDCAD:{label:"USD/CAD",tv:"OANDA:USDCAD",lr:"USD/CAD",pivot:1.3300,high:1.4100,h4:0.0040,h1:0.0012,dec:4},
+ USDCHF:{label:"USD/CHF",tv:"OANDA:USDCHF",lr:"USD/CHF",pivot:0.8300,high:0.9100,h4:0.0035,h1:0.0010,dec:4},
+ NZDUSD:{label:"NZD/USD",tv:"OANDA:NZDUSD",lr:"NZD/USD",pivot:0.5500,high:0.6200,h4:0.0035,h1:0.0010,dec:4},
+ EURGBP:{label:"EUR/GBP",tv:"OANDA:EURGBP",lr:"EUR/GBP",pivot:0.8400,high:0.8800,h4:0.0025,h1:0.0008,dec:4},
+ EURJPY:{label:"EUR/JPY",tv:"OANDA:EURJPY",lr:"EUR/JPY",pivot:160,high:180,h4:0.70,h1:0.25,dec:2},
+ GBPJPY:{label:"GBP/JPY",tv:"OANDA:GBPJPY",lr:"GBP/JPY",pivot:185,high:205,h4:0.90,h1:0.30,dec:2},
+ AUDJPY:{label:"AUD/JPY",tv:"OANDA:AUDJPY",lr:"AUD/JPY",pivot:90,high:104,h4:0.50,h1:0.18,dec:2},
+ EURAUD:{label:"EUR/AUD",tv:"OANDA:EURAUD",lr:"EUR/AUD",pivot:1.7500,high:1.8600,h4:0.0070,h1:0.0022,dec:4},
+ GBPAUD:{label:"GBP/AUD",tv:"OANDA:GBPAUD",lr:"GBP/AUD",pivot:1.9500,high:2.0800,h4:0.0080,h1:0.0026,dec:4},
+ USDSGD:{label:"USD/SGD",tv:"OANDA:USDSGD",lr:"USD/SGD",pivot:1.3000,high:1.3600,h4:0.0035,h1:0.0011,dec:4},
+ EURCHF:{label:"EUR/CHF",tv:"OANDA:EURCHF",lr:"EUR/CHF",pivot:0.9300,high:0.9800,h4:0.0030,h1:0.0009,dec:4},
+};
+let curSym=localStorage.getItem("fx_current_symbol")||"EURUSD";
+if(!FX_SYMBOLS[curSym])curSym="EURUSD";
+function stateKey(){return "fx_astrogann_v2_"+curSym;}
+function defFor(sym){const c=FX_SYMBOLS[sym];return {pivot:c.pivot,high:c.high,h4:c.h4,h1:c.h1,history:[],ticks:[]};}
+let mem=null;
+function load(){try{const r=localStorage.getItem(stateKey());if(r)return JSON.parse(r);}catch(e){}return mem?JSON.parse(JSON.stringify(mem)):JSON.parse(JSON.stringify(defFor(curSym)));}
+function save(s){try{localStorage.setItem(stateKey(),JSON.stringify(s));}catch(e){mem=s;}}
+let S=load();
+
+function curPrice(){return S.history.length?S.history[S.history.length-1].price:S.pivot;}
+function sq9(base,deg){return Math.pow(Math.sqrt(base)+deg/180,2);}
+function sq9dn(base,deg){const r=Math.sqrt(base)-deg/180;return r>0?Math.pow(r,2):null;}
+function levels(){
+  const p=S.pivot,h=S.high,rng=h-p;
+  const fib={"0%":p,"25%":p+.25*rng,"30%":p+.30*rng,"50%":p+.5*rng,"75%":p+.75*rng,"100%":h};
+  const box={};for(let k=0;k<=8;k++)box[k]=p+k/8*rng;
+  const sq={};[45,90,135,180,225,270,315,360,630].forEach(dg=>sq[dg]=sq9(p,dg));
+  const sqDn={};[45,90,135,180,225,270,315,360].forEach(dg=>sqDn[dg]=sq9dn(p,dg));
+  const fan={"1x1":h,"1x2":p+rng/2,"1x4":p+rng/4,"1x8":p+rng/8};
+  return {p,h,rng,fib,box,sq,sqDn,fan};
+}
+
+function fanPanel(label,scale,yTop,yBot){
+  const p=S.pivot,h=S.high,x0=110,x1=780;const Tmax=(h-p)/scale;
+  const X=t=>x0+t/Tmax*(x1-x0), Y=v=>yBot-(v-p)/(h-p)*(yBot-yTop);
+  let s=`<text class="sh" x="110" y="${yTop-16}">${label} · 1x1 = ${scale} USD/bar · pivot ${idr(p)}</text>`;
+  for(let k=0;k<=4;k++){const v=p+k/4*(h-p),y=Y(v);
+    s+=`<line x1="${x0}" y1="${y}" x2="${x1}" y2="${y}" stroke="${k==0||k==4?'#33396E':'#262b52'}"/>`;
+    s+=`<text class="sm" x="100" y="${y+4}" text-anchor="end">${idr(v)}</text>`;}
+  s+=`<line x1="${x0}" y1="${yTop}" x2="${x0}" y2="${yBot}" stroke="#33396E"/>`;
+  const lines=[["2x1",2*scale,"#8A8FB0",1],["1x1",scale,"#D4AF37",2],["1x2",scale/2,"#8A8FB0",1],["1x4",scale/4,"#8A8FB0",1],["1x8",scale/8,"#8A8FB0",1]];
+  lines.forEach(L=>{const slope=L[1];let ex,ey,pr=p+slope*Tmax;
+    if(pr>h){const tc=(h-p)/slope;ex=X(tc);ey=yTop;}else{ex=x1;ey=Y(pr);}
+    s+=`<line x1="${x0}" y1="${yBot}" x2="${ex.toFixed(1)}" y2="${ey.toFixed(1)}" stroke="${L[2]}" stroke-width="${L[3]}"/>`;
+    s+=`<text class="${L[0]=='1x1'?'sg':'sm'}" x="${(ex>=x1-2?786:ex+6).toFixed(0)}" y="${(ey+4).toFixed(1)}">${L[0]}</text>`;});
+  const cp=curPrice();if(cp>=p&&cp<=h){const y=Y(cp);
+    s+=`<line x1="${x0}" y1="${y}" x2="${x1}" y2="${y}" stroke="#6AA9E9" stroke-width="1" stroke-dasharray="4 3"/>`;
+    s+=`<text class="sb" x="${x0+6}" y="${y-4}">now ${idr(cp,1)}</text>`;}
+  s+=`<circle cx="${x0}" cy="${yBot}" r="3" fill="#D4AF37"/>`;
+  s+=`<text class="sm" x="${x0}" y="${yBot+16}" text-anchor="middle">0</text><text class="sm" x="${x1}" y="${yBot+16}" text-anchor="middle">${Tmax.toFixed(0)} bar</text>`;
+  return s;
+}
+function drawFan(){$("fan").innerHTML=`<svg viewBox="0 0 900 620" role="img" aria-label="Gann fan Forex">${fanPanel("H4",S.h4,60,280)}${fanPanel("H1",S.h1,360,580)}</svg>`;}
+function drawWheel(){
+  const p=S.pivot,val=dg=>idr(sq9(p,dg)),valDn=dg=>{const v=sq9dn(p,dg);return v==null?"—":idr(v);};
+  const cx=300,cy=240,r=175,rt=205,d=r*0.7071,dl=rt*0.7071;
+  const g=(x,y,t,c,a="middle")=>`<text class="${c}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${a}">${t}</text>`;
+  let s=`<svg viewBox="0 0 900 500" role="img" aria-label="Square of Nine dua arah">`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#33396E"/><circle cx="${cx}" cy="${cy}" r="117" fill="none" stroke="#262b52"/><circle cx="${cx}" cy="${cy}" r="59" fill="none" stroke="#262b52"/>`;
+  s+=`<line x1="${cx}" y1="${cy-r}" x2="${cx}" y2="${cy+r}" stroke="#D4AF37" stroke-width="1.5"/><line x1="${cx-r}" y1="${cy}" x2="${cx+r}" y2="${cy}" stroke="#D4AF37" stroke-width="1.5"/>`;
+  s+=`<line x1="${cx+d}" y1="${cy-d}" x2="${cx-d}" y2="${cy+d}" stroke="#8A8FB0"/><line x1="${cx-d}" y1="${cy-d}" x2="${cx+d}" y2="${cy+d}" stroke="#8A8FB0"/>`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="4" fill="#E7C868"/>`+g(cx,cy+22,idr(p)+" · base","sg");
+  // Cardinal: label naik (atas) + turun (bawah, teal) berdampingan
+  s+=g(cx,cy-rt+5,"360° ↑"+val(360),"sg")+g(cx,cy-rt+19,"↓"+valDn(360),"sb");
+  s+=g(cx+rt,cy-6,"90° ↑"+val(90),"sg","start")+g(cx+rt,cy+16,"↓"+valDn(90),"sb","start");
+  s+=g(cx,cy+rt-2,"180° ↑"+val(180),"sg")+g(cx,cy+rt+12,"↓"+valDn(180),"sb");
+  s+=g(cx-rt,cy-6,"270° ↑"+val(270),"sg","end")+g(cx-rt,cy+16,"↓"+valDn(270),"sb","end");
+  s+=g(cx+dl,cy-dl-14,"45° ↑"+val(45),"sm","start")+g(cx+dl,cy-dl,"↓"+valDn(45),"sb","start");
+  s+=g(cx+dl,cy+dl+12,"135° ↑"+val(135),"sm","start")+g(cx+dl,cy+dl+26,"↓"+valDn(135),"sb","start");
+  s+=g(cx-dl,cy+dl+12,"225° ↑"+val(225),"sm","end")+g(cx-dl,cy+dl+26,"↓"+valDn(225),"sb","end");
+  s+=g(cx-dl,cy-dl-14,"315° ↑"+val(315),"sm","end")+g(cx-dl,cy-dl,"↓"+valDn(315),"sb","end");
+  s+=`<text class="sh" x="560" y="110">↑ Naik = resistensi · ↓ Turun = support</text>`;
+  s+=`<text class="sh" x="560" y="140">Cardinal (S/R terkuat)</text><text class="sm" x="560" y="164">90°·↑${val(90)} ↓${valDn(90)}</text><text class="sm" x="560" y="184">180°·↑${val(180)} ↓${valDn(180)}</text><text class="sm" x="560" y="204">270°·↑${val(270)} ↓${valDn(270)}</text><text class="sm" x="560" y="224">360°·↑${val(360)} ↓${valDn(360)}</text>`;
+  s+=`<text class="st" x="560" y="256">Rotasi lanjut</text><text class="sm" x="560" y="280">630° · ↑${val(630)}</text>`;
+  s+=`</svg>`;$("wheel").innerHTML=s;
+}
+function drawHist(){
+  const cv=$("hist"),ctx=cv.getContext("2d"),dpr=devicePixelRatio||1,w=cv.clientWidth,h=230;
+  cv.width=w*dpr;cv.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
+  const pts=S.history.map(r=>({t:Date.parse(r.date),v:r.price})).sort((a,b)=>a.t-b.t);
+  const pL=54,pR=12,pT=12,pB=24,cw=w-pL-pR,ch=h-pT-pB;
+  if(pts.length<1){ctx.fillStyle="#8B90B8";ctx.font="12px system-ui";ctx.fillText("Belum ada data.",pL,h/2);return;}
+  const vs=pts.map(p=>p.v),lo=Math.min(...vs)-20,hi=Math.max(...vs)+20;
+  const X=t=>pL+(pts.length<2?.5:(t-pts[0].t)/((pts[pts.length-1].t-pts[0].t)||1))*cw;
+  const Y=v=>pT+(1-(v-lo)/((hi-lo)||1))*ch;
+  ctx.strokeStyle="#33396E";ctx.fillStyle="#8B90B8";ctx.font="11px system-ui";
+  for(let i=0;i<=4;i++){const v=lo+(hi-lo)*i/4,y=Y(v);ctx.beginPath();ctx.moveTo(pL,y);ctx.lineTo(w-pR,y);ctx.stroke();ctx.fillText(Math.round(v).toLocaleString("id-ID"),4,y+4);}
+  if(pts.length>1){ctx.beginPath();ctx.moveTo(X(pts[0].t),Y(pts[0].v));pts.forEach(p=>ctx.lineTo(X(p.t),Y(p.v)));ctx.strokeStyle="#E7C868";ctx.lineWidth=2;ctx.stroke();}
+  ctx.fillStyle="#E7C868";pts.forEach(p=>{ctx.beginPath();ctx.arc(X(p.t),Y(p.v),3,0,7);ctx.fill();});
+  $("histcap").textContent=`${pts.length} titik · terakhir ${idr(pts[pts.length-1].v,1)} `;
+}
+function role(v){const L=levels(),cp=curPrice();
+  if(Math.abs(v-cp)<(L.rng*0.02))return['t-dec','Keputusan'];
+  if(v>cp)return['t-res','Resistensi'];return['t-sup','Support'];}
+function render(){
+  const L=levels(),cp=curPrice(),h=S.history;
+  let delta=null;
+  if(h.length>1){const last=h[h.length-1];const ref=h.find(x=>(Date.parse(last.date)-Date.parse(x.date))>=6*864e5)||h[0];if(ref&&ref.price)delta=(last.price-ref.price)/ref.price*100;}
+  const pos=(cp-L.p)/L.rng;
+  const bias=pos>=0.625?"Bullish":pos>=0.5?"Bull ringan":pos<0.25?"Bearish":"Netral";
+  $("cards").innerHTML=`
+    <div class="card"><div class="k">Harga</div><div class="v gold num">${idr(cp,1)}</div><div class="s"></div></div>
+    <div class="card"><div class="k">Δ ~mingguan</div><div class="v ${delta==null?'':(delta>=0?'up':'down')} num">${delta==null?'—':(delta>=0?'+':'')+delta.toFixed(1)+'%'}</div><div class="s">dari data tersimpan</div></div>
+    <div class="card"><div class="k">Posisi swing</div><div class="v num">${(pos*100).toFixed(0)}%</div><div class="s">pivot→high</div></div>
+    <div class="card"><div class="k">Bias</div><div class="v gold">${bias}</div><div class="s">acuan 50%/62,5%</div></div>
+    <div class="card"><div class="k">Keputusan</div><div class="v gold">WAIT</div><div class="s">tunggu konfirmasi</div></div>`;
+  let bull=Math.round(Math.max(15,Math.min(60,30+(pos-0.5)*60)));
+  let bear=Math.round(Math.max(15,Math.min(60,30-(pos-0.5)*60)));
+  let rng=100-bull-bear;
+  $("scn").innerHTML=`
+    <div class="sc bull"><h3>Bullish</h3><div class="pct">${bull}%</div><div class="bar"><i style="width:${bull}%"></i></div><p>Terima di atas ${idr(L.box[5])} → ${idr(L.box[6])} / 1x1.</p></div>
+    <div class="sc range"><h3>Range</h3><div class="pct">${rng}%</div><div class="bar"><i style="width:${rng}%"></i></div><p>Kisaran ${idr(L.box[3])}–${idr(L.box[5])}.</p></div>
+    <div class="sc bear"><h3>Bearish</h3><div class="pct">${bear}%</div><div class="bar"><i style="width:${bear}%"></i></div><p>Hilang ${idr(L.box[3])} → ${idr(L.box[2])} / ${idr(L.box[1])}.</p></div>`;
+  const rows=[[L.fan["1x1"],"1x1","8/8","100%","630°→"+idr(L.sq[630])],
+    [L.box[6],"—","6/8","75%","—"],[L.box[5],"—","5/8","—","360°→"+idr(L.sq[360])],
+    [L.fan["1x2"],"1x2","4/8","50%","270°→"+idr(L.sq[270])],
+    [L.box[3],"—","3/8","30%","225°→"+idr(L.sq[225])],
+    [L.fan["1x4"],"1x4","2/8","25%","180°→"+idr(L.sq[180])],
+    [L.fan["1x8"],"1x8","1/8","—","135°→"+idr(L.sq[135])],
+    [L.p,"pivot","0/8","0%","base"]];
+  $("confl").innerHTML=rows.map(r=>{const rl=role(r[0]);const nowc=Math.abs(r[0]-cp)<L.rng*0.02?' class="now-row"':'';
+    return `<tr${nowc}><td class="num">${idr(r[0])}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td><span class="tag ${rl[0]}">${rl[1]}</span></td></tr>`;}).join("");
+  const sqrows=[[0,"base","—",L.p]];
+  [[135,"diagonal"],[180,"cardinal"],[225,"diagonal"],[270,"cardinal"],[315,"diagonal"],[360,"cardinal"]].forEach(([dg,tp])=>{
+    sqrows.push([dg,tp,"↑ naik (resistensi)",L.sq[dg]]);
+    if(L.sqDn[dg]!=null)sqrows.push([dg,tp,"↓ turun (support)",L.sqDn[dg]]);
+  });
+  sqrows.push([630,"cardinal","↑ naik (resistensi)",L.sq[630]]);
+  $("sq9").innerHTML=sqrows.map(r=>`<tr><td>${r[0]}°</td><td>${r[1]}</td><td>${r[2]}</td><td class="num">${idr(r[3])}</td></tr>`).join("");
+  const ds=$("iDate").value||new Date().toISOString().slice(0,10);
+  $("astro").innerHTML=astroFor(ds).map(a=>`<div class="card"><div class="k"><span class="glyph">${a.g}</span> ${a.name}${a.rx?' <span style="color:var(--crim);font-size:10px">Rx</span>':''}</div><div class="v" style="font-size:15px">${fmtDMS(a.lon)}</div></div>`).join("");
+  renderNatal();
+  renderATH();
+  renderDailyFib();
+  $("exec").innerHTML=`
+    <div class="sc bull"><h3>Bullish</h3><p>Entry: retest &gt; ${idr(L.box[5])}<br>SL: &lt; ${idr(L.box[4]-25)}<br>TP: ${idr(L.box[5])} → ${idr(L.box[6])} → ${idr(L.fan["1x1"])}</p></div>
+    <div class="sc bear"><h3>Bearish</h3><p>Entry: break &lt; ${idr(L.box[3])}<br>SL: &gt; ${idr(L.box[3]+40)}<br>TP: ${idr(L.box[2])} → ${idr(L.box[1])} → ${idr(L.p)}</p></div>
+    <div class="sc range"><h3>Range</h3><p>Jual dekat ${idr(L.box[5])}, beli dekat ${idr(L.box[3])}. RR ketat jelang FOMC.</p></div>`;
+  $("final").innerHTML=`<div class="d">Keputusan: WAIT</div><p>Harga di ${(pos*100).toFixed(0)}% swing (dekat 50% = garis keputusan). Break bersih &gt; ${idr(L.box[5])} → bullish; kehilangan ${idr(L.box[3])} → bearish. Confidence Low–Medium.</p>`;
+  drawFan();drawWheel();drawHist();renderGannTime();
+}
+const rnd=(v,d)=>{if(v==null||!isFinite(v))return v;if(d==null)d=FX_SYMBOLS[curSym].dec;return Math.round(v*Math.pow(10,d))/Math.pow(10,d);};
+function syncInputs(){$("iPivot").value=rnd(S.pivot);$("iHigh").value=rnd(S.high);$("iH4").value=rnd(S.h4);$("iH1").value=rnd(S.h1);
+  $("iPrice").value=rnd(curPrice());if(!$("iDate").value)$("iDate").value=S.history.length?S.history[S.history.length-1].date:new Date().toISOString().slice(0,10);
+  if(!$("nDate").value)$("nDate").value="2026-07-06";
+  if(!$("gtPivot").value)$("gtPivot").value="2026-07-06T00:00";}
+function readInputs(){S.pivot=+$("iPivot").value||S.pivot;S.high=+$("iHigh").value||S.high;S.h4=+$("iH4").value||S.h4;S.h1=+$("iH1").value||S.h1;}
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1600);}
+$("recalc").onclick=()=>{readInputs();save(S);render();toast("Level dihitung ulang");};
+// --- Isi otomatis Pivot Low & Swing High dari histori (1D/1W/1M/1Y) ---
+function setPivotFromHistory(days,label){
+  const st=$("pivotAutoStatus");
+  const cutoff=Date.now()-days*86400000;
+  const cp=curPrice();
+  const plausible=v=>typeof v==="number"&&isFinite(v)&&v>0&&(!isFinite(cp)||cp<=0||(v>cp*0.3&&v<cp*3));
+  const hiVals=[],loVals=[];let tMin=null,nPts=0;
+  (S.histOHLC||[]).forEach(c=>{
+    if(typeof c.t==="number"&&c.t>=cutoff&&plausible(c.h)&&plausible(c.l)){
+      hiVals.push(c.h);loVals.push(c.l);nPts++;
+      if(tMin==null||c.t<tMin)tMin=c.t;
+    }
+  });
+  (S.ticks||[]).forEach(tk=>{
+    if(typeof tk.t==="number"&&tk.t>=cutoff&&plausible(tk.p)){
+      hiVals.push(tk.p);loVals.push(tk.p);nPts++;
+      if(tMin==null||tk.t<tMin)tMin=tk.t;
+    }
+  });
+  if(!hiVals.length){
+    st.textContent=`Belum ada data histori/tick yang masuk akal untuk rentang ${label} (dibandingkan harga sekarang ${idr(cp)}). Muat histori dulu (tombol ⚡ di bawah), atau nyalakan auto-refresh.`;
+    return;
+  }
+  const hi=Math.max(...hiVals),lo=Math.min(...loVals),rng=hi-lo;
+  const cakupHari=Math.max(1,Math.round((Date.now()-tMin)/86400000));
+  // Peringatan kalau data terlalu sedikit / rentang tak wajar sempit (bukan H/L harian sungguhan)
+  const rngPct=cp>0?rng/cp*100:0;
+  if(nPts<3||rngPct<0.15){
+    st.innerHTML=`<b>⚠️ Data terlalu sedikit/sempit untuk dipercaya</b> (${nPts} titik data, rentang cuma ${rngPct.toFixed(2)}% dari harga — Low=${idr(lo)}, High=${idr(hi)}). Ini kemungkinan cuma snapshot sesaat, <b>bukan</b> H/L sungguhan sepanjang ${label}. <b>Pivot/Swing High TIDAK diubah.</b> Muat histori dengan cakupan lebih panjang, atau nyalakan auto-refresh lebih lama dulu.`;
+    return;
+  }
+  S.pivot=lo;S.high=hi;save(S);syncInputs();render();
+  const kurang=cakupHari<days*0.9;
+  st.textContent=`Terisi dari ${label}: Low=${idr(lo)}, High=${idr(hi)} (${nPts} titik data).`+
+    (kurang?` Catatan jujur: data yang tersedia cuma menjangkau ~${cakupHari} hari (bukan penuh ${days} hari) — muat histori dengan rentang lebih panjang untuk cakupan penuh.`:` (cakupan data: ~${cakupHari} hari)`);
+}
+$("fibManHi").oninput=renderDailyFib;$("fibManLo").oninput=renderDailyFib;$("fibManClose").oninput=renderDailyFib;
+$("pivotAuto1D").onclick=()=>setPivotFromHistory(1,"1 hari (kemarin)");
+$("pivotAuto7D").onclick=()=>setPivotFromHistory(7,"1 minggu");
+$("pivotAuto30D").onclick=()=>setPivotFromHistory(30,"1 bulan");
+$("pivotAuto365D").onclick=()=>setPivotFromHistory(365,"1 tahun");
+$("save").onclick=()=>{readInputs();const date=$("iDate").value||new Date().toISOString().slice(0,10);const price=+$("iPrice").value;
+  if(!price){toast("Isi harga dulu");return;}const i=S.history.findIndex(x=>x.date===date);
+  if(i>=0)S.history[i].price=price;else S.history.push({date,price});S.history.sort((a,b)=>a.date.localeCompare(b.date));
+  save(S);render();toast("Tersimpan "+date);};
+$("reset").onclick=()=>{if(confirm("Reset ke data awal?")){S=defFor(curSym);save(S);syncInputs();render();toast("Direset");}};
+let tvLoaded=false;
+async function fetchLivePrice(silent){
+  const st=$("liveStatus"),cfg=FX_SYMBOLS[curSym];
+  try{
+    if(!silent)st.textContent="Mengambil harga live...";
+    const r=await fetch("https://www.live-rates.com/rates");
+    if(!r.ok)throw new Error("HTTP "+r.status);
+    const arr=await r.json();
+    const noSlash=cfg.lr.replace("/","");
+    const row=(Array.isArray(arr)?arr:Object.values(arr)).find(x=>{
+      const c=x.currency||x.symbol||x.pair||"";
+      return c===cfg.lr||c===noSlash||c===noSlash.toLowerCase();
+    });
+    if(!row)throw new Error(`${cfg.label} tidak ditemukan di respons (format field mungkin beda — cek konsol browser)`);
+    const price=parseFloat(row.rate||row.bid||row.mid||row.price),now=Date.now();
+    if(!price||isNaN(price))throw new Error("Field harga tidak terbaca dari respons");
+    $("iPrice").value=price.toFixed(cfg.dec);
+    if(!S.ticks)S.ticks=[];
+    S.ticks.push({t:now,p:price});
+    if(S.ticks.length>5000)S.ticks=S.ticks.slice(-5000); // batas memori
+    const today=new Date().toISOString().slice(0,10);
+    const i=S.history.findIndex(x=>x.date===today);
+    if(i>=0)S.history[i].price=price;else S.history.push({date:today,price});
+    S.history.sort((a,b)=>a.date.localeCompare(b.date));
+    save(S);render();
+    st.textContent=`Live: ${idr(price)} · diperbarui ${new Date().toLocaleTimeString("id-ID")} WIB · ${S.ticks.length} tick terkumpul (sumber: live-rates.com, ${cfg.label})`;
+  }catch(e){st.textContent="Gagal mengambil data live: "+e.message+" — cek koneksi internet.";}
+}
+let autoTimer=null;
+$("fetchLive").onclick=()=>fetchLivePrice(false);
+$("fetchHistory").onclick=fetchHistoryOHLC;
+$("autoRefresh").onchange=(e)=>{
+  if(e.target.checked){fetchLivePrice(false);autoTimer=setInterval(()=>fetchLivePrice(true),60000);toast("Auto-refresh aktif tiap 60 detik");}
+  else{clearInterval(autoTimer);toast("Auto-refresh dimatikan");}
+};
+// --- Prefetch histori OHLC (metalpriceapi.com — butuh API key gratis) → grid Gann penuh ---
+async function fetchHistoryOHLC(){
+  const st=$("histStatus"),key=($("histKey")&&$("histKey").value.trim())||"";
+  const days=+($("histDays")&&$("histDays").value)||14;
+  const sym=curSym; // mis. EURUSD → base EUR, quote USD
+  const base=sym.slice(0,3),quote=sym.slice(3,6);
+  if(!key){st.textContent="Isi API key metalpriceapi.com dulu (gratis, daftar ~30 detik via tautan).";return;}
+  try{
+    st.textContent="Mengambil histori candle harian...";
+    const out=[];const today=new Date();
+    for(let i=days;i>=1;i--){
+      const d=new Date(today.getTime()-i*86400000).toISOString().slice(0,10);
+      const r=await fetch(`https://api.metalpriceapi.com/v1/ohlc?api_key=${encodeURIComponent(key)}&base=${base}&currency=${quote}&date=${d}`);
+      if(!r.ok){if(r.status===429){st.textContent="Rate limit tercapai, coba lagi nanti.";break;}continue;}
+      const j=await r.json();
+      if(j&&j.rate){const rt=j.rate,ts=(j.timestamp?j.timestamp*1000:Date.parse(d));
+        out.push({t:ts,o:rt.open,h:rt.high,l:rt.low,c:rt.close});}
+    }
+    if(!out.length)throw new Error("Tidak ada data (cek API key / dukungan pasangan / kuota)");
+    out.sort((a,b)=>a.t-b.t);
+    S.histOHLC=out;save(S);render();
+    st.textContent=`Histori termuat: ${out.length} candle harian ${sym}. Grid Gann tergambar dari data lampau; tick live menyambung. (Tier gratis = candle harian.)`;
+  }catch(e){st.textContent="Gagal ambil histori: "+e.message;}
+}
+// --- Bangun candle: gabung histori OHLC (prefetch) + candle live dari tick ---
+function buildCandles(barMin){
+  const ms=barMin*60000,bars=new Map();
+  (S.histOHLC||[]).forEach(c=>{const key=Math.floor(c.t/ms)*ms;
+    if(!bars.has(key)){bars.set(key,{t:key,o:c.o,h:c.h,l:c.l,c:c.c});}
+    else{const b=bars.get(key);b.h=Math.max(b.h,c.h);b.l=Math.min(b.l,c.l);b.c=c.c;}});
+  const ticks=(S.ticks||[]).slice().sort((a,b)=>a.t-b.t);
+  ticks.forEach(tk=>{const key=Math.floor(tk.t/ms)*ms;
+    if(!bars.has(key))bars.set(key,{t:key,o:tk.p,h:tk.p,l:tk.p,c:tk.p});
+    const b=bars.get(key);b.h=Math.max(b.h,tk.p);b.l=Math.min(b.l,tk.p);b.c=tk.p;});
+  return[...bars.values()].sort((a,b)=>a.t-b.t);
+}
+// --- Deteksi fractal swing high/low (N=2 bar kiri-kanan) ---
+function fractalSwing(candles,n=2){
+  let swH=null,swL=null;
+  for(let i=n;i<candles.length-n;i++){
+    const c=candles[i];let isH=true,isL=true;
+    for(let k=1;k<=n;k++){
+      if(candles[i-k].h>=c.h||candles[i+k].h>=c.h)isH=false;
+      if(candles[i-k].l<=c.l||candles[i+k].l<=c.l)isL=false;
+    }
+    if(isH)swH=c;if(isL)swL=c;
+  }
+  return{swH,swL};
+}
+$("detectSwingFree").onclick=()=>{
+  const st=$("swingStatus"),barMin=+$("barMin").value||15;
+  const candles=buildCandles(barMin);
+  if(candles.length<10){st.textContent=`Baru ${candles.length} candle terkumpul (butuh min. 10). Nyalakan auto-refresh dan tunggu — makin lama makin akurat.`;return;}
+  const{swH,swL}=fractalSwing(candles,2);
+  if(!swH||!swL){st.textContent="Belum ada swing high/low yang terkonfirmasi (fractal 2 bar). Kumpulkan data lebih lama.";return;}
+  S.pivot=Math.floor(swL.l);S.high=Math.ceil(swH.h);
+  save(S);syncInputs();render();
+  const fw=t=>new Date(t).toLocaleString("id-ID",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});
+  st.textContent=`Swing terdeteksi (${candles.length} candle ${barMin}m, gratis): low ${idr(swL.l)} @ ${fw(swL.t)} · high ${idr(swH.h)} @ ${fw(swH.t)}. Pivot/Swing high sudah diperbarui.`;
+};
+// --- Backtest ★ konfluensi terhadap data tick sungguhan ---
+function runBacktest(){
+  const out=$("backtestResult"),tbl=$("backtestTable");
+  const ticks=(S.ticks||[]).slice().sort((a,b)=>a.t-b.t);
+  const pv=$("gtPivot").value;if(!pv){out.textContent="Set pivot Gann Time dulu.";return;}
+  const tf=+$("gtTF").value||60,pms=Date.parse(pv+":00+07:00");
+  const scale=+$("gtScale").value||8,P0=S.pivot,rng=S.high-S.pivot;
+  const cross=crossPoints(pms,tf,scale,P0,rng);
+  const now=Date.now(),winMs=2*3600000,tol=0.003;
+  const nearTick=(t)=>{let best=null,bd=Infinity;ticks.forEach(tk=>{const d=Math.abs(tk.t-t);if(d<bd){bd=d;best=tk;}});return bd<10*60000?best:null;};
+  let tested=0,hit=0,rows=[];
+  cross.filter(c=>c.ms<now).forEach(c=>{
+    const before=ticks.filter(t=>t.t>=c.ms-winMs&&t.t<=c.ms);
+    const after=ticks.filter(t=>t.t>=c.ms&&t.t<=c.ms+winMs);
+    if(before.length<2||after.length<2)return;
+    const atCross=nearTick(c.ms);if(!atCross)return;
+    if(Math.abs(atCross.p-c.price)/c.price>tol)return;
+    const trendB=before[before.length-1].p-before[0].p;
+    const trendA=after[after.length-1].p-after[0].p;
+    const rev=Math.sign(trendB)!==0&&Math.sign(trendA)!==0&&Math.sign(trendB)!==Math.sign(trendA)&&Math.abs(trendA)>rng*0.005;
+    tested++;if(rev)hit++;
+    rows.push({t:c.ms,label:c.label,price:c.price,rev});
+  });
+  if(tested===0){out.innerHTML=`Belum ada titik ★ masa lalu yang tercakup data tick tersimpan (${ticks.length} tick). Nyalakan auto-refresh lebih lama supaya makin banyak yang bisa divalidasi.`;tbl.innerHTML="";return;}
+  const pct=(hit/tested*100).toFixed(0);
+  out.innerHTML=`<b style="color:var(--goldS);font-size:16px">${hit}/${tested} (${pct}%)</b> titik ★ diikuti pembalikan arah dalam ±2 jam — dihitung dari data tick sungguhan yang tersimpan (bukan simulasi). Sampel kecil belum tentu representatif; makin banyak data, makin bisa dipercaya.`;
+  tbl.innerHTML=rows.map(r=>`<tr><td class="num">${fmtWIB(r.t)}</td><td>${r.label}</td><td class="num">${idr(r.price)}</td><td>${r.rev?'<span class="tag t-sup">terkonfirmasi</span>':'<span class="tag t-res">tidak</span>'}</td></tr>`).join("");
+}
+$("runBacktest").onclick=runBacktest;
+
+// --- Fibonacci Harian (dari high/low tick live hari ini) ---
+function renderDailyFib(){
+  const cardsEl=$("dailyFibCards"),tbl=$("dailyFibTable"),note=$("dailyFibNote");
+  const isNum=v=>typeof v==="number"&&isFinite(v)&&v>0;
+  const cp=curPrice();
+  const plausible=v=>isNum(v)&&isNum(cp)&&v>cp*0.3&&v<cp*3; // tolak angka yang jauh di luar akal (mis. "1")
+  const dayOf=t=>new Date(t).toISOString().slice(0,10);
+  const todayStr=dayOf(Date.now()),yStr=dayOf(Date.now()-86400000);
+  let pHi=null,pLo=null,oToday=null,sumber="";
+
+  // --- 1) INPUT MANUAL: selalu diprioritaskan kalau diisi ---
+  const mHi=parseFloat($("fibManHi").value),mLo=parseFloat($("fibManLo").value),mClose=parseFloat($("fibManClose").value);
+  if(isFinite(mHi)&&mHi>0&&isFinite(mLo)&&mLo>0&&isFinite(mClose)&&mClose>0&&mHi>mLo){
+    pHi=mHi;pLo=mLo;oToday=mClose;sumber="input manual Anda";
+  } else {
+    // --- 2) OTOMATIS: histori candle + fallback tick live ---
+    let pCloseT=null;
+    (S.histOHLC||[]).slice().sort((a,b)=>a.t-b.t).forEach(c=>{
+      if(!isNum(c.t))return;
+      const d=dayOf(c.t);
+      if(d===yStr&&plausible(c.h)&&plausible(c.l)){
+        pHi=pHi==null?c.h:Math.max(pHi,c.h);pLo=pLo==null?c.l:Math.min(pLo,c.l);
+        if(plausible(c.c)&&(pCloseT==null||c.t>=pCloseT)){oToday=c.c;pCloseT=c.t;}
+      }
+    });
+    const ticks=(S.ticks||[]).filter(t=>isNum(t.t)&&plausible(t.p)).slice().sort((a,b)=>a.t-b.t);
+    if(pHi==null||pLo==null){const ys=ticks.filter(t=>dayOf(t.t)===yStr);
+      if(ys.length){pHi=Math.max(...ys.map(t=>t.p));pLo=Math.min(...ys.map(t=>t.p));}}
+    if(oToday==null){const ys=ticks.filter(t=>dayOf(t.t)===yStr);if(ys.length)oToday=ys[ys.length-1].p;}
+    if(pHi!=null&&!plausible(pHi))pHi=null;
+    if(pLo!=null&&!plausible(pLo))pLo=null;
+    if(oToday!=null&&!plausible(oToday))oToday=null;
+    if(pHi!=null&&pLo!=null&&oToday!=null&&pHi>pLo){sumber="data live kemarin/hari ini (otomatis)";}
+    else{
+      pHi=plausible(S.high)?S.high:cp*1.02;
+      pLo=plausible(S.pivot)?S.pivot:cp*0.98;
+      oToday=isNum(cp)?cp:pHi;
+      sumber="perkiraan dari Pivot/High &amp; harga sekarang (data live kemarin belum lengkap — isi kotak manual di atas untuk hasil pasti)";
+    }
+  }
+
+  if(!isNum(pHi)||!isNum(pLo)||!isNum(oToday)||pHi<=pLo){
+    cardsEl.innerHTML="";tbl.innerHTML="";
+    note.innerHTML="Data harga belum tersedia/valid. Isi 3 kotak manual di atas, atau cek input Pivot/High.";
+    return;
+  }
+  const rng=pHi-pLo;
+  cardsEl.innerHTML=`
+    <div class="card"><div class="k">High kemarin</div><div class="v gold num">${idr(pHi)}</div></div>
+    <div class="card"><div class="k">Low kemarin</div><div class="v gold num">${idr(pLo)}</div></div>
+    <div class="card"><div class="k">Range kemarin</div><div class="v num">${idr(rng)}</div></div>
+    <div class="card"><div class="k">Close kemarin (0%)</div><div class="v gold num">${idr(oToday)}</div></div>`;
+  const ratios=[[25,.25],[30,.30],[50,.50],[61.8,.618],[75,.75],[100,1]];
+  let rows=`<tr style="background:rgba(231,200,104,.07)"><td><b>Start 0%</b></td><td class="num" colspan="2" style="color:var(--goldS);font-weight:700">${idr(oToday)}</td></tr>`;
+  rows+=ratios.map(([lbl,r])=>{
+    const up=oToday+r*rng,dn=oToday-r*rng;
+    const upN=Math.abs(up-cp)<rng*0.03,dnN=Math.abs(dn-cp)<rng*0.03;
+    return `<tr><td>${lbl}%</td><td class="num" ${upN?'style="color:var(--goldS);font-weight:700"':''}>${idr(up)}</td><td class="num" ${dnN?'style="color:var(--goldS);font-weight:700"':''}>${idr(dn)}</td></tr>`;
+  }).join("");
+  tbl.innerHTML=rows;
+  note.innerHTML=`Range = High−Low kemarin, 0% = Close kemarin, level = Close ± rasio×Range. Sumber saat ini: <b>${sumber}</b>. Angka emas = terdekat harga sekarang.`;
+}
+// --- Rotasi ATH: konfluensi Price x Time (Gann Square of 9) ---
+function renderATH(){
+  const athP=+$("athPrice").value||5608,athDs=$("athDate").value||"2026-01-29";
+  const athDate=new Date(athDs+"T00:00:00Z"),now=new Date(),cp=curPrice();
+  const sqrtATH=Math.sqrt(athP);
+  const priceAt=deg=>{const r=sqrtATH-deg/180;return r>0?r*r:null;};
+  const totalDegPrice=(sqrtATH-Math.sqrt(cp))*180;
+  const remDegP=totalDegPrice%360;
+  const days=Math.round((now-athDate)/86400000);
+  const remDegT=days%360;
+  const nearestCard=r=>{const cs=[0,90,180,270,360];let best=cs[0];cs.forEach(c=>{if(Math.abs(c-r)<Math.abs(best-r))best=c;});return best;};
+  const pc=nearestCard(remDegP),tc=nearestCard(remDegT);
+  $("athCards").innerHTML=`
+    <div class="card"><div class="k">Turun dari ATH</div><div class="v down num">${((athP-cp)/athP*100).toFixed(1)}%</div><div class="s">${idr(athP-cp)} poin</div></div>
+    <div class="card"><div class="k">Rotasi harga</div><div class="v gold num">${remDegP.toFixed(0)}°</div><div class="s">dekat cardinal ${pc}° (Δ${(remDegP-pc).toFixed(0)}°)</div></div>
+    <div class="card"><div class="k">Rotasi waktu</div><div class="v gold num">${remDegT}°</div><div class="s">${days} hari · dekat cardinal ${tc}° (Δ${remDegT-tc})</div></div>
+    <div class="card"><div class="k">Status</div><div class="v ${Math.abs(remDegP-pc)<10?'gold':''}" style="font-size:15px">${Math.abs(remDegP-pc)<10?'Harga di cardinal!':'Menuju cardinal'}</div></div>`;
+  const kCenter=Math.round(totalDegPrice/90);
+  let rows=[];
+  for(let k=kCenter-3;k<=kCenter+3;k++){const d=k*90,p=priceAt(d);if(p)rows.push({d,p});}
+  rows.sort((a,b)=>b.p-a.p);
+  $("athPriceTable").innerHTML=rows.map(r=>{const near=Math.abs(r.p-cp)<cp*0.005;
+    const role=r.p>cp?'<span class="tag t-res">Resistensi</span>':r.p<cp?'<span class="tag t-sup">Support</span>':'<span class="tag t-dec">Sekarang</span>';
+    return `<tr${near?' class="now-row"':''}><td class="num">${idr(r.p)}</td><td>${role}</td></tr>`;}).join("");
+  let trows=[];
+  for(let k=1;k<=6;k++){const d=k*90,dt=new Date(athDate.getTime()+d*86400000);trows.push({d,dt});}
+  const upcoming=trows.filter(x=>x.dt>=now).sort((a,b)=>a.d-b.d);
+  const nextD=upcoming.length?upcoming[0].d:null;
+  $("athTimeTable").innerHTML=trows.map(r=>{const passed=r.dt<now,isNext=r.d===nextD;
+    const dstr=r.dt.toISOString().slice(0,10);
+    return `<tr${isNext?' class="now-row"':''}><td>${r.d} hari · ${dstr}</td><td>${passed?'sudah lewat':(isNext?'<span class="tag t-dec">★ target terdekat</span>':'akan datang')}</td></tr>`;}).join("");
+  const nextT=upcoming.length?upcoming[0]:trows[trows.length-1];
+  $("athSummary").innerHTML=`<b>Ringkasan:</b> harga saat ini <b>${idr(cp)}</b> berjarak <b>${(remDegP-pc).toFixed(1)}°</b> dari cardinal harga terdekat (level <b>${idr(priceAt(kCenter*90))}</b>). Target waktu berikutnya: <b>${nextT.dt.toISOString().slice(0,10)}</b> (${nextT.d} hari dari ATH). Konfluensi terkuat: saat harga berada di salah satu level cardinal pada tabel di atas <i>bertepatan</i> dengan tanggal target waktu.`;
+  drawATHChart(athP,athDate,cp,kCenter,priceAt,days);
+}
+function drawATHChart(athP,athDate,cp,kCenter,priceAt,days){
+  const fmtShort=d=>{const M=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];return d.getUTCDate()+" "+M[d.getUTCMonth()];};
+  const now=Date.now();
+  const resPrice=priceAt(kCenter*90),supPrice=priceAt((kCenter+1)*90);
+  const targetDays=Math.ceil((days+1)/90)*90;
+  const targetDate=new Date(athDate.getTime()+targetDays*86400000);
+  let pts=[{t:athDate.getTime(),p:athP}];
+  (S.history||[]).forEach(h=>{const t=Date.parse(h.date+"T00:00:00Z");if(t>athDate.getTime()&&t<=now)pts.push({t,p:h.price});});
+  pts.push({t:now,p:cp});
+  pts=pts.filter((v,i,a)=>a.findIndex(x=>x.t===v.t)===i).sort((a,b)=>a.t-b.t);
+  const domainDays=Math.max(targetDays,days)*1.0;
+  const x0=60,x1=560,y0=40,y1=340;
+  const X=t=>x0+((t-athDate.getTime())/86400000/domainDays)*(x1-x0);
+  const priceVals=[athP,cp,resPrice,supPrice,...pts.map(p=>p.p)];
+  const pMin=Math.min(...priceVals)*0.985,pMax=Math.max(...priceVals)*1.015;
+  const Y=p=>y1-(p-pMin)/(pMax-pMin)*(y1-y0);
+  let s=`<svg viewBox="0 0 680 385" role="img" aria-label="Grafik rotasi ATH price times time"><title>Rotasi Gann dari ATH ke target waktu berikutnya</title>`;
+  s+=`<line x1="${x0}" y1="${y0}" x2="${x0}" y2="${y1}" stroke="var(--border-strong,#33396E)" stroke-width="0.5"/>`;
+  s+=`<line x1="${x0}" y1="${y1}" x2="${x1}" y2="${y1}" stroke="var(--border-strong,#33396E)" stroke-width="0.5"/>`;
+  s+=`<line x1="${x0}" y1="${Y(resPrice).toFixed(1)}" x2="566" y2="${Y(resPrice).toFixed(1)}" stroke="#BA7517" stroke-width="1" stroke-dasharray="5 4"/>`;
+  s+=`<line x1="${x0}" y1="${Y(supPrice).toFixed(1)}" x2="566" y2="${Y(supPrice).toFixed(1)}" stroke="#0F6E56" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+  const xT=X(targetDate.getTime());
+  s+=`<line x1="${xT.toFixed(1)}" y1="${y0}" x2="${xT.toFixed(1)}" y2="${y1}" stroke="#BA7517" stroke-width="1" stroke-dasharray="2 3"/>`;
+  let path="M"+pts.map(p=>X(p.t).toFixed(1)+","+Y(p.p).toFixed(1)).join(" L");
+  s+=`<path d="${path}" fill="none" stroke="#D85A30" stroke-width="2" stroke-linecap="round"/>`;
+  const last=pts[pts.length-1];
+  s+=`<path d="M${X(last.t).toFixed(1)},${Y(last.p).toFixed(1)} L${xT.toFixed(1)},${Y(supPrice).toFixed(1)}" fill="none" stroke="#8A8FB0" stroke-width="1.2" stroke-dasharray="4 3" stroke-linecap="round"/>`;
+  s+=`<circle cx="${X(pts[0].t).toFixed(1)}" cy="${Y(pts[0].p).toFixed(1)}" r="4" fill="#D85A30"/>`;
+  s+=`<circle cx="${X(last.t).toFixed(1)}" cy="${Y(last.p).toFixed(1)}" r="4" fill="#D85A30"/>`;
+  s+=`<circle cx="${xT.toFixed(1)}" cy="${Y(supPrice).toFixed(1)}" r="5" fill="none" stroke="#0F6E56" stroke-width="2"/><circle cx="${xT.toFixed(1)}" cy="${Y(supPrice).toFixed(1)}" r="2" fill="#0F6E56"/>`;
+  s+=`<text class="sh" x="570" y="${(Y(athP)+4).toFixed(1)}">ATH ${idr(athP)}</text>`;
+  s+=`<text class="sh" x="570" y="${(Y(resPrice)+4).toFixed(1)}" style="fill:#854F0B">${idr(resPrice)}</text>`;
+  s+=`<text class="sh" x="570" y="${(Y(supPrice)+4).toFixed(1)}" style="fill:#085041">★ ${idr(supPrice)}</text>`;
+  s+=`<text class="sm" x="${(xT+4).toFixed(1)}" y="50">${targetDays}°</text>`;
+  s+=`<text class="sm" x="${X(pts[0].t).toFixed(1)}" y="360" text-anchor="middle">${fmtShort(athDate)}</text>`;
+  s+=`<text class="sh" x="${X(last.t).toFixed(1)}" y="360" text-anchor="middle" style="fill:#6AA9E9">${fmtShort(new Date(last.t))}</text>`;
+  s+=`<text class="sh" x="${xT.toFixed(1)}" y="360" text-anchor="middle" style="fill:#BA7517">${fmtShort(targetDate)}</text>`;
+  s+=`</svg>`;
+  $("athChart").innerHTML=s;
+}
+$("athPrice").onchange=renderATH;$("athDate").onchange=renderATH;
+function loadTV(){
+  const cfg=FX_SYMBOLS[curSym];
+  $("liveNote").textContent=`Chart live TradingView (${cfg.tv}). Butuh internet; buka file ini di browser. Ganti timeframe H1/H4 di toolbar chart.`;
+  $("tvchart").innerHTML="";
+  const draw=()=>{try{new TradingView.widget({container_id:"tvchart",symbol:cfg.tv,interval:"60",timezone:"Asia/Jakarta",theme:"dark",style:"1",locale:"id",autosize:true,hide_side_toolbar:false,studies:[]});}catch(e){$("tvchart").innerHTML='<div class="live-note">Gagal memuat TradingView.</div>';}};
+  if(tvLoaded){draw();return;}
+  tvLoaded=true;const sc=document.createElement("script");sc.src="https://s3.tradingview.com/tv.js";
+  sc.onload=draw;
+  sc.onerror=()=>{$("tvchart").innerHTML='<div class="live-note">TradingView tidak dapat dimuat (offline/diblokir). Buka file di browser dengan internet.</div>';};
+  document.body.appendChild(sc);
+}
+$("tabCalc").onclick=()=>{$("tabCalc").classList.add("on");$("tabLive").classList.remove("on");$("viewCalc").classList.add("on");$("viewLive").classList.remove("on");};
+$("tabLive").onclick=()=>{$("tabLive").classList.add("on");$("tabCalc").classList.remove("on");$("viewLive").classList.add("on");$("viewCalc").classList.remove("on");loadTV();};
+$("nDate").onchange=renderNatal;$("nTime").onchange=renderNatal;
+const GT_SCALE_PRESET={15:3,30:5,60:8,240:25,1440:55,10080:130,43200:280};
+$("gtTF").onchange=()=>{$("gtScale").value=GT_SCALE_PRESET[$("gtTF").value]||$("gtScale").value;renderGannTime();};
+$("gtPivot").onchange=renderGannTime;$("gtScale").onchange=renderGannTime;$("gtWin").onchange=renderGannTime;
+// --- Symbol picker (multi pasangan forex) ---
+function populateSymbolPicker(){
+  const sel=$("symbolPicker");
+  sel.innerHTML=Object.keys(FX_SYMBOLS).map(k=>`<option value="${k}">${FX_SYMBOLS[k].label}</option>`).join("");
+  sel.value=curSym;
+}
+function switchSymbol(sym){
+  if(!FX_SYMBOLS[sym])return;
+  curSym=sym;localStorage.setItem("fx_current_symbol",curSym);
+  S=load();syncInputs();render();
+  if($("viewLive").classList.contains("on"))loadTV();
+  toast("Beralih ke "+FX_SYMBOLS[curSym].label);
+}
+$("symbolPicker").onchange=(e)=>switchSymbol(e.target.value);
+populateSymbolPicker();
+syncInputs();render();
+addEventListener("resize",()=>{drawFan();drawHist();});
+</script>
+</body>
+</html>

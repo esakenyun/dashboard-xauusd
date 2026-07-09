@@ -4,15 +4,15 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 ---
 
-<Layout title="XAUUSD — Dashboard Astro-Gann (Auto-update + Live)" description="Dashboard hitung Gann Fan, Square of Nine dua arah, Fibonacci Harian, rotasi ATH, Gann Time, backtest, plus data live gold-api.com dan chart TradingView.">
+<Layout title="Crypto — Dashboard Astro-Gann (Auto-update + Live)" description="Dashboard multi-koin (BTC/ETH/SOL/BNB/XRP/DOGE/ADA/LTC/DOT/AVAX) — Gann Fan, Square of Nine dua arah, Fibonacci Harian, rotasi ATH, Gann Time, backtest, data live CoinGecko, chart TradingView.">
   <Header />
 
-  <div class="xaug-dashboard-page">
+  <div class="xcrypto-dashboard-page">
     <div class="wrap">
       <header>
-        <div class="eyebrow">Trade Plan Mingguan · XAUUSD</div>
-        <h1>Dashboard Astro-Gann — Auto-update &amp; Live</h1>
-        <p class="sub">Ubah pivot / harga → semua level Gann (Fan, Square of 9, Fibo Harian) hitung ulang otomatis &amp; tersimpan. Ambil harga live, muat histori, deteksi swing otomatis, dan backtest konfluensi terhadap data sungguhan.</p>
+        <div class="eyebrow">Trade Plan Mingguan · Crypto</div>
+        <h1>Dashboard Astro-Gann — Auto-update &amp; Live (Crypto)</h1>
+        <p class="sub">Pilih koin kripto, lalu ubah pivot/harga → semua level Gann hitung ulang otomatis &amp; tersimpan per koin. Ambil harga live, muat histori, deteksi swing otomatis, dan backtest konfluensi terhadap data sungguhan.</p>
         <div class="disc"><b>Disclaimer:</b> level Gann bergantung asumsi pivot/skala. Probabilitas = heuristik dari posisi harga. <b>Bukan nasihat keuangan.</b></div>
       </header>
 
@@ -22,6 +22,12 @@ import Footer from '../components/Footer.astro';
       </div>
 
       <section class="view on" id="viewCalc">
+        <div class="live-note">
+          <label style="margin-bottom:4px">Pilih koin kripto</label>
+          <select id="symbolPicker" style="font-size:16px;font-weight:700"></select>
+          <p class="sub" style="margin:8px 0 0">Ganti koin → seluruh data (pivot, riwayat, level Gann, chart) beralih ke penyimpanan terpisah milik koin itu.</p>
+        </div>
+
         <div class="inputs">
           <div><label>Pivot low</label><input type="number" id="iPivot" step="1"></div>
           <div><label>Swing high</label><input type="number" id="iHigh" step="1"></div>
@@ -50,7 +56,8 @@ import Footer from '../components/Footer.astro';
         </div>
 
         <div class="live-note" style="margin-top:14px">
-          <b>📡 Data live (gold-api.com — gratis, tanpa key untuk harga real-time):</b>
+          <b>📡 Data live (CoinGecko — gratis, tanpa key, keyless public API):</b>
+          <p class="sub" style="margin:6px 0">Rate limit publik ~10-30 request/menit — cukup untuk auto-refresh 60 detik. Kalau kena limit, tunggu sebentar lalu coba lagi.</p>
           <div class="btnrow" style="margin-top:8px">
             <button class="btn btn-gold" id="fetchLive">Ambil harga live sekarang</button>
             <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ivory)"><input type="checkbox" id="autoRefresh" style="width:auto"> Auto-refresh tiap 60 detik</label>
@@ -60,32 +67,24 @@ import Footer from '../components/Footer.astro';
 
         <div class="live-note" style="margin-top:10px">
           <b>⚡ Muat histori candle (untuk Fibonacci Harian akurat):</b>
-          <p class="sub" style="margin:6px 0">Tarik candle harian masa lalu dari <b>metalpriceapi.com</b> (tier gratis, butuh API key — daftar ~30 detik tanpa kartu) supaya <b>Fibonacci Harian</b> di bawah langsung dapat High/Low kemarin &amp; Close (harga sekarang) yang akurat, bukan menunggu lintas hari. <i>Tier gratis = candle harian.</i></p>
+          <p class="sub" style="margin:6px 0">Tarik ratusan candle masa lalu dari CoinGecko sekaligus, supaya <b>Fibonacci Harian</b> di bawah langsung dapat High/Low kemarin &amp; Close (harga sekarang) yang akurat, bukan menunggu lintas hari.</p>
           <div class="inputs" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
-            <div><label>API Key metalpriceapi</label><input type="text" id="histKey" placeholder="tempel API key"></div>
-            <div><label>Rentang histori (hari)</label><select id="histDays"><option value="7">7 hari</option><option value="14" selected>14 hari</option><option value="30">30 hari</option><option value="60">60 hari</option></select></div>
+            <div><label>Rentang histori (hari)</label><select id="histDays"><option value="7">7 hari</option><option value="14">14 hari</option><option value="30" selected>30 hari</option><option value="90">90 hari</option><option value="180">180 hari</option><option value="365">365 hari</option></select></div>
           </div>
           <div class="btnrow">
-            <button class="btn btn-gold" id="fetchHistory">Muat histori &amp; gambar grid</button>
-            <a href="https://metalpriceapi.com" target="_blank" rel="noopener" style="align-self:center;font-size:12px;color:var(--goldS)">Daftar API key gratis →</a>
+            <button class="btn btn-gold" id="fetchHistory">Muat histori &amp; gambar grid sekarang</button>
           </div>
           <div class="sub" id="histStatus" style="margin-top:6px">Belum dimuat.</div>
         </div>
 
         <div class="live-note" style="margin-top:10px">
-          <b>🔎 Deteksi swing otomatis — 2 cara:</b>
-          <p class="sub" style="margin:6px 0">
-            <b>A) Gratis (bawaan):</b> dashboard mengumpulkan harga live jadi candle sendiri selama auto-refresh aktif — makin lama dinyalakan, makin akurat. Tidak instan untuk masa lalu, tapi tanpa biaya.<br>
-            <b>B) Instan/berbayar:</b> data candle historis (per-jam/menit) adalah fitur <b>Premium gold-api.com ($10/bulan)</b> — kalau Anda upgrade, isi API key di bawah untuk deteksi instan dari histori panjang.
-          </p>
+          <b>🔎 Deteksi swing otomatis (dari data terkumpul, gratis):</b>
+          <p class="sub" style="margin:6px 0">Dashboard mengumpulkan harga live jadi candle sendiri selama auto-refresh aktif — makin lama dinyalakan, makin akurat.</p>
           <div class="inputs" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
             <div><label>Ukuran candle (menit)</label><input type="number" id="barMin" value="15" step="5"></div>
-            <div><label>API Key Premium (opsional)</label><input type="text" id="goldApiKey" placeholder="kosongkan jika pakai cara gratis"></div>
           </div>
           <div class="btnrow">
             <button class="btn btn-gold" id="detectSwingFree">Deteksi dari data terkumpul (gratis)</button>
-            <button class="btn btn-ghost" id="detectSwing">Deteksi instan (Premium)</button>
-            <a href="https://gold-api.com/pricing" target="_blank" rel="noopener" style="align-self:center;font-size:12px;color:var(--goldS)">Lihat harga Premium →</a>
           </div>
           <div class="sub" id="swingStatus" style="margin-top:6px">Belum dideteksi.</div>
         </div>
@@ -129,11 +128,11 @@ import Footer from '../components/Footer.astro';
           <table><thead><tr><th>Rotasi</th><th>Tipe</th><th>Arah</th><th>Harga</th></tr></thead><tbody id="sq9"></tbody></table>
         </div>
 
-        <h2><span class="ic">◆</span> Rotasi dari ATH — konfluensi Price × Time</h2>
-        <p class="sub">Menghitung rotasi Gann (Square of 9) dari titik ATH (harga &amp; tanggal tertinggi) ke harga sekarang — dua metode berbeda: rotasi <b>harga</b> (cardinal 90° pada skala akar kuadrat) dan rotasi <b>waktu</b> (1 hari = 1°). Ubah ATH kapan saja bila ada rekor baru.</p>
+        <h2><span class="ic">◆</span> Rotasi dari titik referensi tertinggi — konfluensi Price × Time</h2>
+        <p class="sub">Menghitung rotasi Gann (Square of 9) dari titik referensi tertinggi (swing high signifikan pilihan Anda) ke harga sekarang. <b>Nilai di bawah cuma contoh placeholder</b> — ganti dengan swing high &amp; tanggal sungguhan sesuai koin &amp; skala yang sedang aktif.</p>
         <div class="inputs" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
-          <div><label>Harga ATH</label><input type="number" id="athPrice" value="5608" step="1"></div>
-          <div><label>Tanggal ATH</label><input type="date" id="athDate" value="2026-01-29"></div>
+          <div><label>Harga referensi tertinggi</label><input type="number" id="athPrice" value="73000" step="100"></div>
+          <div><label>Tanggal referensi</label><input type="date" id="athDate" value="2026-01-01"></div>
         </div>
         <div class="cards" id="athCards"></div>
         <div class="table-wrap">
@@ -143,16 +142,16 @@ import Footer from '../components/Footer.astro';
           <table><thead><tr><th>Tanggal (cardinal 90 hari)</th><th>Status</th></tr></thead><tbody id="athTimeTable"></tbody></table>
         </div>
         <p class="sub" id="athSummary"></p>
-        <figure><div id="athChart"></div><figcaption>Garis oranye = harga aktual (ATH → sekarang). Putus-putus abu = arah menuju tanggal target (bukan prediksi). Amber/teal putus = level cardinal harga. Garis vertikal emas = cardinal waktu. ★ = konfluensi price×time.</figcaption></figure>
+        <figure><div id="athChart"></div><figcaption>Garis oranye = harga aktual (referensi → sekarang). Putus-putus abu = arah menuju tanggal target (bukan prediksi). Amber/teal putus = level cardinal harga. Garis vertikal emas = cardinal waktu. ★ = konfluensi price×time.</figcaption></figure>
 
-        <h2><span class="ic">◷</span> Sesi pasar dunia (WIB)</h2>
+        <h2><span class="ic">◷</span> Jam aktif pasar kripto (WIB)</h2>
+        <p class="sub">Kripto diperdagangkan 24/7 tanpa jam tutup. Volume tertinggi biasanya bertepatan dengan jam bursa tradisional berikut (WIB):</p>
         <div class="table-wrap">
-          <table><thead><tr><th>Sesi</th><th>Lokal</th><th>WIB</th></tr></thead><tbody>
-            <tr><td>Sydney</td><td>07–16 AEST</td><td class="num">04:00–13:00</td></tr>
-            <tr><td>Tokyo</td><td>09–18 JST</td><td class="num">07:00–16:00</td></tr>
+          <table><thead><tr><th>Sesi referensi</th><th>Lokal</th><th>WIB</th></tr></thead><tbody>
+            <tr><td>Asia (Tokyo/Singapura)</td><td>09–18 JST</td><td class="num">07:00–16:00</td></tr>
             <tr><td>London</td><td>08–17 BST</td><td class="num">14:00–23:00</td></tr>
-            <tr><td>New York</td><td>08–17 EDT</td><td class="num">19:00–04:00</td></tr>
-            <tr class="now-row"><td>Overlap London–NY (emas paling aktif)</td><td>08–12 EDT</td><td class="num">19:00–23:00</td></tr>
+            <tr class="now-row"><td>New York (volume tertinggi)</td><td>08–17 EDT</td><td class="num">19:00–04:00</td></tr>
+            <tr class="now-row"><td>Overlap London–NY</td><td>08–12 EDT</td><td class="num">19:00–23:00</td></tr>
           </tbody></table>
         </div>
 
@@ -191,7 +190,7 @@ import Footer from '../components/Footer.astro';
       </section>
 
       <section class="view" id="viewLive">
-        <div class="live-note">Chart live TradingView (OANDA:XAUUSD). Butuh internet. Ganti timeframe H1/H4 di toolbar chart.</div>
+        <div class="live-note" id="liveNote">Chart live TradingView. Butuh internet. Ganti timeframe H1/H4 di toolbar chart.</div>
         <figure style="padding:0;overflow:hidden">
           <div class="tradingview-widget-container tv-wrap"><div id="tvchart" style="height:100%"></div></div>
         </figure>
@@ -204,7 +203,7 @@ import Footer from '../components/Footer.astro';
 </Layout>
 
 <style is:global>
-  .xaug-dashboard-page {
+  .xcrypto-dashboard-page {
     --bg2:#161B3E;--panel:#1C2350;--panel2:#232B60;--ivory:#EDE8DA;--muted:#9AA0C8;
     --line:#33396E;--gold:#3b82f6;--goldS:#60a5fa;--teal:#5FB0B7;--blue:#6AA9E9;--crim:#C7566A;--green:#7FBF8A;
     background:radial-gradient(1000px 500px at 85% -10%,rgba(59,130,246,.10),transparent 60%),
@@ -212,50 +211,50 @@ import Footer from '../components/Footer.astro';
     color:var(--ivory);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5;padding:24px;
     min-height:100vh;position:relative;z-index:10;
   }
-  .xaug-dashboard-page *{box-sizing:border-box}
-  .xaug-dashboard-page .wrap{max-width:1000px;margin:0 auto}
-  .xaug-dashboard-page h1,.xaug-dashboard-page h2,.xaug-dashboard-page h3{font-family:"Iowan Old Style",Palatino,Georgia,serif;font-weight:600;margin:0}
-  .xaug-dashboard-page h1{font-size:26px} .xaug-dashboard-page h2{font-size:18px;margin:26px 0 10px;color:var(--goldS)} .xaug-dashboard-page h2 .ic{color:var(--gold)}
-  .xaug-dashboard-page .num{font-variant-numeric:tabular-nums}
-  .xaug-dashboard-page .eyebrow{letter-spacing:.26em;text-transform:uppercase;font-size:11px;color:var(--gold);margin-bottom:6px}
-  .xaug-dashboard-page .sub{color:var(--muted);font-size:13.5px;margin-top:6px}
-  .xaug-dashboard-page .disc{margin-top:14px;border:1px solid var(--line);border-left:3px solid var(--gold);
+  .xcrypto-dashboard-page *{box-sizing:border-box}
+  .xcrypto-dashboard-page .wrap{max-width:1000px;margin:0 auto}
+  .xcrypto-dashboard-page h1,.xcrypto-dashboard-page h2,.xcrypto-dashboard-page h3{font-family:"Iowan Old Style",Palatino,Georgia,serif;font-weight:600;margin:0}
+  .xcrypto-dashboard-page h1{font-size:26px} .xcrypto-dashboard-page h2{font-size:18px;margin:26px 0 10px;color:var(--goldS)} .xcrypto-dashboard-page h2 .ic{color:var(--gold)}
+  .xcrypto-dashboard-page .num{font-variant-numeric:tabular-nums}
+  .xcrypto-dashboard-page .eyebrow{letter-spacing:.26em;text-transform:uppercase;font-size:11px;color:var(--gold);margin-bottom:6px}
+  .xcrypto-dashboard-page .sub{color:var(--muted);font-size:13.5px;margin-top:6px}
+  .xcrypto-dashboard-page .disc{margin-top:14px;border:1px solid var(--line);border-left:3px solid var(--gold);
     background:rgba(59,130,246,.06);border-radius:8px;padding:11px 15px;font-size:12.5px;color:#cfd2ec}
-  .xaug-dashboard-page .disc b{color:var(--goldS)}
-  .xaug-dashboard-page .tabs{display:flex;gap:8px;margin:16px 0 4px}
-  .xaug-dashboard-page .tab{border:1px solid var(--line);background:var(--panel);color:var(--ivory);border-radius:10px;
+  .xcrypto-dashboard-page .disc b{color:var(--goldS)}
+  .xcrypto-dashboard-page .tabs{display:flex;gap:8px;margin:16px 0 4px}
+  .xcrypto-dashboard-page .tab{border:1px solid var(--line);background:var(--panel);color:var(--ivory);border-radius:10px;
     padding:9px 16px;font:600 14px system-ui;cursor:pointer}
-  .xaug-dashboard-page .tab.on{background:linear-gradient(180deg,var(--goldS),var(--gold));color:#04101f;border-color:transparent}
-  .xaug-dashboard-page .view{display:none} .xaug-dashboard-page .view.on{display:block}
-  .xaug-dashboard-page .inputs{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;background:var(--panel);
+  .xcrypto-dashboard-page .tab.on{background:linear-gradient(180deg,var(--goldS),var(--gold));color:#04101f;border-color:transparent}
+  .xcrypto-dashboard-page .view{display:none} .xcrypto-dashboard-page .view.on{display:block}
+  .xcrypto-dashboard-page .inputs{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;background:var(--panel);
     border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:8px}
-  .xaug-dashboard-page label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
-  .xaug-dashboard-page input,.xaug-dashboard-page select{width:100%;background:var(--bg2);border:1px solid var(--line);color:var(--ivory);border-radius:9px;
+  .xcrypto-dashboard-page label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
+  .xcrypto-dashboard-page input,.xcrypto-dashboard-page select{width:100%;background:var(--bg2);border:1px solid var(--line);color:var(--ivory);border-radius:9px;
     padding:9px 10px;font-size:14px;font-family:inherit}
-  .xaug-dashboard-page input:focus,.xaug-dashboard-page select:focus{outline:2px solid var(--gold);border-color:var(--gold)}
-  .xaug-dashboard-page .btnrow{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
-  .xaug-dashboard-page .btn{border:none;border-radius:10px;font:600 14px system-ui;padding:10px 16px;cursor:pointer}
-  .xaug-dashboard-page .btn-gold{background:linear-gradient(180deg,var(--goldS),var(--gold));color:#04101f}
-  .xaug-dashboard-page .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--ivory)}
-  .xaug-dashboard-page .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:14px}
-  .xaug-dashboard-page .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 15px}
-  .xaug-dashboard-page .card .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-  .xaug-dashboard-page .card .v{font-size:21px;font-weight:700;margin-top:3px} .xaug-dashboard-page .card .s{font-size:11px;color:var(--muted);margin-top:2px}
-  .xaug-dashboard-page .v.up{color:var(--green)} .xaug-dashboard-page .v.down{color:var(--crim)} .xaug-dashboard-page .v.gold{color:var(--goldS)}
-  .xaug-dashboard-page .scn{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:6px}
-  @media(max-width:760px){.xaug-dashboard-page .scn{grid-template-columns:1fr}}
-  .xaug-dashboard-page .sc{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
-  .xaug-dashboard-page .sc.bull{border-top:3px solid var(--green)}.xaug-dashboard-page .sc.range{border-top:3px solid var(--goldS)}.xaug-dashboard-page .sc.bear{border-top:3px solid var(--crim)}
-  .xaug-dashboard-page .sc h3{font-size:15px} .xaug-dashboard-page .sc .pct{font-size:28px;font-weight:700;margin:4px 0}
-  .xaug-dashboard-page .bull .pct{color:var(--green)}.xaug-dashboard-page .range .pct{color:var(--goldS)}.xaug-dashboard-page .bear .pct{color:var(--crim)}
-  .xaug-dashboard-page .bar{height:7px;border-radius:4px;background:var(--bg2);overflow:hidden;margin:6px 0 10px}.xaug-dashboard-page .bar>i{display:block;height:100%}
-  .xaug-dashboard-page .bull .bar>i{background:var(--green)}.xaug-dashboard-page .range .bar>i{background:var(--goldS)}.xaug-dashboard-page .bear .bar>i{background:var(--crim)}
-  .xaug-dashboard-page .sc p{font-size:12.5px;color:#d3d7f2;margin:4px 0}
-  .xaug-dashboard-page table{width:100%;border-collapse:collapse;font-size:12.8px;margin-top:8px}
-  .xaug-dashboard-page th,.xaug-dashboard-page td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
-  .xaug-dashboard-page th{color:var(--goldS);font-size:11px;text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+  .xcrypto-dashboard-page input:focus,.xcrypto-dashboard-page select:focus{outline:2px solid var(--gold);border-color:var(--gold)}
+  .xcrypto-dashboard-page .btnrow{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+  .xcrypto-dashboard-page .btn{border:none;border-radius:10px;font:600 14px system-ui;padding:10px 16px;cursor:pointer}
+  .xcrypto-dashboard-page .btn-gold{background:linear-gradient(180deg,var(--goldS),var(--gold));color:#04101f}
+  .xcrypto-dashboard-page .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--ivory)}
+  .xcrypto-dashboard-page .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:14px}
+  .xcrypto-dashboard-page .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+  .xcrypto-dashboard-page .card .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .xcrypto-dashboard-page .card .v{font-size:21px;font-weight:700;margin-top:3px} .xcrypto-dashboard-page .card .s{font-size:11px;color:var(--muted);margin-top:2px}
+  .xcrypto-dashboard-page .v.up{color:var(--green)} .xcrypto-dashboard-page .v.down{color:var(--crim)} .xcrypto-dashboard-page .v.gold{color:var(--goldS)}
+  .xcrypto-dashboard-page .scn{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:6px}
+  @media(max-width:760px){.xcrypto-dashboard-page .scn{grid-template-columns:1fr}}
+  .xcrypto-dashboard-page .sc{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .xcrypto-dashboard-page .sc.bull{border-top:3px solid var(--green)}.xcrypto-dashboard-page .sc.range{border-top:3px solid var(--goldS)}.xcrypto-dashboard-page .sc.bear{border-top:3px solid var(--crim)}
+  .xcrypto-dashboard-page .sc h3{font-size:15px} .xcrypto-dashboard-page .sc .pct{font-size:28px;font-weight:700;margin:4px 0}
+  .xcrypto-dashboard-page .bull .pct{color:var(--green)}.xcrypto-dashboard-page .range .pct{color:var(--goldS)}.xcrypto-dashboard-page .bear .pct{color:var(--crim)}
+  .xcrypto-dashboard-page .bar{height:7px;border-radius:4px;background:var(--bg2);overflow:hidden;margin:6px 0 10px}.xcrypto-dashboard-page .bar>i{display:block;height:100%}
+  .xcrypto-dashboard-page .bull .bar>i{background:var(--green)}.xcrypto-dashboard-page .range .bar>i{background:var(--goldS)}.xcrypto-dashboard-page .bear .bar>i{background:var(--crim)}
+  .xcrypto-dashboard-page .sc p{font-size:12.5px;color:#d3d7f2;margin:4px 0}
+  .xcrypto-dashboard-page table{width:100%;border-collapse:collapse;font-size:12.8px;margin-top:8px}
+  .xcrypto-dashboard-page th,.xcrypto-dashboard-page td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  .xcrypto-dashboard-page th{color:var(--goldS);font-size:11px;text-transform:uppercase;letter-spacing:.04em;font-weight:600}
 
-  .xaug-dashboard-page .table-wrap {
+  .xcrypto-dashboard-page .table-wrap {
     width: 100%;
     max-width: 100%;
     overflow-x: auto;
@@ -265,66 +264,77 @@ import Footer from '../components/Footer.astro';
     background: var(--panel);
     margin-top: 8px;
   }
-  .xaug-dashboard-page .table-wrap table {
-    margin-top: 0;
-    min-width: 600px;
-  }
-  .xaug-dashboard-page .table-wrap th, .xaug-dashboard-page .table-wrap td {
-    white-space: nowrap;
-  }
+  .xcrypto-dashboard-page .table-wrap table { margin-top: 0; min-width: 600px; }
+  .xcrypto-dashboard-page .table-wrap th, .xcrypto-dashboard-page .table-wrap td { white-space: nowrap; }
 
-  .xaug-dashboard-page .tv-wrap { height: 560px; width: 100%; }
+  .xcrypto-dashboard-page .tv-wrap { height: 560px; width: 100%; }
 
-  .xaug-dashboard-page tbody tr:hover td{background:rgba(255,255,255,.03)}
-  .xaug-dashboard-page .tag{font-size:10.5px;padding:2px 8px;border-radius:20px;border:1px solid;white-space:nowrap}
-  .xaug-dashboard-page .t-res{color:var(--crim);border-color:rgba(199,86,106,.5)}.xaug-dashboard-page .t-sup{color:var(--green);border-color:rgba(127,191,138,.5)}
-  .xaug-dashboard-page .t-dec{color:var(--goldS);border-color:rgba(59,130,246,.5)}.xaug-dashboard-page .t-key{color:var(--blue);border-color:rgba(106,169,233,.5)}
-  .xaug-dashboard-page .now-row td{background:rgba(59,130,246,.08)}
-  .xaug-dashboard-page figure{margin:10px 0 0;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 8px 6px}
-  .xaug-dashboard-page figcaption{font-size:11.5px;color:var(--muted);padding:4px 10px 2px}
-  .xaug-dashboard-page svg{width:100%;height:auto;display:block} .xaug-dashboard-page canvas{width:100%;height:230px;display:block}
-  .xaug-dashboard-page .st{fill:#C9CCE8;font:12px system-ui}.xaug-dashboard-page .sm{fill:#8B90B8;font:11px system-ui}
-  .xaug-dashboard-page .sg{fill:#60a5fa;font:12px system-ui;font-weight:600}.xaug-dashboard-page .sh{fill:#93c5fd;font:13px system-ui;font-weight:600}.xaug-dashboard-page .sb{fill:#6AA9E9;font:11px system-ui}
-  .xaug-dashboard-page .final{margin-top:20px;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:14px;padding:18px 20px}
-  .xaug-dashboard-page .final .d{font-size:24px;font-weight:700;color:var(--goldS);font-family:"Iowan Old Style",Georgia,serif}
-  .xaug-dashboard-page .final p{font-size:13px;color:#d3d7f2;margin:8px 0 0}
-  .xaug-dashboard-page .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--gold);
+  .xcrypto-dashboard-page tbody tr:hover td{background:rgba(255,255,255,.03)}
+  .xcrypto-dashboard-page .tag{font-size:10.5px;padding:2px 8px;border-radius:20px;border:1px solid;white-space:nowrap}
+  .xcrypto-dashboard-page .t-res{color:var(--crim);border-color:rgba(199,86,106,.5)}.xcrypto-dashboard-page .t-sup{color:var(--green);border-color:rgba(127,191,138,.5)}
+  .xcrypto-dashboard-page .t-dec{color:var(--goldS);border-color:rgba(59,130,246,.5)}.xcrypto-dashboard-page .t-key{color:var(--blue);border-color:rgba(106,169,233,.5)}
+  .xcrypto-dashboard-page .now-row td{background:rgba(59,130,246,.08)}
+  .xcrypto-dashboard-page figure{margin:10px 0 0;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 8px 6px}
+  .xcrypto-dashboard-page figcaption{font-size:11.5px;color:var(--muted);padding:4px 10px 2px}
+  .xcrypto-dashboard-page svg{width:100%;height:auto;display:block} .xcrypto-dashboard-page canvas{width:100%;height:230px;display:block}
+  .xcrypto-dashboard-page .st{fill:#C9CCE8;font:12px system-ui}.xcrypto-dashboard-page .sm{fill:#8B90B8;font:11px system-ui}
+  .xcrypto-dashboard-page .sg{fill:#60a5fa;font:12px system-ui;font-weight:600}.xcrypto-dashboard-page .sh{fill:#93c5fd;font:13px system-ui;font-weight:600}.xcrypto-dashboard-page .sb{fill:#6AA9E9;font:11px system-ui}
+  .xcrypto-dashboard-page .final{margin-top:20px;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+  .xcrypto-dashboard-page .final .d{font-size:24px;font-weight:700;color:var(--goldS);font-family:"Iowan Old Style",Georgia,serif}
+  .xcrypto-dashboard-page .final p{font-size:13px;color:#d3d7f2;margin:8px 0 0}
+  .xcrypto-dashboard-page .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--gold);
     color:#04101f;font-weight:600;font-size:13px;padding:10px 18px;border-radius:10px;opacity:0;pointer-events:none;transition:.25s;z-index:1000}
-  .xaug-dashboard-page .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-  .xaug-dashboard-page .live-note{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 15px;font-size:12.5px;color:#cfd2ec;margin-top:8px}
+  .xcrypto-dashboard-page .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .xcrypto-dashboard-page .live-note{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 15px;font-size:12.5px;color:#cfd2ec;margin-top:8px}
 
   @media (max-width: 768px) {
-    .xaug-dashboard-page { padding: 16px; }
-    .xaug-dashboard-page h1 { font-size: 22px; }
-    .xaug-dashboard-page h2 { font-size: 16px; margin: 20px 0 8px; }
-    .xaug-dashboard-page .eyebrow { font-size: 10px; }
-    .xaug-dashboard-page .inputs { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); padding: 12px; }
-    .xaug-dashboard-page .cards { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
-    .xaug-dashboard-page .card .v { font-size: 18px; }
-    .xaug-dashboard-page canvas { height: 200px; }
+    .xcrypto-dashboard-page { padding: 16px; }
+    .xcrypto-dashboard-page h1 { font-size: 22px; }
+    .xcrypto-dashboard-page h2 { font-size: 16px; margin: 20px 0 8px; }
+    .xcrypto-dashboard-page .eyebrow { font-size: 10px; }
+    .xcrypto-dashboard-page .inputs { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); padding: 12px; }
+    .xcrypto-dashboard-page .cards { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+    .xcrypto-dashboard-page .card .v { font-size: 18px; }
+    .xcrypto-dashboard-page canvas { height: 200px; }
   }
   @media (max-width: 640px) {
-    .xaug-dashboard-page { padding: 12px; }
-    .xaug-dashboard-page h1 { font-size: 20px; }
-    .xaug-dashboard-page .inputs { grid-template-columns: 1fr; }
-    .xaug-dashboard-page .btnrow { flex-direction: column; gap: 8px; }
-    .xaug-dashboard-page .btn { width: 100%; text-align: center; justify-content: center; }
-    .xaug-dashboard-page .cards { grid-template-columns: 1fr 1fr; }
-    .xaug-dashboard-page .tv-wrap { height: 400px; }
+    .xcrypto-dashboard-page { padding: 12px; }
+    .xcrypto-dashboard-page h1 { font-size: 20px; }
+    .xcrypto-dashboard-page .inputs { grid-template-columns: 1fr; }
+    .xcrypto-dashboard-page .btnrow { flex-direction: column; gap: 8px; }
+    .xcrypto-dashboard-page .btn { width: 100%; text-align: center; justify-content: center; }
+    .xcrypto-dashboard-page .cards { grid-template-columns: 1fr 1fr; }
+    .xcrypto-dashboard-page .tv-wrap { height: 400px; }
   }
   @media (max-width: 480px) {
-    .xaug-dashboard-page .cards { grid-template-columns: 1fr; }
+    .xcrypto-dashboard-page .cards { grid-template-columns: 1fr; }
   }
 </style>
 
 <script is:inline>
 const $=id=>document.getElementById(id);
-const idr=(n,d=0)=>n==null?"—":Number(n).toLocaleString("id-ID",{minimumFractionDigits:d,maximumFractionDigits:d});
 
-const KEY="xau_astrogann_v2";let mem=null;
-const DEF={pivot:3960,high:4400,h4:25,h1:8,history:[{date:"2026-07-05",price:4175.7}],ticks:[]};
-function load(){try{const r=localStorage.getItem(KEY);if(r)return JSON.parse(r);}catch(e){}return mem?JSON.parse(JSON.stringify(mem)):JSON.parse(JSON.stringify(DEF));}
-function save(s){try{localStorage.setItem(KEY,JSON.stringify(s));}catch(e){mem=s;}}
+const CRYPTO_SYMBOLS={
+ BTC:{label:"BTC · Bitcoin",tv:"BINANCE:BTCUSDT",cg:"bitcoin",pivot:55000,high:68000,h4:150,h1:50,dec:0},
+ ETH:{label:"ETH · Ethereum",tv:"BINANCE:ETHUSDT",cg:"ethereum",pivot:1600,high:2000,h4:8,h1:3,dec:2},
+ SOL:{label:"SOL · Solana",tv:"BINANCE:SOLUSDT",cg:"solana",pivot:120,high:180,h4:1.5,h1:0.5,dec:2},
+ BNB:{label:"BNB · Binance Coin",tv:"BINANCE:BNBUSDT",cg:"binancecoin",pivot:550,high:700,h4:4,h1:1.5,dec:2},
+ XRP:{label:"XRP · Ripple",tv:"BINANCE:XRPUSDT",cg:"ripple",pivot:0.4500,high:0.6500,h4:0.0080,h1:0.0030,dec:4},
+ DOGE:{label:"DOGE · Dogecoin",tv:"BINANCE:DOGEUSDT",cg:"dogecoin",pivot:0.10000,high:0.18000,h4:0.00300,h1:0.00100,dec:5},
+ ADA:{label:"ADA · Cardano",tv:"BINANCE:ADAUSDT",cg:"cardano",pivot:0.3500,high:0.5500,h4:0.0060,h1:0.0020,dec:4},
+ LTC:{label:"LTC · Litecoin",tv:"BINANCE:LTCUSDT",cg:"litecoin",pivot:60,high:90,h4:0.80,h1:0.30,dec:2},
+ DOT:{label:"DOT · Polkadot",tv:"BINANCE:DOTUSDT",cg:"polkadot",pivot:5.000,high:8.000,h4:0.080,h1:0.030,dec:3},
+ AVAX:{label:"AVAX · Avalanche",tv:"BINANCE:AVAXUSDT",cg:"avalanche-2",pivot:20,high:35,h4:0.40,h1:0.15,dec:2},
+};
+let curSym=localStorage.getItem("crypto_current_symbol")||"BTC";
+if(!CRYPTO_SYMBOLS[curSym])curSym="BTC";
+const idr=(n,d)=>{if(d==null)d=CRYPTO_SYMBOLS[curSym].dec;return n==null?"—":Number(n).toLocaleString("id-ID",{minimumFractionDigits:d,maximumFractionDigits:d});};
+
+function stateKey(){return "crypto_astrogann_v2_"+curSym;}
+function defFor(sym){const c=CRYPTO_SYMBOLS[sym];return {pivot:c.pivot,high:c.high,h4:c.h4,h1:c.h1,history:[],ticks:[]};}
+let mem=null;
+function load(){try{const r=localStorage.getItem(stateKey());if(r)return JSON.parse(r);}catch(e){}return mem?JSON.parse(JSON.stringify(mem)):JSON.parse(JSON.stringify(defFor(curSym)));}
+function save(s){try{localStorage.setItem(stateKey(),JSON.stringify(s));}catch(e){mem=s;}}
 let S=load();
 
 function curPrice(){return S.history.length?S.history[S.history.length-1].price:S.pivot;}
@@ -343,7 +353,7 @@ function levels(){
 function fanPanel(label,scale,yTop,yBot){
   const p=S.pivot,h=S.high,x0=110,x1=780;const Tmax=(h-p)/scale;
   const X=t=>x0+t/Tmax*(x1-x0), Y=v=>yBot-(v-p)/(h-p)*(yBot-yTop);
-  let s=`<text class="sh" x="110" y="${yTop-16}">${label} · 1x1 = ${scale} USD/bar · pivot ${idr(p)}</text>`;
+  let s=`<text class="sh" x="110" y="${yTop-16}">${label} · 1x1 = ${scale} /bar · pivot ${idr(p)}</text>`;
   for(let k=0;k<=4;k++){const v=p+k/4*(h-p),y=Y(v);
     s+=`<line x1="${x0}" y1="${y}" x2="${x1}" y2="${y}" stroke="${k==0||k==4?'#33396E':'#262b52'}"/>`;
     s+=`<text class="sm" x="100" y="${y+4}" text-anchor="end">${idr(v)}</text>`;}
@@ -360,7 +370,7 @@ function fanPanel(label,scale,yTop,yBot){
   s+=`<text class="sm" x="${x0}" y="${yBot+16}" text-anchor="middle">0</text><text class="sm" x="${x1}" y="${yBot+16}" text-anchor="middle">${Tmax.toFixed(0)} bar</text>`;
   return s;
 }
-function drawFan(){$("fan").innerHTML=`<svg viewBox="0 0 900 620" role="img" aria-label="Gann fan XAUUSD">${fanPanel("H4",S.h4,60,280)}${fanPanel("H1",S.h1,360,580)}</svg>`;}
+function drawFan(){$("fan").innerHTML=`<svg viewBox="0 0 900 620" role="img" aria-label="Gann fan Crypto">${fanPanel("H4",S.h4,60,280)}${fanPanel("H1",S.h1,360,580)}</svg>`;}
 function drawWheel(){
   const p=S.pivot,val=dg=>idr(sq9(p,dg)),valDn=dg=>{const v=sq9dn(p,dg);return v==null?"—":idr(v);};
   const cx=300,cy=240,r=175,rt=205,d=r*0.7071,dl=rt*0.7071;
@@ -384,7 +394,7 @@ function drawWheel(){
   s+=`</svg>`;$("wheel").innerHTML=s;
 }
 function drawHist(){
-  const cv=$("hist"),ctx=cv.getContext("2d"),dpr=devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight||230;
+  const cv=$("hist"),ctx=cv.getContext("2d"),dpr=devicePixelRatio||1,w=cv.clientWidth,h=230;
   cv.width=w*dpr;cv.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
   const pts=S.history.map(r=>({t:Date.parse(r.date),v:r.price})).sort((a,b)=>a.t-b.t);
   const pL=54,pR=12,pT=12,pB=24,cw=w-pL-pR,ch=h-pT-pB;
@@ -396,7 +406,7 @@ function drawHist(){
   for(let i=0;i<=4;i++){const v=lo+(hi-lo)*i/4,y=Y(v);ctx.beginPath();ctx.moveTo(pL,y);ctx.lineTo(w-pR,y);ctx.stroke();ctx.fillText(Math.round(v).toLocaleString("id-ID"),4,y+4);}
   if(pts.length>1){ctx.beginPath();ctx.moveTo(X(pts[0].t),Y(pts[0].v));pts.forEach(p=>ctx.lineTo(X(p.t),Y(p.v)));ctx.strokeStyle="#60a5fa";ctx.lineWidth=2;ctx.stroke();}
   ctx.fillStyle="#60a5fa";pts.forEach(p=>{ctx.beginPath();ctx.arc(X(p.t),Y(p.v),3,0,7);ctx.fill();});
-  $("histcap").textContent=`${pts.length} titik · terakhir ${idr(pts[pts.length-1].v,1)} USD/oz`;
+  $("histcap").textContent=`${pts.length} titik · terakhir ${idr(pts[pts.length-1].v,1)}`;
 }
 function role(v){const L=levels(),cp=curPrice();
   if(Math.abs(v-cp)<(L.rng*0.02))return['t-dec','Keputusan'];
@@ -408,7 +418,7 @@ function render(){
   const pos=(cp-L.p)/L.rng;
   const bias=pos>=0.625?"Bullish":pos>=0.5?"Bull ringan":pos<0.25?"Bearish":"Netral";
   $("cards").innerHTML=`
-    <div class="card"><div class="k">Harga</div><div class="v gold num">${idr(cp,1)}</div><div class="s">USD/oz</div></div>
+    <div class="card"><div class="k">Harga</div><div class="v gold num">${idr(cp,1)}</div><div class="s"></div></div>
     <div class="card"><div class="k">Δ ~mingguan</div><div class="v ${delta==null?'':(delta>=0?'up':'down')} num">${delta==null?'—':(delta>=0?'+':'')+delta.toFixed(1)+'%'}</div><div class="s">dari data tersimpan</div></div>
     <div class="card"><div class="k">Posisi swing</div><div class="v num">${(pos*100).toFixed(0)}%</div><div class="s">pivot→high</div></div>
     <div class="card"><div class="k">Bias</div><div class="v gold">${bias}</div><div class="s">acuan 50%/62,5%</div></div>
@@ -489,14 +499,13 @@ function renderGannTime(){
   s+=`</svg>`;$("gtStrip").innerHTML=s;
 }
 
-const rnd=(v,d=2)=>v==null||!isFinite(v)?v:Math.round(v*Math.pow(10,d))/Math.pow(10,d);
-function syncInputs(){$("iPivot").value=rnd(S.pivot,2);$("iHigh").value=rnd(S.high,2);$("iH4").value=rnd(S.h4,2);$("iH1").value=rnd(S.h1,2);
-  $("iPrice").value=rnd(curPrice(),2);if(!$("iDate").value)$("iDate").value=S.history.length?S.history[S.history.length-1].date:new Date().toISOString().slice(0,10);
+const rnd=(v,d)=>{if(v==null||!isFinite(v))return v;if(d==null)d=CRYPTO_SYMBOLS[curSym].dec;return Math.round(v*Math.pow(10,d))/Math.pow(10,d);};
+function syncInputs(){$("iPivot").value=rnd(S.pivot);$("iHigh").value=rnd(S.high);$("iH4").value=rnd(S.h4);$("iH1").value=rnd(S.h1);
+  $("iPrice").value=rnd(curPrice());if(!$("iDate").value)$("iDate").value=S.history.length?S.history[S.history.length-1].date:new Date().toISOString().slice(0,10);
   if(!$("gtPivot").value)$("gtPivot").value=new Date().toISOString().slice(0,10)+"T00:00";}
 function readInputs(){S.pivot=+$("iPivot").value||S.pivot;S.high=+$("iHigh").value||S.high;S.h4=+$("iH4").value||S.h4;S.h1=+$("iH1").value||S.h1;}
 function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1600);}
 
-/* --- Isi otomatis Pivot Low & Swing High dari histori (1D/1W/1M/1Y) --- */
 function setPivotFromHistory(days,label){
   const st=$("pivotAutoStatus");
   const cutoff=Date.now()-days*86400000;
@@ -532,17 +541,17 @@ function setPivotFromHistory(days,label){
     (kurang?` Catatan jujur: data yang tersedia cuma menjangkau ~${cakupHari} hari (bukan penuh ${days} hari) — muat histori dengan rentang lebih panjang untuk cakupan penuh.`:` (cakupan data: ~${cakupHari} hari)`);
 }
 
-/* --- Data live gold-api.com --- */
 let autoTimer=null;
 async function fetchLivePrice(silent){
-  const st=$("liveStatus");
+  const st=$("liveStatus"),cfg=CRYPTO_SYMBOLS[curSym];
   try{
     if(!silent)st.textContent="Mengambil harga live...";
-    const r=await fetch("https://api.gold-api.com/price/XAU");
-    if(!r.ok)throw new Error("HTTP "+r.status);
+    const r=await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${cfg.cg}&vs_currencies=usd`);
+    if(!r.ok)throw new Error("HTTP "+r.status+(r.status===429?" (rate limit CoinGecko, tunggu sebentar)":""));
     const d=await r.json();
-    const price=d.price,now=Date.now();
-    $("iPrice").value=price.toFixed(2);
+    const price=d[cfg.cg]&&d[cfg.cg].usd,now=Date.now();
+    if(!price||isNaN(price))throw new Error(`${cfg.label} tidak ditemukan di respons`);
+    $("iPrice").value=price.toFixed(cfg.dec);
     if(!S.ticks)S.ticks=[];
     S.ticks.push({t:now,p:price});
     if(S.ticks.length>5000)S.ticks=S.ticks.slice(-5000);
@@ -551,34 +560,27 @@ async function fetchLivePrice(silent){
     if(i>=0)S.history[i].price=price;else S.history.push({date:today,price});
     S.history.sort((a,b)=>a.date.localeCompare(b.date));
     save(S);render();
-    st.textContent=`Live: $${price.toFixed(2)}/oz · diperbarui ${new Date().toLocaleTimeString("id-ID")} WIB · ${S.ticks.length} tick terkumpul (sumber: gold-api.com, spot XAU/USD)`;
+    st.textContent=`Live: $${idr(price)} · diperbarui ${new Date().toLocaleTimeString("id-ID")} WIB · ${S.ticks.length} tick terkumpul (sumber: CoinGecko, ${cfg.label})`;
   }catch(e){st.textContent="Gagal mengambil data live: "+e.message+" — cek koneksi internet.";}
 }
 
-/* --- Prefetch histori OHLC (metalpriceapi.com) --- */
 async function fetchHistoryOHLC(){
-  const st=$("histStatus"),key=($("histKey")&&$("histKey").value.trim())||"";
-  const days=+($("histDays")&&$("histDays").value)||14;
-  if(!key){st.textContent="Isi API key metalpriceapi.com dulu (gratis, daftar ~30 detik via tautan).";return;}
+  const st=$("histStatus"),cfg=CRYPTO_SYMBOLS[curSym];
+  const days=+($("histDays")&&$("histDays").value)||30;
   try{
-    st.textContent="Mengambil histori candle harian...";
-    const out=[];const today=new Date();
-    for(let i=days;i>=1;i--){
-      const d=new Date(today.getTime()-i*86400000).toISOString().slice(0,10);
-      const r=await fetch(`https://api.metalpriceapi.com/v1/ohlc?api_key=${encodeURIComponent(key)}&base=XAU&currency=USD&date=${d}`);
-      if(!r.ok){if(r.status===429){st.textContent="Rate limit tercapai, coba lagi nanti.";break;}continue;}
-      const j=await r.json();
-      if(j&&j.rate){const rt=j.rate,ts=(j.timestamp?j.timestamp*1000:Date.parse(d));
-        out.push({t:ts,o:rt.open,h:rt.high,l:rt.low,c:rt.close});}
-    }
-    if(!out.length)throw new Error("Tidak ada data (cek API key / kuota)");
-    out.sort((a,b)=>a.t-b.t);
-    S.histOHLC=out;save(S);render();
-    st.textContent=`Histori termuat: ${out.length} candle harian. Grid Gann kini tergambar dari data masa lalu; tick live menyambung di ujung. (Catatan: metalpriceapi gratis = candle harian, bukan per-jam.)`;
+    st.textContent="Mengambil histori candle...";
+    const r=await fetch(`https://api.coingecko.com/api/v3/coins/${cfg.cg}/ohlc?vs_currency=usd&days=${days}`);
+    if(!r.ok)throw new Error("HTTP "+r.status+(r.status===429?" (rate limit, tunggu ~1 menit)":""));
+    const arr=await r.json();
+    if(!Array.isArray(arr)||!arr.length)throw new Error("Respons histori kosong");
+    S.histOHLC=arr.map(c=>({t:c[0],o:c[1],h:c[2],l:c[3],c:c[4]}));
+    save(S);render();
+    const d0=new Date(S.histOHLC[0].t).toISOString().slice(0,10);
+    const d1=new Date(S.histOHLC[S.histOHLC.length-1].t).toISOString().slice(0,10);
+    st.textContent=`Histori termuat: ${S.histOHLC.length} candle (${d0} → ${d1}). Grid Gann kini tergambar penuh. Tick live akan menyambung di ujung.`;
   }catch(e){st.textContent="Gagal ambil histori: "+e.message;}
 }
 
-/* --- Candle gabungan histori + tick live --- */
 function buildCandles(barMin){
   const ms=barMin*60000,bars=new Map();
   (S.histOHLC||[]).forEach(c=>{const key=Math.floor(c.t/ms)*ms;
@@ -603,7 +605,6 @@ function fractalSwing(candles,n=2){
   return{swH,swL};
 }
 
-/* --- Backtest ★ vs data tick sungguhan --- */
 function runBacktest(){
   const out=$("backtestResult"),tbl=$("backtestTable");
   const ticks=(S.ticks||[]).slice().sort((a,b)=>a.t-b.t);
@@ -632,14 +633,13 @@ function runBacktest(){
   tbl.innerHTML=rows.map(r=>`<tr><td class="num">${fmtWIB(r.t)}</td><td>${r.label}</td><td class="num">${idr(r.price)}</td><td>${r.rev?'<span class="tag t-sup">terkonfirmasi</span>':'<span class="tag t-res">tidak</span>'}</td></tr>`).join("");
 }
 
-/* --- Fibonacci Harian --- */
 function renderDailyFib(){
   const cardsEl=$("dailyFibCards"),tbl=$("dailyFibTable"),note=$("dailyFibNote");
   const isNum=v=>typeof v==="number"&&isFinite(v)&&v>0;
   const cp=curPrice();
   const plausible=v=>isNum(v)&&isNum(cp)&&v>cp*0.3&&v<cp*3;
   const dayOf=t=>new Date(t).toISOString().slice(0,10);
-  const todayStr=dayOf(Date.now()),yStr=dayOf(Date.now()-86400000);
+  const yStr=dayOf(Date.now()-86400000);
   let pHi=null,pLo=null,oToday=null,sumber="";
 
   const mHi=parseFloat($("fibManHi").value),mLo=parseFloat($("fibManLo").value),mClose=parseFloat($("fibManClose").value);
@@ -693,9 +693,8 @@ function renderDailyFib(){
   note.innerHTML=`Range = High−Low kemarin, 0% = Close kemarin, level = Close ± rasio×Range. Sumber saat ini: <b>${sumber}</b>. Angka emas = terdekat harga sekarang.`;
 }
 
-/* --- Rotasi ATH: konfluensi Price x Time --- */
 function renderATH(){
-  const athP=+$("athPrice").value||5608,athDs=$("athDate").value||"2026-01-29";
+  const athP=+$("athPrice").value||73000,athDs=$("athDate").value||"2026-01-01";
   const athDate=new Date(athDs+"T00:00:00Z"),now=new Date(),cp=curPrice();
   const sqrtATH=Math.sqrt(athP);
   const priceAt=deg=>{const r=sqrtATH-deg/180;return r>0?r*r:null;};
@@ -706,7 +705,7 @@ function renderATH(){
   const nearestCard=r=>{const cs=[0,90,180,270,360];let best=cs[0];cs.forEach(c=>{if(Math.abs(c-r)<Math.abs(best-r))best=c;});return best;};
   const pc=nearestCard(remDegP),tc=nearestCard(remDegT);
   $("athCards").innerHTML=`
-    <div class="card"><div class="k">Turun dari ATH</div><div class="v down num">${((athP-cp)/athP*100).toFixed(1)}%</div><div class="s">${idr(athP-cp)} poin</div></div>
+    <div class="card"><div class="k">Turun dari referensi</div><div class="v down num">${((athP-cp)/athP*100).toFixed(1)}%</div><div class="s">${idr(athP-cp)} poin</div></div>
     <div class="card"><div class="k">Rotasi harga</div><div class="v gold num">${remDegP.toFixed(0)}°</div><div class="s">dekat cardinal ${pc}° (Δ${(remDegP-pc).toFixed(0)}°)</div></div>
     <div class="card"><div class="k">Rotasi waktu</div><div class="v gold num">${remDegT}°</div><div class="s">${days} hari · dekat cardinal ${tc}° (Δ${remDegT-tc})</div></div>
     <div class="card"><div class="k">Status</div><div class="v ${Math.abs(remDegP-pc)<10?'gold':''}" style="font-size:15px">${Math.abs(remDegP-pc)<10?'Harga di cardinal!':'Menuju cardinal'}</div></div>`;
@@ -725,7 +724,7 @@ function renderATH(){
     const dstr=r.dt.toISOString().slice(0,10);
     return `<tr${isNext?' class="now-row"':''}><td>${r.d} hari · ${dstr}</td><td>${passed?'sudah lewat':(isNext?'<span class="tag t-dec">★ target terdekat</span>':'akan datang')}</td></tr>`;}).join("");
   const nextT=upcoming.length?upcoming[0]:trows[trows.length-1];
-  $("athSummary").innerHTML=`<b>Ringkasan:</b> harga saat ini <b>${idr(cp)}</b> berjarak <b>${(remDegP-pc).toFixed(1)}°</b> dari cardinal harga terdekat (level <b>${idr(priceAt(kCenter*90))}</b>). Target waktu berikutnya: <b>${nextT.dt.toISOString().slice(0,10)}</b> (${nextT.d} hari dari ATH). Konfluensi terkuat: saat harga berada di salah satu level cardinal pada tabel di atas <i>bertepatan</i> dengan tanggal target waktu.`;
+  $("athSummary").innerHTML=`<b>Ringkasan:</b> harga saat ini <b>${idr(cp)}</b> berjarak <b>${(remDegP-pc).toFixed(1)}°</b> dari cardinal harga terdekat (level <b>${idr(priceAt(kCenter*90))}</b>). Target waktu berikutnya: <b>${nextT.dt.toISOString().slice(0,10)}</b> (${nextT.d} hari dari referensi). Konfluensi terkuat: saat harga berada di salah satu level cardinal pada tabel di atas <i>bertepatan</i> dengan tanggal target waktu.`;
   drawATHChart(athP,athDate,cp,kCenter,priceAt,days);
 }
 function drawATHChart(athP,athDate,cp,kCenter,priceAt,days){
@@ -744,7 +743,7 @@ function drawATHChart(athP,athDate,cp,kCenter,priceAt,days){
   const priceVals=[athP,cp,resPrice,supPrice,...pts.map(p=>p.p)];
   const pMin=Math.min(...priceVals)*0.985,pMax=Math.max(...priceVals)*1.015;
   const Y=p=>y1-(p-pMin)/(pMax-pMin)*(y1-y0);
-  let s=`<svg viewBox="0 0 680 385" role="img" aria-label="Grafik rotasi ATH price times time"><title>Rotasi Gann dari ATH ke target waktu berikutnya</title>`;
+  let s=`<svg viewBox="0 0 680 385" role="img" aria-label="Grafik rotasi referensi price times time"><title>Rotasi Gann dari titik referensi ke target waktu berikutnya</title>`;
   s+=`<line x1="${x0}" y1="${y0}" x2="${x0}" y2="${y1}" stroke="#33396E" stroke-width="0.5"/>`;
   s+=`<line x1="${x0}" y1="${y1}" x2="${x1}" y2="${y1}" stroke="#33396E" stroke-width="0.5"/>`;
   s+=`<line x1="${x0}" y1="${Y(resPrice).toFixed(1)}" x2="566" y2="${Y(resPrice).toFixed(1)}" stroke="#BA7517" stroke-width="1" stroke-dasharray="5 4"/>`;
@@ -758,7 +757,7 @@ function drawATHChart(athP,athDate,cp,kCenter,priceAt,days){
   s+=`<circle cx="${X(pts[0].t).toFixed(1)}" cy="${Y(pts[0].p).toFixed(1)}" r="4" fill="#D85A30"/>`;
   s+=`<circle cx="${X(last.t).toFixed(1)}" cy="${Y(last.p).toFixed(1)}" r="4" fill="#D85A30"/>`;
   s+=`<circle cx="${xT.toFixed(1)}" cy="${Y(supPrice).toFixed(1)}" r="5" fill="none" stroke="#0F6E56" stroke-width="2"/><circle cx="${xT.toFixed(1)}" cy="${Y(supPrice).toFixed(1)}" r="2" fill="#0F6E56"/>`;
-  s+=`<text class="sh" x="570" y="${(Y(athP)+4).toFixed(1)}">ATH ${idr(athP)}</text>`;
+  s+=`<text class="sh" x="570" y="${(Y(athP)+4).toFixed(1)}">Ref ${idr(athP)}</text>`;
   s+=`<text class="sh" x="570" y="${(Y(resPrice)+4).toFixed(1)}" style="fill:#854F0B">${idr(resPrice)}</text>`;
   s+=`<text class="sh" x="570" y="${(Y(supPrice)+4).toFixed(1)}" style="fill:#085041">★ ${idr(supPrice)}</text>`;
   s+=`<text class="sm" x="${(xT+4).toFixed(1)}" y="50">${targetDays}°</text>`;
@@ -769,15 +768,43 @@ function drawATHChart(athP,athDate,cp,kCenter,priceAt,days){
   $("athChart").innerHTML=s;
 }
 
+let tvLoaded=false;
+function loadTV(){
+  const cfg=CRYPTO_SYMBOLS[curSym];
+  $("liveNote").textContent=`Chart live TradingView (${cfg.tv}). Butuh internet. Ganti timeframe H1/H4 di toolbar chart.`;
+  $("tvchart").innerHTML="";
+  const draw=()=>{try{new TradingView.widget({container_id:"tvchart",symbol:cfg.tv,interval:"60",timezone:"Asia/Jakarta",theme:"dark",style:"1",locale:"id",autosize:true,hide_side_toolbar:false,studies:[]});}catch(e){$("tvchart").innerHTML='<div class="live-note">Gagal memuat TradingView.</div>';}};
+  if(tvLoaded){draw();return;}
+  tvLoaded=true;const sc=document.createElement("script");sc.src="https://s3.tradingview.com/tv.js";
+  sc.onload=draw;
+  sc.onerror=()=>{$("tvchart").innerHTML='<div class="live-note">TradingView tidak dapat dimuat (offline/diblokir). Buka dengan internet.</div>';};
+  document.body.appendChild(sc);
+}
+
+function populateSymbolPicker(){
+  const sel=$("symbolPicker");
+  sel.innerHTML=Object.keys(CRYPTO_SYMBOLS).map(k=>`<option value="${k}">${CRYPTO_SYMBOLS[k].label}</option>`).join("");
+  sel.value=curSym;
+}
+function switchSymbol(sym){
+  if(!CRYPTO_SYMBOLS[sym])return;
+  curSym=sym;localStorage.setItem("crypto_current_symbol",curSym);
+  S=load();syncInputs();render();
+  if($("viewLive").classList.contains("on"))loadTV();
+  toast("Beralih ke "+CRYPTO_SYMBOLS[curSym].label);
+}
+
 function init(){
+  populateSymbolPicker();
   syncInputs();render();
 
+  $("symbolPicker").onchange=(e)=>switchSymbol(e.target.value);
   $("recalc").onclick=()=>{readInputs();save(S);render();toast("Level dihitung ulang");};
   $("save").onclick=()=>{readInputs();const date=$("iDate").value||new Date().toISOString().slice(0,10);const price=+$("iPrice").value;
     if(!price){toast("Isi harga dulu");return;}const i=S.history.findIndex(x=>x.date===date);
     if(i>=0)S.history[i].price=price;else S.history.push({date,price});S.history.sort((a,b)=>a.date.localeCompare(b.date));
     save(S);render();toast("Tersimpan "+date);};
-  $("reset").onclick=()=>{if(confirm("Reset ke data awal?")){S=JSON.parse(JSON.stringify(DEF));save(S);syncInputs();render();toast("Direset");}};
+  $("reset").onclick=()=>{if(confirm("Reset ke data awal?")){S=defFor(curSym);save(S);syncInputs();render();toast("Direset");}};
 
   $("pivotAuto1D").onclick=()=>setPivotFromHistory(1,"1 hari (kemarin)");
   $("pivotAuto7D").onclick=()=>setPivotFromHistory(7,"1 minggu");
@@ -803,30 +830,11 @@ function init(){
     const fw=t=>new Date(t).toLocaleString("id-ID",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});
     st.textContent=`Swing terdeteksi (${candles.length} candle ${barMin}m, gratis): low ${idr(swL.l)} @ ${fw(swL.t)} · high ${idr(swH.h)} @ ${fw(swH.t)}. Pivot/Swing high sudah diperbarui.`;
   };
-  $("detectSwing").onclick=async()=>{
-    const st=$("swingStatus"),key=$("goldApiKey").value.trim(),days=7;
-    if(!key){st.textContent="Isi API key Premium dulu, atau pakai tombol 'Deteksi dari data terkumpul (gratis)' di atas.";return;}
-    const end=Math.floor(Date.now()/1000),start=end-days*86400;
-    try{
-      st.textContent="Mendeteksi swing dari data historis Premium...";
-      const r=await fetch(`https://api.gold-api.com/ohlc/XAU?startTimestamp=${start}&endTimestamp=${end}`,{headers:{"x-api-key":key}});
-      if(!r.ok)throw new Error("HTTP "+r.status+(r.status===401?" (API key salah/belum Premium)":r.status===429?" (limit tercapai)":""));
-      const d=await r.json();
-      S.pivot=Math.floor(d.low);S.high=Math.ceil(d.high);
-      save(S);syncInputs();render();
-      st.textContent=`Terdeteksi (Premium, ${days} hari): low ${idr(d.low)} · high ${idr(d.high)}.`;
-    }catch(e){st.textContent="Gagal: "+e.message;}
-  };
 
   $("runBacktest").onclick=runBacktest;
   $("fibManHi").oninput=renderDailyFib;$("fibManLo").oninput=renderDailyFib;$("fibManClose").oninput=renderDailyFib;
   $("athPrice").onchange=renderATH;$("athDate").onchange=renderATH;
 
-  let tvLoaded=false;
-  function loadTV(){if(tvLoaded)return;tvLoaded=true;const sc=document.createElement("script");sc.src="https://s3.tradingview.com/tv.js";
-    sc.onload=()=>{try{new TradingView.widget({container_id:"tvchart",symbol:"OANDA:XAUUSD",interval:"60",timezone:"Asia/Jakarta",theme:"dark",style:"1",locale:"id",autosize:true,hide_side_toolbar:false,studies:[]});}catch(e){$("tvchart").innerHTML='<div class="live-note">Gagal memuat TradingView.</div>';}};
-    sc.onerror=()=>{$("tvchart").innerHTML='<div class="live-note">TradingView tidak dapat dimuat (offline/diblokir). Buka dengan internet.</div>';};
-    document.body.appendChild(sc);}
   $("tabCalc").onclick=()=>{$("tabCalc").classList.add("on");$("tabLive").classList.remove("on");$("viewCalc").classList.add("on");$("viewLive").classList.remove("on");};
   $("tabLive").onclick=()=>{$("tabLive").classList.add("on");$("tabCalc").classList.remove("on");$("viewLive").classList.add("on");$("viewCalc").classList.remove("on");loadTV();};
 
@@ -837,5 +845,5 @@ function init(){
   window.addEventListener("resize",()=>{drawFan();drawHist();});
 }
 init();
-document.addEventListener('astro:after-swap',()=>{clearInterval(autoTimer);S=load();init();});
+document.addEventListener('astro:after-swap',()=>{clearInterval(autoTimer);curSym=localStorage.getItem("crypto_current_symbol")||"BTC";if(!CRYPTO_SYMBOLS[curSym])curSym="BTC";S=load();init();});
 </script>
