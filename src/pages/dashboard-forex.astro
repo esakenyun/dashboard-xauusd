@@ -145,7 +145,27 @@ import Footer from '../components/Footer.astro';
         <p class="sub" id="athSummary"></p>
         <figure><div id="athChart"></div><figcaption>Garis oranye = harga aktual (referensi → sekarang). Putus-putus abu = arah menuju tanggal target (bukan prediksi). Amber/teal putus = level cardinal harga. Garis vertikal emas = cardinal waktu. ★ = konfluensi price×time.</figcaption></figure>
 
-        <h2><span class="ic">◷</span> Sesi pasar dunia (WIB)</h2>
+        <h2><span class="ic">☾</span> Astro hari ini (efemeris — cocok Optuma, +7 WIB)</h2>
+        <div class="cards" id="astro"></div>
+        <ul class="asp">
+          <li><b>Mars ☌ Uranus</b> (Gemini, awal pekan) — volatilitas/kejutan.</li>
+          <li><b>Sun □ Saturn</b> (~6 Jul, 17:46 WIB) — tekanan/tertahan.</li>
+          <li><b>Moon ☌ Mars/Uranus</b> (~9–10 Jul) — lonjakan intraday.</li>
+          <li><b>Venus masuk Virgo</b> (10 Jul, 00:22 WIB) — pergeseran nada nilai.</li>
+          <li><b>New Moon Cancer</b> (14 Jul, 16:43 WIB) — energi meredup.</li>
+        </ul>
+
+        <h2><span class="ic">✷</span> Natal chart / efemeris — New York &amp; Jakarta</h2>
+        <div class="inputs" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr))">
+          <div><label>Tanggal natal</label><input type="date" id="nDate"></div>
+          <div><label>Jam lokal kota</label><input type="time" id="nTime" value="00:00"></div>
+        </div>
+        <p class="sub">Planet geosentris identik di kedua kota pada instan yang sama; yang berbeda Ascendant/MC/rumah (whole-sign). Jakarta 00:00 WIB = persis data Optuma. New York memakai tengah malam lokalnya (11 jam setelah Jakarta → Bulan bergeser).</p>
+        <div class="scn" style="grid-template-columns:1fr 1fr">
+          <div id="natalNY"></div><div id="natalJKT"></div>
+        </div>
+
+        <h2><span class="ic">◷</span> Sesi pasar dunia (WIB) &amp; waktu aspek</h2>
         <div class="table-wrap">
           <table><thead><tr><th>Sesi</th><th>Lokal</th><th>WIB</th></tr></thead><tbody>
             <tr><td>Sydney</td><td>07–16 AEST</td><td class="num">04:00–13:00</td></tr>
@@ -155,6 +175,15 @@ import Footer from '../components/Footer.astro';
             <tr class="now-row"><td>Overlap London–NY (paling aktif)</td><td>08–12 EDT</td><td class="num">19:00–23:00</td></tr>
           </tbody></table>
         </div>
+        <div class="table-wrap">
+          <table><thead><tr><th>WIB</th><th>New York (EDT)</th><th>Peristiwa</th></tr></thead><tbody>
+            <tr><td>Sen 6 · 17:46</td><td>06:46</td><td>Sun □ Saturn (tekanan)</td></tr>
+            <tr class="now-row"><td>Kam 9 · 01:00</td><td>Rab 14:00</td><td>Risalah FOMC (kunci)</td></tr>
+            <tr><td>Kam 9 · 19:30</td><td>08:30</td><td>Klaim pengangguran</td></tr>
+            <tr><td>Jum 10 · 00:22</td><td>Kam 13:22</td><td>Venus masuk Virgo</td></tr>
+          </tbody></table>
+        </div>
+        <p class="sub">Konversi: EDT (New York) + 11 jam = WIB.</p>
 
         <h2><span class="ic">◷</span> Gann Time — proyeksi putaran intraday (WIB)</h2>
         <div class="inputs" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
@@ -287,6 +316,10 @@ import Footer from '../components/Footer.astro';
     color:#04101f;font-weight:600;font-size:13px;padding:10px 18px;border-radius:10px;opacity:0;pointer-events:none;transition:.25s;z-index:1000}
   .xforex-dashboard-page .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   .xforex-dashboard-page .live-note{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 15px;font-size:12.5px;color:#cfd2ec;margin-top:8px}
+  .xforex-dashboard-page .glyph{color:var(--gold);font-size:15px}
+  .xforex-dashboard-page ul.asp{margin:8px 0;padding-left:0;list-style:none}
+  .xforex-dashboard-page ul.asp li{padding:7px 0;border-bottom:1px solid var(--line);font-size:13px}
+  .xforex-dashboard-page ul.asp b{color:var(--goldS)}
 
   @media (max-width: 768px) {
     .xforex-dashboard-page { padding: 16px; }
@@ -314,6 +347,80 @@ import Footer from '../components/Footer.astro';
 
 <script is:inline>
 const $=id=>document.getElementById(id);
+
+/* --- Efemeris geosentris tropikal — anchor ke OPTUMA 2026-07-06 00:00 WIB (= Jul 5 17:00 UTC) --- */
+const SIGNS=["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+const EPOCH2=Date.UTC(2026,6,5,17,0,0);
+const D2R=Math.PI/180,R2D=180/Math.PI,nz=x=>((x%360)+360)%360;
+const GLYPH={Sun:"☉",Moon:"☽",Mercury:"☿",Venus:"♀",Mars:"♂",Jupiter:"♃",Saturn:"♄",Uranus:"♅",Neptune:"♆",Pluto:"♇"};
+const ORDER=["Sun","Moon","Mercury","Venus","Mars","Jupiter","Saturn","Uranus","Neptune","Pluto"];
+const EL={
+ Mercury:[[0.38709927,0.20563593,7.00497902,252.25032350,77.45779628,48.33076593],[0.00000037,0.00001906,-0.00594749,149472.67411175,0.16047689,-0.12534081]],
+ Venus:[[0.72333566,0.00677672,3.39467605,181.97909950,131.60246718,76.67984255],[0.00000390,-0.00004107,-0.00078890,58517.81538729,0.00268329,-0.27769418]],
+ Earth:[[1.00000261,0.01671123,-0.00001531,100.46457166,102.93768193,0.0],[0.00000562,-0.00004392,-0.01294668,35999.37244981,0.32327364,0.0]],
+ Mars:[[1.52371034,0.09339410,1.84969142,-4.55343205,-23.94362959,49.55953891],[0.00001847,0.00007882,-0.00813131,19140.30268499,0.44441088,-0.29257343]],
+ Jupiter:[[5.20288700,0.04838624,1.30439695,34.39644051,14.72847983,100.47390909],[-0.00011607,-0.00013253,-0.00183714,3034.74612775,0.21252668,0.20469106]],
+ Saturn:[[9.53667594,0.05386179,2.48599187,49.95424423,92.59887831,113.66242448],[-0.00125060,-0.00050991,0.00193609,1222.49362201,-0.41897216,-0.28867794]],
+ Uranus:[[19.18916464,0.04725744,0.77263783,313.23810451,170.95427630,74.01692503],[-0.00196176,-0.00004397,-0.00242939,428.48202785,0.40805281,0.04240589]],
+ Neptune:[[30.06992276,0.00859048,1.77004347,-55.12002969,44.96476227,131.78422574],[0.00026291,0.00005105,0.00035372,218.45945325,-0.32241464,-0.00508664]]};
+function helioXYZ(name,T){const el=EL[name],e0=el[0],r=el[1];
+ let a=e0[0]+r[0]*T,e=e0[1]+r[1]*T,I=(e0[2]+r[2]*T)*D2R,L=e0[3]+r[3]*T,peri=e0[4]+r[4]*T,nod=(e0[5]+r[5]*T)*D2R;
+ let w=(peri-(e0[5]+r[5]*T))*D2R;let M=nz(L-peri);if(M>180)M-=360;M*=D2R;
+ let E=M;for(let i=0;i<8;i++)E=E-(E-e*Math.sin(E)-M)/(1-e*Math.cos(E));
+ let xp=a*(Math.cos(E)-e),yp=a*Math.sqrt(1-e*e)*Math.sin(E);
+ let cw=Math.cos(w),sw=Math.sin(w),cO=Math.cos(nod),sO=Math.sin(nod),ci=Math.cos(I),si=Math.sin(I);
+ return [(cw*cO-sw*sO*ci)*xp+(-sw*cO-cw*sO*ci)*yp,(cw*sO+sw*cO*ci)*xp+(-sw*sO+cw*cO*ci)*yp,(sw*si)*xp+(cw*si)*yp];}
+function planetLon(name,ms){const T=(ms/86400000+2440587.5-2451545.0)/36525;
+ let p=helioXYZ(name,T),ea=helioXYZ("Earth",T);
+ return nz(Math.atan2(p[1]-ea[1],p[0]-ea[0])*R2D+1.396971*T+0.0003086*T*T);}
+function sunMoon(ms){
+  const D2R=Math.PI/180,J=ms/86400000+2440587.5,T=(J-2451545.0)/36525,nz=x=>((x%360)+360)%360;
+  let L0=nz(280.46646+36000.76983*T+0.0003032*T*T);
+  let M=nz(357.52911+35999.05029*T-0.0001537*T*T)*D2R;
+  let C=(1.914602-0.004817*T-0.000014*T*T)*Math.sin(M)+(0.019993-0.000101*T)*Math.sin(2*M)+0.000289*Math.sin(3*M);
+  let sun=nz(L0+C-0.00569);
+  let Lp=nz(218.3164477+481267.88123421*T-0.0015786*T*T+T*T*T/538841-T*T*T*T/65194000);
+  let Dm=nz(297.8501921+445267.1114034*T-0.0018819*T*T+T*T*T/545868-T*T*T*T/113065000);
+  let Ms=nz(357.5291092+35999.0502909*T-0.0001536*T*T+T*T*T/24490000);
+  let Mp=nz(134.9633964+477198.8675055*T+0.0087414*T*T+T*T*T/69699-T*T*T*T/14712000);
+  let F=nz(93.272095+483202.0175233*T-0.0036539*T*T-T*T*T/3526000+T*T*T*T/863310000);
+  let E=1-0.002516*T-0.0000074*T*T,s=x=>Math.sin(x*D2R),sum=0;
+  const tm=[[6288774,0,0,1,0],[1274027,2,0,-1,0],[658314,2,0,0,0],[213618,0,0,2,0],[-185116,0,1,0,0],[-114332,0,0,0,2],[58793,2,0,-2,0],[57066,2,-1,-1,0],[53322,2,0,1,0],[45758,2,-1,0,0],[-40923,0,1,-1,0],[-34720,1,0,0,0],[-30383,0,1,1,0],[15327,2,0,0,-2],[-12528,0,0,1,2],[10980,0,0,1,-2],[10675,4,0,-1,0],[10034,0,0,3,0],[8548,4,0,-2,0],[-7888,2,1,-1,0],[-6766,2,1,0,0],[-5163,1,0,-1,0],[4987,1,1,0,0],[4036,2,-1,1,0],[3994,2,0,2,0],[3861,4,0,0,0],[3665,2,0,-3,0],[-2689,0,1,-2,0],[-2602,2,0,-1,2]];
+  for(const[c,d,m,mp,f]of tm){let e=1;if(Math.abs(m)==1)e=E;else if(Math.abs(m)==2)e=E*E;sum+=c*e*s(d*Dm+m*Ms+mp*Mp+f*F);}
+  return {sun,moon:nz(Lp+sum/1e6)};
+}
+function lonOf(name,ms){if(name==="Sun")return sunMoon(ms).sun;if(name==="Moon")return sunMoon(ms).moon;
+  if(name==="Pluto")return nz(304.78-0.015*(ms-EPOCH2)/86400000);return planetLon(name,ms);}
+function posAt(ms){return ORDER.map(n=>({name:n,g:GLYPH[n],lon:lonOf(n,ms)}));}
+const fmtDMS=x=>{const d=x%30;return Math.floor(d)+"°"+String(Math.floor((d%1)*60)).padStart(2,"0")+"' "+SIGNS[Math.floor(x/30)%12];};
+function astroFor(ds){return posAt(Date.parse(ds+"T00:00:00+07:00"));}
+/* --- Ascendant / Midheaven --- */
+const OBLIQ=23.4366;
+function ascmc(jd,lat,lonE){const T=(jd-2451545.0)/36525;
+  let g=280.46061837+360.98564736629*(jd-2451545.0)+0.000387933*T*T-T*T*T/38710000;
+  const lst=((g+lonE)%360+360)%360,r=lst*Math.PI/180,e=OBLIQ*Math.PI/180,p=lat*Math.PI/180;
+  let mc=Math.atan2(Math.sin(r),Math.cos(r)*Math.cos(e))*180/Math.PI;mc=(mc%360+360)%360;
+  let asc=Math.atan2(Math.cos(r),-(Math.sin(r)*Math.cos(e)+Math.tan(p)*Math.sin(e)))*180/Math.PI;asc=(asc%360+360)%360;
+  return {asc,mc};}
+function natalPanel(title,tzName,tzOff,lat,lon){
+  const dd=$("nDate").value||"2026-07-06",tt=$("nTime").value||"00:00";
+  const off=(tzOff>=0?"+":"-")+String(Math.abs(tzOff)).padStart(2,"0")+":00";
+  const ms=Date.parse(dd+"T"+tt+":00"+off),jd=ms/86400000+2440587.5;
+  const mm=ascmc(jd,lat,lon),pls=posAt(ms),ascS=Math.floor(mm.asc/30)%12;
+  const rows=pls.map(p=>{const h=((Math.floor(p.lon/30)-ascS)%12+12)%12+1;
+    return `<tr><td><span class="glyph">${p.g}</span> ${p.name}</td><td class="num">${fmtDMS(p.lon)}</td><td>${h}</td></tr>`;}).join("");
+  const utc=new Date(ms).toISOString().slice(0,16).replace("T"," ");
+  return `<div class="card"><h3 style="color:var(--goldS)">${title}</h3>
+   <div class="sub" style="margin:2px 0 8px">${dd} ${tt} ${tzName} · ${utc} UTC · ${lat.toFixed(2)}, ${lon.toFixed(2)}</div>
+   <div style="display:flex;gap:22px;margin-bottom:8px">
+     <div><div style="font-size:10px;color:var(--muted)">ASC</div><div style="font-weight:700;color:var(--goldS)">${fmtDMS(mm.asc)}</div></div>
+     <div><div style="font-size:10px;color:var(--muted)">MC</div><div style="font-weight:700;color:var(--goldS)">${fmtDMS(mm.mc)}</div></div></div>
+   <table><thead><tr><th>Planet</th><th>Posisi</th><th>Rmh</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+function renderNatal(){
+  $("natalNY").innerHTML=natalPanel("New York","EDT (GMT−4)",-4,40.7128,-74.0060);
+  $("natalJKT").innerHTML=natalPanel("Jakarta","WIB (GMT+7)",7,-6.2088,106.8456);
+}
 
 const FX_SYMBOLS={
  EURUSD:{label:"EUR/USD",tv:"OANDA:EURUSD",lr:"EUR/USD",pivot:1.1200,high:1.1600,h4:0.0040,h1:0.0012,dec:4},
@@ -452,6 +559,9 @@ function render(){
   });
   sqrows.push([630,"cardinal","↑ naik (resistensi)",L.sq[630]]);
   $("sq9").innerHTML=sqrows.map(r=>`<tr><td>${r[0]}°</td><td>${r[1]}</td><td>${r[2]}</td><td class="num">${idr(r[3])}</td></tr>`).join("");
+  const ds=$("iDate").value||new Date().toISOString().slice(0,10);
+  $("astro").innerHTML=astroFor(ds).map(a=>`<div class="card"><div class="k"><span class="glyph">${a.g}</span> ${a.name}</div><div class="v" style="font-size:15px">${fmtDMS(a.lon)}</div></div>`).join("");
+  renderNatal();
   renderATH();
   renderDailyFib();
   $("exec").innerHTML=`
@@ -508,7 +618,8 @@ function renderGannTime(){
 const rnd=(v,d)=>{if(v==null||!isFinite(v))return v;if(d==null)d=FX_SYMBOLS[curSym].dec;return Math.round(v*Math.pow(10,d))/Math.pow(10,d);};
 function syncInputs(){$("iPivot").value=rnd(S.pivot);$("iHigh").value=rnd(S.high);$("iH4").value=rnd(S.h4);$("iH1").value=rnd(S.h1);
   $("iPrice").value=rnd(curPrice());if(!$("iDate").value)$("iDate").value=S.history.length?S.history[S.history.length-1].date:new Date().toISOString().slice(0,10);
-  if(!$("gtPivot").value)$("gtPivot").value=new Date().toISOString().slice(0,10)+"T00:00";}
+  if(!$("gtPivot").value)$("gtPivot").value=new Date().toISOString().slice(0,10)+"T00:00";
+  if(!$("nDate").value)$("nDate").value=new Date().toISOString().slice(0,10);}
 function readInputs(){S.pivot=+$("iPivot").value||S.pivot;S.high=+$("iHigh").value||S.high;S.h4=+$("iH4").value||S.h4;S.h1=+$("iH1").value||S.h1;}
 function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1600);}
 
@@ -853,6 +964,8 @@ function init(){
   $("runBacktest").onclick=runBacktest;
   $("fibManHi").oninput=renderDailyFib;$("fibManLo").oninput=renderDailyFib;$("fibManClose").oninput=renderDailyFib;
   $("athPrice").onchange=renderATH;$("athDate").onchange=renderATH;
+  $("iDate").addEventListener("change",render);
+  $("nDate").onchange=renderNatal;$("nTime").onchange=renderNatal;
 
   $("tabCalc").onclick=()=>{$("tabCalc").classList.add("on");$("tabLive").classList.remove("on");$("viewCalc").classList.add("on");$("viewLive").classList.remove("on");};
   $("tabLive").onclick=()=>{$("tabLive").classList.add("on");$("tabCalc").classList.remove("on");$("viewLive").classList.add("on");$("viewCalc").classList.remove("on");loadTV();};
