@@ -153,7 +153,7 @@ import Footer from '../components/Footer.astro';
         <figure><div id="athChart"></div><figcaption>Garis oranye = harga aktual (referensi → sekarang). Putus-putus abu = arah menuju tanggal target (bukan prediksi). Amber/teal putus = level cardinal harga. Garis vertikal emas = cardinal waktu. ★ = konfluensi price×time.</figcaption></figure>
 
         <h2><span class="ic">🌗</span> Klaster Waktu — Gann Time × Fase Bulan</h2>
-        <p class="sub">Mencari kapan cardinal waktu Gann (90/180/270°...) dan fase bulan (New/Full Moon) jatuh berdekatan (≤3 hari) — dua siklus independen (geometris &amp; lunar sinodis) yang saling menguatkan kalau bertepatan. Tidak memakai status retrograde planet mana pun.</p>
+        <p class="sub">Untuk cardinal Gann yang sedang dibuka (navigasi ◀▶ di panel Rotasi ATH), mencari <b>New Moon</b> dan <b>Full Moon</b> terdekat — dua siklus independen (geometris Gann &amp; lunar sinodis) yang saling menguatkan kalau berdekatan (≤3 hari). Tidak memakai status retrograde planet mana pun.</p>
         <div id="timeCluster"></div>
 
         <h2><span class="ic">☾</span> Astro hari ini (efemeris — cocok Optuma, +7 WIB)</h2>
@@ -181,15 +181,10 @@ import Footer from '../components/Footer.astro';
             <tr class="now-row"><td>Overlap London–NY</td><td>08–12 EDT</td><td class="num">19:00–23:00</td></tr>
           </tbody></table>
         </div>
+        <p class="sub">Aspek planet mendatang (dihitung otomatis, sama dengan daftar di bagian Astro — hanya di sini ditampilkan dengan konversi jam WIB &amp; New York). <b>Bukan kalender ekonomi</b> (FOMC, NFP, dll.) — dashboard tidak punya sumber data itu; cek kalender ekonomi terpisah untuk itu. <i>Menyegarkan diri otomatis tiap 5 menit selama tab ini terbuka — tidak perlu reload manual.</i></p>
         <div class="table-wrap">
-          <table><thead><tr><th>WIB</th><th>New York (EDT)</th><th>Peristiwa</th></tr></thead><tbody>
-            <tr><td>Sen 6 · 17:46</td><td>06:46</td><td>Sun □ Saturn (tekanan)</td></tr>
-            <tr class="now-row"><td>Kam 9 · 01:00</td><td>Rab 14:00</td><td>Risalah FOMC (kunci)</td></tr>
-            <tr><td>Kam 9 · 19:30</td><td>08:30</td><td>Klaim pengangguran</td></tr>
-            <tr><td>Jum 10 · 00:22</td><td>Kam 13:22</td><td>Venus masuk Virgo</td></tr>
-          </tbody></table>
+          <table><thead><tr><th>WIB</th><th>New York</th><th>Peristiwa</th></tr></thead><tbody id="aspectTimesTable"></tbody></table>
         </div>
-        <p class="sub">Konversi: EDT (New York) + 11 jam = WIB.</p>
 
         <h2><span class="ic">◷</span> Gann Time — proyeksi putaran intraday (WIB)</h2>
         <div class="inputs" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
@@ -399,6 +394,14 @@ function lonOf(name,ms){if(name==="Sun")return sunMoon(ms).sun;if(name==="Moon")
   if(name==="Pluto")return nz(304.78-0.015*(ms-EPOCH2)/86400000);return planetLon(name,ms);}
 function posAt(ms){return ORDER.map(n=>({name:n,g:GLYPH[n],lon:lonOf(n,ms)}));}
 /* --- Hitung aspek & ingress sungguhan (dari efemeris, tanpa retrograde) --- */
+function refineHour(fn,roughT,windowH){
+  let bestT=roughT,bestV=fn(roughT);
+  for(let dt=-windowH*3600000;dt<=windowH*3600000;dt+=3600000){
+    const t=roughT+dt,v=fn(t);
+    if(v<bestV){bestV=v;bestT=t;}
+  }
+  return bestT;
+}
 function computeAspectEvents(){
   const ASPECTS=[{a:0,n:"☌ konjungsi"},{a:60,n:"⚹ sextile"},{a:90,n:"□ square"},{a:120,n:"△ trine"},{a:180,n:"☍ oposisi"}];
   const now=Date.now();
@@ -417,7 +420,12 @@ function computeAspectEvents(){
         if(diff<bestDiff){bestDiff=diff;bestIdx=di;}
       });
       if(bestDiff<2.2&&bestIdx>0&&bestIdx<days.length-1){
-        events.push({t:days[bestIdx],text:`${GLYPH[ORDER[i]]} ${ORDER[i]} ${asp.n} ${GLYPH[ORDER[j]]} ${ORDER[j]}`,type:"aspect"});
+        const tPrecise=refineHour(t=>{
+          const p=posAt(t),li=p[i].lon,lj=p[j].lon;
+          let sep=Math.abs(li-lj)%360;if(sep>180)sep=360-sep;
+          return Math.abs(sep-asp.a);
+        },days[bestIdx],30);
+        events.push({t:tPrecise,text:`${GLYPH[ORDER[i]]} ${ORDER[i]} ${asp.n} ${GLYPH[ORDER[j]]} ${ORDER[j]}`,type:"aspect"});
       }
     });
   }
@@ -425,7 +433,14 @@ function computeAspectEvents(){
     for(let di=1;di<days.length;di++){
       const s0=Math.floor(((posByDay[di-1][i].lon%360)+360)%360/30);
       const s1=Math.floor(((posByDay[di][i].lon%360)+360)%360/30);
-      if(s0!==s1)events.push({t:days[di],text:`${GLYPH[ORDER[i]]} ${ORDER[i]} masuk ${SIGNS[s1%12]}`,type:"ingress"});
+      if(s0!==s1){
+        const tPrecise=refineHour(t=>{
+          const lon=((posAt(t)[i].lon%360)+360)%360;
+          const distToBoundary=Math.abs(lon-Math.round(lon/30)*30);
+          return distToBoundary;
+        },days[di],24);
+        events.push({t:tPrecise,text:`${GLYPH[ORDER[i]]} ${ORDER[i]} masuk ${SIGNS[s1%12]}`,type:"ingress"});
+      }
     }
   }
   events.sort((a,b)=>a.t-b.t);
@@ -443,6 +458,18 @@ function renderAspects(){
     const passed=e.t<now-43200000;
     const tag=e.type==="ingress"?"pergeseran sign":"aspek";
     return `<li${passed?' style="opacity:0.55"':''}><b>${e.text}</b> (${dstr}${passed?', sudah lewat':''}) — ${tag}.</li>`;
+  }).join("");
+}
+function renderAspectTimes(){
+  const el=$("aspectTimesTable");if(!el)return;
+  const now=Date.now();
+  const events=computeAspectEvents().filter(e=>e.t>=now-43200000).slice(0,6);
+  if(!events.length){el.innerHTML='<tr><td colspan="3">Tidak ada aspek terdeteksi dalam waktu dekat.</td></tr>';return;}
+  const wibFmt=new Intl.DateTimeFormat("id-ID",{timeZone:"Asia/Jakarta",weekday:"short",day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});
+  const nyFmt=new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",weekday:"short",hour:"2-digit",minute:"2-digit",hour12:false});
+  el.innerHTML=events.map(e=>{
+    const d=new Date(e.t);
+    return `<tr><td>${wibFmt.format(d)} WIB</td><td>${nyFmt.format(d)}</td><td>${e.text}</td></tr>`;
   }).join("");
 }
 const fmtDMS=x=>{const d=x%30;return Math.floor(d)+"°"+String(Math.floor((d%1)*60)).padStart(2,"0")+"' "+SIGNS[Math.floor(x/30)%12];};
@@ -611,6 +638,7 @@ function render(){
   $("astro").innerHTML=astroFor(ds).map(a=>`<div class="card"><div class="k"><span class="glyph">${a.g}</span> ${a.name}</div><div class="v" style="font-size:15px">${fmtDMS(a.lon)}</div></div>`).join("");
   renderNatal();
   renderAspects();
+  renderAspectTimes();
   renderATH();
   renderTimeCluster();
   renderDailyFib();
@@ -869,19 +897,20 @@ function datesForDegrees(anchorMs,targets){
   const anchorLon=sunMoon(anchorMs).sun;
   const out=new Array(targets.length);
   let ti=0,ms=anchorMs,prevMs=anchorMs;
-  let targetLon=(anchorLon+targets[0])%360;
-  let prevDiff=((anchorLon-targetLon+540)%360)-180;
+  let prevLon=anchorLon,cum=0,prevCum=0;
   while(ti<targets.length){
     ms+=86400000;
     const lon=sunMoon(ms).sun;
-    const diff=((lon-targetLon+540)%360)-180;
-    if(prevDiff<0&&diff>=0){
-      const frac=diff===prevDiff?0:-prevDiff/(diff-prevDiff);
+    let step=lon-prevLon;
+    if(step<-180)step+=360;
+    if(step<0)step=0;
+    cum+=step;
+    while(ti<targets.length&&cum>=targets[ti]){
+      const frac=cum===prevCum?0:(targets[ti]-prevCum)/(cum-prevCum);
       out[ti]=new Date(prevMs+frac*(ms-prevMs));
       ti++;
-      if(ti<targets.length){targetLon=(anchorLon+targets[ti])%360;prevDiff=((lon-targetLon+540)%360)-180;}
-    } else prevDiff=diff;
-    prevMs=ms;
+    }
+    prevLon=lon;prevMs=ms;prevCum=cum;
   }
   return out;
 }
@@ -944,46 +973,51 @@ function renderATH(){
 }
 function renderTimeCluster(){
   const el=$("timeCluster");
-  const athP=+$("athPrice").value||S.high,athDs=$("athDate").value||"2026-01-01";
+  const athDs=$("athDate").value||"2026-01-01";
   const athDate=new Date(athDs+"T00:00:00Z");
+  const athMsNoon=athDate.getTime()+12*3600000;
+  const cardStep=+($("cardStep")&&$("cardStep").value)||90;
   const now=Date.now();
-  const gann=[];
-  for(let k=1;k<=6;k++){const d=k*90,dt=new Date(athDate.getTime()+d*86400000);if(dt.getTime()>=now-86400000)gann.push({label:`Gann ${d%360===0?360:d%360}° (hari ke-${d})`,dt});}
+  const days=Math.round((now-athDate)/86400000);
+  const daysPerDeg=365.25/360;
+  const approxCardinal=Math.max(1,Math.round(days/(cardStep*daysPerDeg)));
+  const k=athPageK!=null?athPageK:approxCardinal;
+  const cardinalDate=datesForDegrees(athMsNoon,[cardStep*k])[0];
+
   const synMs=29.530588853*86400000;
   const refNew=Date.UTC(2000,0,6,18,14);
+  const rangeStart=Math.min(now,cardinalDate.getTime())-45*86400000;
+  const rangeEnd=Math.max(now,cardinalDate.getTime())+45*86400000;
+  let kk=Math.floor((rangeStart-refNew)/synMs)-1;
   const moons=[];
-  let k=Math.floor((now-refNew)/synMs)-1;
-  for(let i=0;i<8;i++){
-    const evNew=refNew+k*synMs,evFull=refNew+(k+0.5)*synMs;
-    if(evNew>=now-86400000)moons.push({label:"New Moon",dt:new Date(evNew)});
-    if(evFull>=now-86400000)moons.push({label:"Full Moon",dt:new Date(evFull)});
-    k++;
+  while(true){
+    const evNew=refNew+kk*synMs,evFull=refNew+(kk+0.5)*synMs;
+    if(evNew>rangeEnd&&evFull>rangeEnd)break;
+    if(evNew>=rangeStart&&evNew<=rangeEnd)moons.push({label:"New Moon",dt:new Date(evNew)});
+    if(evFull>=rangeStart&&evFull<=rangeEnd)moons.push({label:"Full Moon",dt:new Date(evFull)});
+    kk++;
   }
-  moons.sort((a,b)=>a.dt-b.dt);
-  const gannNext=gann.slice(0,3),moonsNext=moons.slice(0,4);
-  const clusters=[];
-  gannNext.forEach(g=>{
-    moonsNext.forEach(m=>{
-      const diffDays=Math.abs(g.dt-m.dt)/86400000;
-      if(diffDays<=3)clusters.push({g,m,diffDays});
-    });
-  });
+  const nearestOf=lbl=>{let best=null,bd=Infinity;moons.filter(m=>m.label===lbl).forEach(m=>{const d=Math.abs(m.dt-cardinalDate)/86400000;if(d<bd){bd=d;best=m;}});return {m:best,d:bd};};
+  const nn=nearestOf("New Moon"),nf=nearestOf("Full Moon");
   const fmt=d=>d.toISOString().slice(0,10);
-  let html=`<table><thead><tr><th>Gann Time terdekat</th><th>Fase Bulan terdekat</th><th>Selisih</th><th>Status</th></tr></thead><tbody>`;
-  for(let i=0;i<Math.max(gannNext.length,3);i++){
-    const g=gannNext[i];
-    if(!g)continue;
-    let nearest=null,nd=Infinity;
-    moonsNext.forEach(m=>{const dd=Math.abs(g.dt-m.dt)/86400000;if(dd<nd){nd=dd;nearest=m;}});
-    const isCluster=nd<=3;
-    html+=`<tr${isCluster?' class="now-row"':''}><td>${g.label}<br><span class="sub">${fmt(g.dt)}</span></td><td>${nearest?nearest.label+'<br><span class="sub">'+fmt(nearest.dt)+'</span>':'—'}</td><td>${isFinite(nd)?nd.toFixed(1)+' hari':'—'}</td><td>${isCluster?'<span class="tag t-dec">★ Klaster waktu!</span>':'terpisah'}</td></tr>`;
-  }
+  let html=`<div class="btnrow" style="margin-bottom:10px;align-items:center">
+    <button class="btn btn-ghost" onclick="athGoPrev()">◀ Sebelumnya</button>
+    <span class="sub" style="font-weight:700;color:var(--ivory)">Cardinal ke-${k} (${cardStep*k}°) · ${fmt(cardinalDate)}</span>
+    <button class="btn btn-ghost" onclick="athGoNext()">Berikutnya ▶</button>
+    <button class="btn btn-gold" onclick="athGoNow()">Sekarang</button>
+  </div>`;
+  html+=`<table><thead><tr><th>Fase Bulan</th><th>Tanggal</th><th>Selisih dari cardinal</th><th>Status</th></tr></thead><tbody>`;
+  [["New Moon",nn],["Full Moon",nf]].forEach(([label,res])=>{
+    if(!res.m){html+=`<tr><td>${label}</td><td colspan="3">tidak ditemukan dalam rentang</td></tr>`;return;}
+    const isCluster=res.d<=3;
+    html+=`<tr${isCluster?' class="now-row"':''}><td>${label}</td><td>${fmt(res.m.dt)}</td><td>${res.d.toFixed(1)} hari</td><td>${isCluster?'<span class="tag t-dec">★ Klaster waktu!</span>':'terpisah'}</td></tr>`;
+  });
   html+=`</tbody></table>`;
-  if(clusters.length){
-    const c=clusters[0];
-    html+=`<p class="sub" style="margin-top:8px"><b>Klaster terdekat:</b> ${c.g.label} (${fmt(c.g.dt)}) berdekatan dengan ${c.m.label} (${fmt(c.m.dt)}) — selisih cuma ${c.diffDays.toFixed(1)} hari. Ini jendela waktu dengan probabilitas turn tertinggi karena dua siklus independen (Gann geometris &amp; lunar sinodis) menunjuk ke tanggal yang nyaris sama.</p>`;
+  if((nn.m&&nn.d<=3)||(nf.m&&nf.d<=3)){
+    const which=(nf.m&&nf.d<=nn.d)?nf:nn,whichLabel=(nf.m&&nf.d<=nn.d)?"Full Moon":"New Moon";
+    html+=`<p class="sub" style="margin-top:8px"><b>Klaster terdeteksi:</b> Cardinal ${cardStep*k}° (${fmt(cardinalDate)}) berdekatan dengan ${whichLabel} (${fmt(which.m.dt)}) — selisih ${which.d.toFixed(1)} hari. Dua siklus independen (geometris Gann &amp; lunar sinodis) saling menguatkan.</p>`;
   } else {
-    html+=`<p class="sub" style="margin-top:8px">Belum ada klaster ketat (≤3 hari) dalam 3 Gann cardinal ke depan — jendela waktu tersebar, tidak mengelompok.</p>`;
+    html+=`<p class="sub" style="margin-top:8px">Tidak ada klaster ketat (≤3 hari) untuk cardinal ini. Jelajah cardinal lain via navigasi ◀▶ di panel Rotasi ATH di atas.</p>`;
   }
   el.innerHTML=html;
 }
@@ -998,32 +1032,39 @@ function drawATHChart(athP,athDate,cp,kCenter,priceAt,days){
   pts.push({t:now,p:cp});
   pts=pts.filter((v,i,a)=>a.findIndex(x=>x.t===v.t)===i).sort((a,b)=>a.t-b.t);
   const domainDays=Math.max(targetDays,days)*1.0;
-  const x0=60,x1=560,y0=40,y1=340;
+  const x0=64,x1=560,y0=44,y1=340;
   const X=t=>x0+((t-athDate.getTime())/86400000/domainDays)*(x1-x0);
   const priceVals=[athP,cp,resPrice,supPrice,...pts.map(p=>p.p)];
   const pMin=Math.min(...priceVals)*0.985,pMax=Math.max(...priceVals)*1.015;
   const Y=p=>y1-(p-pMin)/(pMax-pMin)*(y1-y0);
-  let s=`<svg viewBox="0 0 680 385" role="img" aria-label="Grafik rotasi referensi price times time"><title>Rotasi Gann dari titik referensi ke target waktu berikutnya</title>`;
-  s+=`<line x1="${x0}" y1="${y0}" x2="${x0}" y2="${y1}" stroke="#33396E" stroke-width="0.5"/>`;
-  s+=`<line x1="${x0}" y1="${y1}" x2="${x1}" y2="${y1}" stroke="#33396E" stroke-width="0.5"/>`;
-  s+=`<line x1="${x0}" y1="${Y(resPrice).toFixed(1)}" x2="566" y2="${Y(resPrice).toFixed(1)}" stroke="#BA7517" stroke-width="1" stroke-dasharray="5 4"/>`;
-  s+=`<line x1="${x0}" y1="${Y(supPrice).toFixed(1)}" x2="566" y2="${Y(supPrice).toFixed(1)}" stroke="#0F6E56" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+  let s=`<svg viewBox="0 0 680 410" role="img" aria-label="Grafik rotasi ATH price times time"><title>Rotasi Gann dari ATH ke target waktu berikutnya</title>`;
+  for(let i=1;i<4;i++){const gy=y0+((y1-y0)/4)*i;s+=`<line x1="${x0}" y1="${gy.toFixed(1)}" x2="${x1}" y2="${gy.toFixed(1)}" stroke="var(--border,#262b52)" stroke-width="0.5" stroke-dasharray="2 4" opacity="0.5"/>`;}
+  s+=`<line x1="${x0}" y1="${y0}" x2="${x0}" y2="${y1}" stroke="var(--border-strong,#33396E)" stroke-width="0.7"/>`;
+  s+=`<line x1="${x0}" y1="${y1}" x2="${x1}" y2="${y1}" stroke="var(--border-strong,#33396E)" stroke-width="0.7"/>`;
+  s+=`<text class="sm" x="${(x0-6).toFixed(1)}" y="${(y0+4).toFixed(1)}" text-anchor="end">${idr(pMax)}</text>`;
+  s+=`<text class="sm" x="${(x0-6).toFixed(1)}" y="${(y1+2).toFixed(1)}" text-anchor="end">${idr(pMin)}</text>`;
+  const yRes=Y(resPrice),ySup=Y(supPrice);
+  s+=`<rect x="${x0}" y="${Math.min(yRes,ySup).toFixed(1)}" width="${(x1-x0).toFixed(1)}" height="${Math.abs(ySup-yRes).toFixed(1)}" fill="#1E7A5A" opacity="0.08"/>`;
+  s+=`<line x1="${x0}" y1="${yRes.toFixed(1)}" x2="${x1}" y2="${yRes.toFixed(1)}" stroke="#BA7517" stroke-width="1" stroke-dasharray="5 4"/>`;
+  s+=`<line x1="${x0}" y1="${ySup.toFixed(1)}" x2="${x1}" y2="${ySup.toFixed(1)}" stroke="#0F6E56" stroke-width="1.5" stroke-dasharray="5 4"/>`;
   const xT=X(targetDate.getTime());
   s+=`<line x1="${xT.toFixed(1)}" y1="${y0}" x2="${xT.toFixed(1)}" y2="${y1}" stroke="#BA7517" stroke-width="1" stroke-dasharray="2 3"/>`;
   let path="M"+pts.map(p=>X(p.t).toFixed(1)+","+Y(p.p).toFixed(1)).join(" L");
-  s+=`<path d="${path}" fill="none" stroke="#D85A30" stroke-width="2" stroke-linecap="round"/>`;
+  s+=`<path d="${path}" fill="none" stroke="#D85A30" stroke-width="2.2" stroke-linecap="round"/>`;
   const last=pts[pts.length-1];
-  s+=`<path d="M${X(last.t).toFixed(1)},${Y(last.p).toFixed(1)} L${xT.toFixed(1)},${Y(supPrice).toFixed(1)}" fill="none" stroke="#8A8FB0" stroke-width="1.2" stroke-dasharray="4 3" stroke-linecap="round"/>`;
-  s+=`<circle cx="${X(pts[0].t).toFixed(1)}" cy="${Y(pts[0].p).toFixed(1)}" r="4" fill="#D85A30"/>`;
-  s+=`<circle cx="${X(last.t).toFixed(1)}" cy="${Y(last.p).toFixed(1)}" r="4" fill="#D85A30"/>`;
-  s+=`<circle cx="${xT.toFixed(1)}" cy="${Y(supPrice).toFixed(1)}" r="5" fill="none" stroke="#0F6E56" stroke-width="2"/><circle cx="${xT.toFixed(1)}" cy="${Y(supPrice).toFixed(1)}" r="2" fill="#0F6E56"/>`;
-  s+=`<text class="sh" x="570" y="${(Y(athP)+4).toFixed(1)}">Ref ${idr(athP)}</text>`;
-  s+=`<text class="sh" x="570" y="${(Y(resPrice)+4).toFixed(1)}" style="fill:#854F0B">${idr(resPrice)}</text>`;
-  s+=`<text class="sh" x="570" y="${(Y(supPrice)+4).toFixed(1)}" style="fill:#085041">★ ${idr(supPrice)}</text>`;
-  s+=`<text class="sm" x="${(xT+4).toFixed(1)}" y="50">${targetDays}°</text>`;
-  s+=`<text class="sm" x="${X(pts[0].t).toFixed(1)}" y="360" text-anchor="middle">${fmtShort(athDate)}</text>`;
-  s+=`<text class="sh" x="${X(last.t).toFixed(1)}" y="360" text-anchor="middle" style="fill:#6AA9E9">${fmtShort(new Date(last.t))}</text>`;
-  s+=`<text class="sh" x="${xT.toFixed(1)}" y="360" text-anchor="middle" style="fill:#BA7517">${fmtShort(targetDate)}</text>`;
+  s+=`<path d="M${X(last.t).toFixed(1)},${Y(last.p).toFixed(1)} L${xT.toFixed(1)},${ySup.toFixed(1)}" fill="none" stroke="#8A8FB0" stroke-width="1.2" stroke-dasharray="4 3" stroke-linecap="round"/>`;
+  const athX=X(pts[0].t),athY=Y(athP);
+  s+=`<circle cx="${athX.toFixed(1)}" cy="${athY.toFixed(1)}" r="4.5" fill="#D85A30"/>`;
+  s+=`<text class="sh" x="${(athX+8).toFixed(1)}" y="${(athY-8).toFixed(1)}">ATH ${idr(athP)}</text>`;
+  s+=`<circle cx="${X(last.t).toFixed(1)}" cy="${Y(last.p).toFixed(1)}" r="4.5" fill="#D85A30"/>`;
+  s+=`<circle cx="${xT.toFixed(1)}" cy="${ySup.toFixed(1)}" r="5.5" fill="none" stroke="#0F6E56" stroke-width="2"/><circle cx="${xT.toFixed(1)}" cy="${ySup.toFixed(1)}" r="2.2" fill="#0F6E56"/>`;
+  s+=`<text class="sh" x="570" y="${(yRes+4).toFixed(1)}" style="fill:#854F0B">${idr(resPrice)}</text>`;
+  s+=`<text class="sh" x="570" y="${(ySup+4).toFixed(1)}" style="fill:#085041">★ ${idr(supPrice)}</text>`;
+  s+=`<text class="sm" x="${xT.toFixed(1)}" y="${(y0-8).toFixed(1)}" text-anchor="middle" style="fill:#BA7517">Target waktu (${targetDays}°)</text>`;
+  const nowX=X(last.t),tX=xT,tooClose=Math.abs(nowX-tX)<48;
+  s+=`<text class="sm" x="${athX.toFixed(1)}" y="374" text-anchor="middle">${fmtShort(athDate)}</text>`;
+  s+=`<text class="sh" x="${nowX.toFixed(1)}" y="374" text-anchor="middle" style="fill:#6AA9E9">${fmtShort(new Date(last.t))} (now)</text>`;
+  s+=`<text class="sh" x="${tX.toFixed(1)}" y="${tooClose?390:374}" text-anchor="middle" style="fill:#BA7517">${fmtShort(targetDate)}</text>`;
   s+=`</svg>`;
   $("athChart").innerHTML=s;
 }
@@ -1053,6 +1094,10 @@ function switchSymbol(sym){
   if($("viewLive").classList.contains("on"))loadTV();
   toast("Beralih ke "+CRYPTO_SYMBOLS[curSym].label);
 }
+
+function athGoPrev(){athPageK=Math.max(1,(athPageK||1)-1);S.athPageK=athPageK;save(S);renderATH();renderTimeCluster();}
+function athGoNext(){athPageK=(athPageK||1)+1;S.athPageK=athPageK;save(S);renderATH();renderTimeCluster();}
+function athGoNow(){athPageK=null;S.athPageK=null;save(S);renderATH();renderTimeCluster();}
 
 function init(){
   populateSymbolPicker();
@@ -1095,10 +1140,10 @@ function init(){
   $("fibManHi").oninput=renderDailyFib;$("fibManLo").oninput=renderDailyFib;$("fibManClose").oninput=renderDailyFib;
   $("athPrice").oninput=()=>{S.athPrice=+$("athPrice").value||S.athPrice;athPageK=null;S.athPageK=null;save(S);renderATH();renderTimeCluster();};
   $("athDate").oninput=()=>{S.athDate=$("athDate").value;athPageK=null;S.athPageK=null;save(S);renderATH();renderTimeCluster();};
-  $("cardStep").oninput=()=>{S.cardStep=+$("cardStep").value||90;athPageK=null;S.athPageK=null;save(S);renderATH();};
-  $("athPagePrev").onclick=()=>{athPageK=Math.max(1,(athPageK||1)-1);S.athPageK=athPageK;save(S);renderATH();};
-  $("athPageNext").onclick=()=>{athPageK=(athPageK||1)+1;S.athPageK=athPageK;save(S);renderATH();};
-  $("athPageNow").onclick=()=>{athPageK=null;S.athPageK=null;save(S);renderATH();};
+  $("cardStep").oninput=()=>{S.cardStep=+$("cardStep").value||90;athPageK=null;S.athPageK=null;save(S);renderATH();renderTimeCluster();};
+  $("athPagePrev").onclick=athGoPrev;
+  $("athPageNext").onclick=athGoNext;
+  $("athPageNow").onclick=athGoNow;
   $("iDate").addEventListener("change",render);
   $("nDate").onchange=renderNatal;$("nTime").onchange=renderNatal;
 
@@ -1112,5 +1157,6 @@ function init(){
   window.addEventListener("resize",()=>{drawFan();drawHist();});
 }
 init();
-document.addEventListener('astro:after-swap',()=>{clearInterval(autoTimer);curSym=localStorage.getItem("crypto_current_symbol")||"BTC";if(!CRYPTO_SYMBOLS[curSym])curSym="BTC";S=load();init();});
+let aspectRefreshTimer=setInterval(()=>{renderAspects();renderAspectTimes();renderTimeCluster();},5*60*1000);
+document.addEventListener('astro:after-swap',()=>{clearInterval(autoTimer);clearInterval(aspectRefreshTimer);curSym=localStorage.getItem("crypto_current_symbol")||"BTC";if(!CRYPTO_SYMBOLS[curSym])curSym="BTC";S=load();init();aspectRefreshTimer=setInterval(()=>{renderAspects();renderAspectTimes();renderTimeCluster();},5*60*1000);});
 </script>
