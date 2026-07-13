@@ -135,26 +135,33 @@ import Footer from '../components/Footer.astro';
         <div class="inputs" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
           <div><label>Harga referensi tertinggi</label><input type="number" id="athPrice" value="3200" step="5"></div>
           <div><label>Tanggal referensi</label><input type="date" id="athDate" value="2026-04-01"></div>
+          <div><label>Jarak antar cardinal utama (derajat)</label><input type="number" id="cardStep" value="90" step="5" min="5"></div>
         </div>
+        <p class="sub" style="margin-top:6px">Tanggal dihitung dari <b>pergerakan Matahari sungguhan</b> (ekliptika), persis metode "Square of Nine Dates" Optuma. Aturan: cek dulu tiap <b>cardinal utama</b> (kelipatan derajat di atas, biasanya 90°), lalu di sekitarnya ditandai <b>±5° (aktivasi planet), ±15° (midpoint), ±30° (bulan alami)</b> — bukan langkah 5/15/30 berdiri sendiri dari referensi. Navigasi ◀ ▶ untuk menjelajah banyak cardinal.</p>
         <div class="cards" id="athCards"></div>
         <div class="table-wrap">
           <table><thead><tr><th>Harga (cardinal 90°)</th><th>Peran</th></tr></thead><tbody id="athPriceTable"></tbody></table>
         </div>
-        <div class="table-wrap" style="margin-top:10px">
-          <table><thead><tr><th>Tanggal (cardinal 90 hari)</th><th>Status</th></tr></thead><tbody id="athTimeTable"></tbody></table>
+        <div class="btnrow" style="margin-top:10px;align-items:center">
+          <button class="btn btn-ghost" id="athPagePrev">◀ Cardinal sebelumnya</button>
+          <span id="athPageLabel" class="sub" style="font-weight:700;color:var(--ivory)">Cardinal ke-2 (180°)</span>
+          <button class="btn btn-ghost" id="athPageNext">Cardinal berikutnya ▶</button>
+          <button class="btn btn-gold" id="athPageNow">Kembali ke sekarang</button>
+        </div>
+        <div class="table-wrap" style="margin-top:8px">
+          <table><thead><tr><th>Offset dari cardinal</th><th>Tanggal (Matahari sungguhan)</th><th>Harga Squared</th><th>Status</th></tr></thead><tbody id="athTimeTable"></tbody></table>
         </div>
         <p class="sub" id="athSummary"></p>
         <figure><div id="athChart"></div><figcaption>Garis oranye = harga aktual (ATH → sekarang). Putus-putus abu = arah menuju tanggal target (bukan prediksi). Amber/teal putus = level cardinal harga. Garis vertikal emas = cardinal waktu. ★ = konfluensi price×time.</figcaption></figure>
 
+        <h2><span class="ic">🌗</span> Klaster Waktu — Gann Time × Fase Bulan</h2>
+        <p class="sub">Mencari kapan cardinal waktu Gann (90/180/270°...) dan fase bulan (New/Full Moon) jatuh berdekatan (≤3 hari) — dua siklus independen (geometris &amp; lunar sinodis) yang saling menguatkan kalau bertepatan. Tidak memakai status retrograde planet mana pun.</p>
+        <div id="timeCluster"></div>
+
         <h2><span class="ic">☾</span> Astro hari ini (efemeris — cocok Optuma, +7 WIB)</h2>
         <div class="cards" id="astro"></div>
-        <ul class="asp">
-          <li><b>Mars ☌ Uranus</b> (Gemini, awal pekan) — volatilitas/kejutan.</li>
-          <li><b>Sun □ Saturn</b> (~6 Jul, 17:46 WIB) — tekanan/tertahan.</li>
-          <li><b>Moon ☌ Mars/Uranus</b> (~9–10 Jul) — lonjakan intraday.</li>
-          <li><b>Venus masuk Virgo</b> (10 Jul, 00:22 WIB) — pergeseran nada nilai.</li>
-          <li><b>New Moon Cancer</b> (14 Jul, 16:43 WIB) — energi meredup.</li>
-        </ul>
+        <p class="sub">Aspek &amp; pergeseran sign dihitung otomatis dari efemeris sungguhan (3 hari lalu s/d 3 minggu ke depan) — bukan daftar tetap. Baris pudar = sudah lewat.</p>
+        <ul class="asp" id="astroAspects"></ul>
 
         <h2><span class="ic">✷</span> Natal chart / efemeris — New York &amp; Jakarta</h2>
         <div class="inputs" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr))">
@@ -396,6 +403,53 @@ function sunMoon(ms){
 function lonOf(name,ms){if(name==="Sun")return sunMoon(ms).sun;if(name==="Moon")return sunMoon(ms).moon;
   if(name==="Pluto")return nz(304.78-0.015*(ms-EPOCH2)/86400000);return planetLon(name,ms);}
 function posAt(ms){return ORDER.map(n=>({name:n,g:GLYPH[n],lon:lonOf(n,ms)}));}
+/* --- Hitung aspek & ingress sungguhan (dari efemeris, tanpa retrograde) --- */
+function computeAspectEvents(){
+  const ASPECTS=[{a:0,n:"☌ konjungsi"},{a:60,n:"⚹ sextile"},{a:90,n:"□ square"},{a:120,n:"△ trine"},{a:180,n:"☍ oposisi"}];
+  const now=Date.now();
+  const winStart=now-3*86400000,winEnd=now+21*86400000;
+  const days=[];for(let t=winStart;t<=winEnd;t+=86400000)days.push(t);
+  const posByDay=days.map(t=>posAt(t));
+  const n=ORDER.length;
+  const events=[];
+  for(let i=0;i<n;i++)for(let j=i+1;j<n;j++){
+    ASPECTS.forEach(asp=>{
+      let bestDiff=Infinity,bestIdx=-1;
+      days.forEach((t,di)=>{
+        const li=posByDay[di][i].lon,lj=posByDay[di][j].lon;
+        let sep=Math.abs(li-lj)%360;if(sep>180)sep=360-sep;
+        const diff=Math.abs(sep-asp.a);
+        if(diff<bestDiff){bestDiff=diff;bestIdx=di;}
+      });
+      if(bestDiff<2.2&&bestIdx>0&&bestIdx<days.length-1){
+        events.push({t:days[bestIdx],text:`${GLYPH[ORDER[i]]} ${ORDER[i]} ${asp.n} ${GLYPH[ORDER[j]]} ${ORDER[j]}`,type:"aspect"});
+      }
+    });
+  }
+  for(let i=0;i<n;i++){
+    for(let di=1;di<days.length;di++){
+      const s0=Math.floor(((posByDay[di-1][i].lon%360)+360)%360/30);
+      const s1=Math.floor(((posByDay[di][i].lon%360)+360)%360/30);
+      if(s0!==s1)events.push({t:days[di],text:`${GLYPH[ORDER[i]]} ${ORDER[i]} masuk ${SIGNS[s1%12]}`,type:"ingress"});
+    }
+  }
+  events.sort((a,b)=>a.t-b.t);
+  const seen=new Set(),out=[];
+  events.forEach(e=>{const key=e.text+"|"+Math.floor(e.t/172800000);if(!seen.has(key)){seen.add(key);out.push(e);}});
+  return out.slice(0,10);
+}
+function renderAspects(){
+  const el=$("astroAspects");if(!el)return;
+  const now=Date.now();
+  const events=computeAspectEvents();
+  if(!events.length){el.innerHTML='<li>Tidak ada aspek utama terdeteksi dalam 3 minggu ke depan.</li>';return;}
+  el.innerHTML=events.map(e=>{
+    const d=new Date(e.t),dstr=`${d.getUTCDate()} ${["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"][d.getUTCMonth()]}`;
+    const passed=e.t<now-43200000;
+    const tag=e.type==="ingress"?"pergeseran sign":"aspek";
+    return `<li${passed?' style="opacity:0.55"':''}><b>${e.text}</b> (${dstr}${passed?', sudah lewat':''}) — ${tag}.</li>`;
+  }).join("");
+}
 const fmtDMS=x=>{const d=x%30;return Math.floor(d)+"°"+String(Math.floor((d%1)*60)).padStart(2,"0")+"' "+SIGNS[Math.floor(x/30)%12];};
 function astroFor(ds){return posAt(Date.parse(ds+"T00:00:00+07:00"));}
 /* --- Ascendant / Midheaven --- */
@@ -451,7 +505,7 @@ const IDX_SYMBOLS={
 let curSym=localStorage.getItem("idx_current_symbol")||"BBRI";
 if(!IDX_SYMBOLS[curSym])curSym="BBRI";
 function stateKey(){return "idx_astrogann_v2_"+curSym;}
-function defFor(sym){const c=IDX_SYMBOLS[sym];return {pivot:c.pivot,high:c.high,h4:c.h4,h1:c.h1,history:[],ticks:[]};}
+function defFor(sym){const c=IDX_SYMBOLS[sym];return {pivot:c.pivot,high:c.high,h4:c.h4,h1:c.h1,history:[],ticks:[],athPrice:3200,athDate:"2026-04-01",cardStep:90,athPageK:null};}
 let mem=null;
 function load(){try{const r=localStorage.getItem(stateKey());if(r)return JSON.parse(r);}catch(e){}return mem?JSON.parse(JSON.stringify(mem)):JSON.parse(JSON.stringify(defFor(curSym)));}
 function save(s){try{localStorage.setItem(stateKey(),JSON.stringify(s));}catch(e){mem=s;}}
@@ -569,7 +623,9 @@ function render(){
   const ds=$("iDate").value||new Date().toISOString().slice(0,10);
   $("astro").innerHTML=astroFor(ds).map(a=>`<div class="card"><div class="k"><span class="glyph">${a.g}</span> ${a.name}</div><div class="v" style="font-size:15px">${fmtDMS(a.lon)}</div></div>`).join("");
   renderNatal();
+  renderAspects();
   renderATH();
+  renderTimeCluster();
   renderDailyFib();
   $("exec").innerHTML=`
     <div class="sc bull"><h3>Bullish</h3><p>Entry: retest &gt; ${idr(L.box[5])}<br>SL: &lt; ${idr(L.box[4]-25)}<br>TP: ${idr(L.box[5])} → ${idr(L.box[6])} → ${idr(L.fan["1x1"])}</p></div>
@@ -626,7 +682,11 @@ const rnd=(v,d=0)=>v==null||!isFinite(v)?v:Math.round(v*Math.pow(10,d))/Math.pow
 function syncInputs(){$("iPivot").value=rnd(S.pivot,0);$("iHigh").value=rnd(S.high,0);$("iH4").value=rnd(S.h4,2);$("iH1").value=rnd(S.h1,2);
   $("iPrice").value=rnd(curPrice(),0);if(!$("iDate").value)$("iDate").value=S.history.length?S.history[S.history.length-1].date:new Date().toISOString().slice(0,10);
   if(!$("gtPivot").value)$("gtPivot").value=new Date().toISOString().slice(0,10)+"T00:00";
-  if(!$("nDate").value)$("nDate").value=new Date().toISOString().slice(0,10);}
+  if(!$("nDate").value)$("nDate").value=new Date().toISOString().slice(0,10);
+  if(S.athPrice!=null)$("athPrice").value=S.athPrice;
+  if(S.athDate!=null)$("athDate").value=S.athDate;
+  if(S.cardStep!=null)$("cardStep").value=S.cardStep;
+  athPageK=S.athPageK!=null?S.athPageK:null;}
 function readInputs(){S.pivot=+$("iPivot").value||S.pivot;S.high=+$("iHigh").value||S.high;S.h4=+$("iH4").value||S.h4;S.h1=+$("iH1").value||S.h1;}
 function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1600);}
 
@@ -821,9 +881,34 @@ function renderDailyFib(){
   note.innerHTML=`Range = High−Low kemarin, 0% = Close kemarin, level = Close ± rasio×Range. Sumber saat ini: <b>${sumber}</b>. Angka emas = terdekat harga sekarang.`;
 }
 
+/* --- Cari tanggal untuk sekumpulan target derajat (kumulatif dari anchor, HARUS terurut naik) --- */
+function datesForDegrees(anchorMs,targets){
+  const anchorLon=sunMoon(anchorMs).sun;
+  const out=new Array(targets.length);
+  let ti=0,ms=anchorMs,prevMs=anchorMs;
+  let targetLon=(anchorLon+targets[0])%360;
+  let prevDiff=((anchorLon-targetLon+540)%360)-180;
+  while(ti<targets.length){
+    ms+=86400000;
+    const lon=sunMoon(ms).sun;
+    const diff=((lon-targetLon+540)%360)-180;
+    if(prevDiff<0&&diff>=0){
+      const frac=diff===prevDiff?0:-prevDiff/(diff-prevDiff);
+      out[ti]=new Date(prevMs+frac*(ms-prevMs));
+      ti++;
+      if(ti<targets.length){targetLon=(anchorLon+targets[ti])%360;prevDiff=((lon-targetLon+540)%360)-180;}
+    } else prevDiff=diff;
+    prevMs=ms;
+  }
+  return out;
+}
+const ATH_OFFSETS=[-30,-15,-5,0,5,15,30];
+const ATH_OFFSET_LABEL={"-30":"Bulan sebelumnya (-30°)","-15":"Midpoint sebelumnya (-15°)","-5":"Aktivasi awal (-5°)","0":"★ Cardinal","5":"Aktivasi akhir (+5°)","15":"Midpoint berikutnya (+15°)","30":"Bulan berikutnya (+30°)"};
+let athPageK=null;
 function renderATH(){
   const athP=+$("athPrice").value||5608,athDs=$("athDate").value||"2026-01-29";
   const athDate=new Date(athDs+"T00:00:00Z"),now=new Date(),cp=curPrice();
+  const cardStep=+($("cardStep")&&$("cardStep").value)||90;
   const sqrtATH=Math.sqrt(athP);
   const priceAt=deg=>{const r=sqrtATH-deg/180;return r>0?r*r:null;};
   const totalDegPrice=(sqrtATH-Math.sqrt(cp))*180;
@@ -838,22 +923,86 @@ function renderATH(){
     <div class="card"><div class="k">Rotasi waktu</div><div class="v gold num">${remDegT}°</div><div class="s">${days} hari · dekat cardinal ${tc}° (Δ${remDegT-tc})</div></div>
     <div class="card"><div class="k">Status</div><div class="v ${Math.abs(remDegP-pc)<10?'gold':''}" style="font-size:15px">${Math.abs(remDegP-pc)<10?'Harga di cardinal!':'Menuju cardinal'}</div></div>`;
   const kCenter=Math.round(totalDegPrice/90);
-  let rowsArr=[];
-  for(let k=kCenter-3;k<=kCenter+3;k++){const d=k*90,p=priceAt(d);if(p)rowsArr.push({d,p});}
-  rowsArr.sort((a,b)=>b.p-a.p);
-  $("athPriceTable").innerHTML=rowsArr.map(r=>{const near=Math.abs(r.p-cp)<cp*0.005;
-    const rl=r.p>cp?'<span class="tag t-res">Resistensi</span>':r.p<cp?'<span class="tag t-sup">Support</span>':'<span class="tag t-dec">Sekarang</span>';
-    return `<tr${near?' class="now-row"':''}><td class="num">${idr(r.p)}</td><td>${rl}</td></tr>`;}).join("");
-  let trows=[];
-  for(let k=1;k<=6;k++){const d=k*90,dt=new Date(athDate.getTime()+d*86400000);trows.push({d,dt});}
-  const upcoming=trows.filter(x=>x.dt>=now).sort((a,b)=>a.d-b.d);
-  const nextD=upcoming.length?upcoming[0].d:null;
-  $("athTimeTable").innerHTML=trows.map(r=>{const passed=r.dt<now,isNext=r.d===nextD;
+  let rows=[];
+  for(let k=kCenter-3;k<=kCenter+3;k++){const d=k*90,p=priceAt(d);if(p)rows.push({d,p});}
+  rows.sort((a,b)=>b.p-a.p);
+  $("athPriceTable").innerHTML=rows.map(r=>{const near=Math.abs(r.p-cp)<cp*0.005;
+    const role=r.p>cp?'<span class="tag t-res">Resistensi</span>':r.p<cp?'<span class="tag t-sup">Support</span>':'<span class="tag t-dec">Sekarang</span>';
+    return `<tr${near?' class="now-row"':''}><td class="num">${idr(r.p)}</td><td>${role}</td></tr>`;}).join("");
+
+  const athMsNoon=athDate.getTime()+12*3600000;
+  const daysPerDeg=365.25/360;
+  const approxCardinal=Math.max(1,Math.round(days/(cardStep*daysPerDeg)));
+  if(athPageK==null)athPageK=approxCardinal;
+  if(athPageK<1)athPageK=1;
+  const k=athPageK;
+  const targets=ATH_OFFSETS.map(o=>cardStep*k+o).sort((a,b)=>a-b);
+  const dates=datesForDegrees(athMsNoon,targets);
+  const satRows=ATH_OFFSETS.map(o=>{
+    const deg=cardStep*k+o,idx=targets.indexOf(deg);
+    const remT=((deg%360)+360)%360;
+    const base360=Math.round((kCenter*90-remT)/360)*360;
+    const sqPrice=priceAt(base360+remT);
+    return {o,deg,dt:dates[idx],remT,sqPrice};
+  });
+  $("athPageLabel").textContent=`Cardinal ke-${k} (${cardStep*k}°)`;
+  const nowMs=now.getTime();
+  let nearestRow=satRows[0],nearestDiff=Infinity;
+  satRows.forEach(r=>{const d=Math.abs(r.dt-nowMs);if(d<nearestDiff){nearestDiff=d;nearestRow=r;}});
+  $("athTimeTable").innerHTML=satRows.map(r=>{
+    const passed=r.dt<now,isNearest=r===nearestRow;
     const dstr=r.dt.toISOString().slice(0,10);
-    return `<tr${isNext?' class="now-row"':''}><td>${r.d} hari · ${dstr}</td><td>${passed?'sudah lewat':(isNext?'<span class="tag t-dec">★ target terdekat</span>':'akan datang')}</td></tr>`;}).join("");
-  const nextT=upcoming.length?upcoming[0]:trows[trows.length-1];
-  $("athSummary").innerHTML=`<b>Ringkasan:</b> harga saat ini <b>${idr(cp)}</b> berjarak <b>${(remDegP-pc).toFixed(1)}°</b> dari cardinal harga terdekat (level <b>${idr(priceAt(kCenter*90))}</b>). Target waktu berikutnya: <b>${nextT.dt.toISOString().slice(0,10)}</b> (${nextT.d} hari dari ATH). Konfluensi terkuat: saat harga berada di salah satu level cardinal pada tabel di atas <i>bertepatan</i> dengan tanggal target waktu.`;
+    const label=ATH_OFFSET_LABEL[String(r.o)];
+    return `<tr${isNearest?' class="now-row"':''}><td>${label}</td><td>${dstr}</td><td class="num">${r.sqPrice?idr(r.sqPrice):'—'} <span class="sub">(${r.remT}°)</span></td><td>${passed?'sudah lewat':(isNearest?'<span class="tag t-dec">★ terdekat</span>':'akan datang')}</td></tr>`;
+  }).join("");
+  const cardinalRow=satRows.find(r=>r.o===0);
+  $("athSummary").innerHTML=`<b>Ringkasan:</b> harga saat ini <b>${idr(cp)}</b> berjarak <b>${(remDegP-pc).toFixed(1)}°</b> dari cardinal harga terdekat (level <b>${idr(priceAt(kCenter*90))}</b>). Cardinal ke-${k} (${cardStep*k}°) jatuh pada <b>${cardinalRow.dt.toISOString().slice(0,10)}</b>, dengan jendela aktivasi ±5°/±15°/±30° di sekitarnya (tabel di atas). Tanggal dihitung dari <b>pergerakan Matahari sungguhan</b> — persis metode Square of Nine Dates Optuma.`;
   drawATHChart(athP,athDate,cp,kCenter,priceAt,days);
+}
+function renderTimeCluster(){
+  const el=$("timeCluster");
+  const athP=+$("athPrice").value||S.high,athDs=$("athDate").value||"2026-01-29";
+  const athDate=new Date(athDs+"T00:00:00Z");
+  const now=Date.now();
+  const gann=[];
+  for(let k=1;k<=6;k++){const d=k*90,dt=new Date(athDate.getTime()+d*86400000);if(dt.getTime()>=now-86400000)gann.push({label:`Gann ${d%360===0?360:d%360}° (hari ke-${d})`,dt});}
+  const synMs=29.530588853*86400000;
+  const refNew=Date.UTC(2000,0,6,18,14);
+  const moons=[];
+  let k=Math.floor((now-refNew)/synMs)-1;
+  for(let i=0;i<8;i++){
+    const evNew=refNew+k*synMs,evFull=refNew+(k+0.5)*synMs;
+    if(evNew>=now-86400000)moons.push({label:"New Moon",dt:new Date(evNew)});
+    if(evFull>=now-86400000)moons.push({label:"Full Moon",dt:new Date(evFull)});
+    k++;
+  }
+  moons.sort((a,b)=>a.dt-b.dt);
+  const gannNext=gann.slice(0,3),moonsNext=moons.slice(0,4);
+  const clusters=[];
+  gannNext.forEach(g=>{
+    moonsNext.forEach(m=>{
+      const diffDays=Math.abs(g.dt-m.dt)/86400000;
+      if(diffDays<=3)clusters.push({g,m,diffDays});
+    });
+  });
+  const fmt=d=>d.toISOString().slice(0,10);
+  let html=`<table><thead><tr><th>Gann Time terdekat</th><th>Fase Bulan terdekat</th><th>Selisih</th><th>Status</th></tr></thead><tbody>`;
+  for(let i=0;i<Math.max(gannNext.length,3);i++){
+    const g=gannNext[i];
+    if(!g)continue;
+    let nearest=null,nd=Infinity;
+    moonsNext.forEach(m=>{const dd=Math.abs(g.dt-m.dt)/86400000;if(dd<nd){nd=dd;nearest=m;}});
+    const isCluster=nd<=3;
+    html+=`<tr${isCluster?' class="now-row"':''}><td>${g.label}<br><span class="sub">${fmt(g.dt)}</span></td><td>${nearest?nearest.label+'<br><span class="sub">'+fmt(nearest.dt)+'</span>':'—'}</td><td>${isFinite(nd)?nd.toFixed(1)+' hari':'—'}</td><td>${isCluster?'<span class="tag t-dec">★ Klaster waktu!</span>':'terpisah'}</td></tr>`;
+  }
+  html+=`</tbody></table>`;
+  if(clusters.length){
+    const c=clusters[0];
+    html+=`<p class="sub" style="margin-top:8px"><b>Klaster terdekat:</b> ${c.g.label} (${fmt(c.g.dt)}) berdekatan dengan ${c.m.label} (${fmt(c.m.dt)}) — selisih cuma ${c.diffDays.toFixed(1)} hari. Ini jendela waktu dengan probabilitas turn tertinggi karena dua siklus independen (Gann geometris &amp; lunar sinodis) menunjuk ke tanggal yang nyaris sama.</p>`;
+  } else {
+    html+=`<p class="sub" style="margin-top:8px">Belum ada klaster ketat (≤3 hari) dalam 3 Gann cardinal ke depan — jendela waktu tersebar, tidak mengelompok.</p>`;
+  }
+  el.innerHTML=html;
 }
 function drawATHChart(athP,athDate,cp,kCenter,priceAt,days){
   const fmtShort=d=>{const M=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];return d.getUTCDate()+" "+M[d.getUTCMonth()];};
@@ -866,32 +1015,38 @@ function drawATHChart(athP,athDate,cp,kCenter,priceAt,days){
   pts.push({t:now,p:cp});
   pts=pts.filter((v,i,a)=>a.findIndex(x=>x.t===v.t)===i).sort((a,b)=>a.t-b.t);
   const domainDays=Math.max(targetDays,days)*1.0;
-  const x0=60,x1=560,y0=40,y1=340;
+  const x0=64,x1=560,y0=44,y1=340;
   const X=t=>x0+((t-athDate.getTime())/86400000/domainDays)*(x1-x0);
   const priceVals=[athP,cp,resPrice,supPrice,...pts.map(p=>p.p)];
   const pMin=Math.min(...priceVals)*0.985,pMax=Math.max(...priceVals)*1.015;
   const Y=p=>y1-(p-pMin)/(pMax-pMin)*(y1-y0);
-  let s=`<svg viewBox="0 0 680 385" role="img" aria-label="Grafik rotasi ATH price times time"><title>Rotasi Gann dari ATH ke target waktu berikutnya</title>`;
-  s+=`<line x1="${x0}" y1="${y0}" x2="${x0}" y2="${y1}" stroke="#33396E" stroke-width="0.5"/>`;
-  s+=`<line x1="${x0}" y1="${y1}" x2="${x1}" y2="${y1}" stroke="#33396E" stroke-width="0.5"/>`;
-  s+=`<line x1="${x0}" y1="${Y(resPrice).toFixed(1)}" x2="566" y2="${Y(resPrice).toFixed(1)}" stroke="#BA7517" stroke-width="1" stroke-dasharray="5 4"/>`;
-  s+=`<line x1="${x0}" y1="${Y(supPrice).toFixed(1)}" x2="566" y2="${Y(supPrice).toFixed(1)}" stroke="#0F6E56" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+  let s=`<svg viewBox="0 0 680 400" role="img" aria-label="Grafik rotasi ATH price times time"><title>Rotasi Gann dari ATH ke target waktu berikutnya</title>`;
+  for(let i=1;i<4;i++){const gy=y0+((y1-y0)/4)*i;s+=`<line x1="${x0}" y1="${gy.toFixed(1)}" x2="${x1}" y2="${gy.toFixed(1)}" stroke="var(--border,#262b52)" stroke-width="0.5" stroke-dasharray="2 4" opacity="0.5"/>`;}
+  s+=`<line x1="${x0}" y1="${y0}" x2="${x0}" y2="${y1}" stroke="var(--border-strong,#33396E)" stroke-width="0.7"/>`;
+  s+=`<line x1="${x0}" y1="${y1}" x2="${x1}" y2="${y1}" stroke="var(--border-strong,#33396E)" stroke-width="0.7"/>`;
+  s+=`<text class="sm" x="${(x0-6).toFixed(1)}" y="${(y0+4).toFixed(1)}" text-anchor="end">${idr(pMax)}</text>`;
+  s+=`<text class="sm" x="${(x0-6).toFixed(1)}" y="${(y1+2).toFixed(1)}" text-anchor="end">${idr(pMin)}</text>`;
+  const yRes=Y(resPrice),ySup=Y(supPrice);
+  s+=`<rect x="${x0}" y="${Math.min(yRes,ySup).toFixed(1)}" width="${(x1-x0).toFixed(1)}" height="${Math.abs(ySup-yRes).toFixed(1)}" fill="#1E7A5A" opacity="0.08"/>`;
+  s+=`<line x1="${x0}" y1="${yRes.toFixed(1)}" x2="${x1}" y2="${yRes.toFixed(1)}" stroke="#BA7517" stroke-width="1" stroke-dasharray="5 4"/>`;
+  s+=`<line x1="${x0}" y1="${ySup.toFixed(1)}" x2="${x1}" y2="${ySup.toFixed(1)}" stroke="#0F6E56" stroke-width="1.5" stroke-dasharray="5 4"/>`;
   const xT=X(targetDate.getTime());
   s+=`<line x1="${xT.toFixed(1)}" y1="${y0}" x2="${xT.toFixed(1)}" y2="${y1}" stroke="#BA7517" stroke-width="1" stroke-dasharray="2 3"/>`;
   let path="M"+pts.map(p=>X(p.t).toFixed(1)+","+Y(p.p).toFixed(1)).join(" L");
-  s+=`<path d="${path}" fill="none" stroke="#D85A30" stroke-width="2" stroke-linecap="round"/>`;
+  s+=`<path d="${path}" fill="none" stroke="#D85A30" stroke-width="2.2" stroke-linecap="round"/>`;
   const last=pts[pts.length-1];
-  s+=`<path d="M${X(last.t).toFixed(1)},${Y(last.p).toFixed(1)} L${xT.toFixed(1)},${Y(supPrice).toFixed(1)}" fill="none" stroke="#8A8FB0" stroke-width="1.2" stroke-dasharray="4 3" stroke-linecap="round"/>`;
-  s+=`<circle cx="${X(pts[0].t).toFixed(1)}" cy="${Y(pts[0].p).toFixed(1)}" r="4" fill="#D85A30"/>`;
-  s+=`<circle cx="${X(last.t).toFixed(1)}" cy="${Y(last.p).toFixed(1)}" r="4" fill="#D85A30"/>`;
-  s+=`<circle cx="${xT.toFixed(1)}" cy="${Y(supPrice).toFixed(1)}" r="5" fill="none" stroke="#0F6E56" stroke-width="2"/><circle cx="${xT.toFixed(1)}" cy="${Y(supPrice).toFixed(1)}" r="2" fill="#0F6E56"/>`;
-  s+=`<text class="sh" x="570" y="${(Y(athP)+4).toFixed(1)}">ATH ${idr(athP)}</text>`;
-  s+=`<text class="sh" x="570" y="${(Y(resPrice)+4).toFixed(1)}" style="fill:#854F0B">${idr(resPrice)}</text>`;
-  s+=`<text class="sh" x="570" y="${(Y(supPrice)+4).toFixed(1)}" style="fill:#085041">★ ${idr(supPrice)}</text>`;
-  s+=`<text class="sm" x="${(xT+4).toFixed(1)}" y="50">${targetDays}°</text>`;
-  s+=`<text class="sm" x="${X(pts[0].t).toFixed(1)}" y="360" text-anchor="middle">${fmtShort(athDate)}</text>`;
-  s+=`<text class="sh" x="${X(last.t).toFixed(1)}" y="360" text-anchor="middle" style="fill:#6AA9E9">${fmtShort(new Date(last.t))}</text>`;
-  s+=`<text class="sh" x="${xT.toFixed(1)}" y="360" text-anchor="middle" style="fill:#BA7517">${fmtShort(targetDate)}</text>`;
+  s+=`<path d="M${X(last.t).toFixed(1)},${Y(last.p).toFixed(1)} L${xT.toFixed(1)},${ySup.toFixed(1)}" fill="none" stroke="#8A8FB0" stroke-width="1.2" stroke-dasharray="4 3" stroke-linecap="round"/>`;
+  const athX=X(pts[0].t),athY=Y(athP);
+  s+=`<circle cx="${athX.toFixed(1)}" cy="${athY.toFixed(1)}" r="4.5" fill="#D85A30"/>`;
+  s+=`<text class="sh" x="${(athX+8).toFixed(1)}" y="${(athY-8).toFixed(1)}">ATH ${idr(athP)}</text>`;
+  s+=`<circle cx="${X(last.t).toFixed(1)}" cy="${Y(last.p).toFixed(1)}" r="4.5" fill="#D85A30"/>`;
+  s+=`<circle cx="${xT.toFixed(1)}" cy="${ySup.toFixed(1)}" r="5.5" fill="none" stroke="#0F6E56" stroke-width="2"/><circle cx="${xT.toFixed(1)}" cy="${ySup.toFixed(1)}" r="2.2" fill="#0F6E56"/>`;
+  s+=`<text class="sh" x="570" y="${(yRes+4).toFixed(1)}" style="fill:#854F0B">${idr(resPrice)}</text>`;
+  s+=`<text class="sh" x="570" y="${(ySup+4).toFixed(1)}" style="fill:#085041">★ ${idr(supPrice)}</text>`;
+  s+=`<text class="sm" x="${xT.toFixed(1)}" y="${(y0-8).toFixed(1)}" text-anchor="middle" style="fill:#BA7517">Target waktu (${targetDays}°)</text>`;
+  s+=`<text class="sm" x="${athX.toFixed(1)}" y="374" text-anchor="middle">${fmtShort(athDate)}</text>`;
+  s+=`<text class="sh" x="${X(last.t).toFixed(1)}" y="374" text-anchor="middle" style="fill:#6AA9E9">${fmtShort(new Date(last.t))} (now)</text>`;
+  s+=`<text class="sh" x="${xT.toFixed(1)}" y="374" text-anchor="middle" style="fill:#BA7517">${fmtShort(targetDate)}</text>`;
   s+=`</svg>`;
   $("athChart").innerHTML=s;
 }
@@ -961,7 +1116,12 @@ function init(){
 
   $("runBacktest").onclick=runBacktest;
   $("fibManHi").oninput=renderDailyFib;$("fibManLo").oninput=renderDailyFib;$("fibManClose").oninput=renderDailyFib;
-  $("athPrice").onchange=renderATH;$("athDate").onchange=renderATH;
+  $("athPrice").oninput=()=>{S.athPrice=+$("athPrice").value||S.athPrice;athPageK=null;S.athPageK=null;save(S);renderATH();renderTimeCluster();};
+  $("athDate").oninput=()=>{S.athDate=$("athDate").value;athPageK=null;S.athPageK=null;save(S);renderATH();renderTimeCluster();};
+  $("cardStep").oninput=()=>{S.cardStep=+$("cardStep").value||90;athPageK=null;S.athPageK=null;save(S);renderATH();};
+  $("athPagePrev").onclick=()=>{athPageK=Math.max(1,(athPageK||1)-1);S.athPageK=athPageK;save(S);renderATH();};
+  $("athPageNext").onclick=()=>{athPageK=(athPageK||1)+1;S.athPageK=athPageK;save(S);renderATH();};
+  $("athPageNow").onclick=()=>{athPageK=null;S.athPageK=null;save(S);renderATH();};
   $("iDate").addEventListener("change",render);
   $("nDate").onchange=renderNatal;$("nTime").onchange=renderNatal;
 
