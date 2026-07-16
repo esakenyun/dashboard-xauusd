@@ -350,8 +350,38 @@
     <p style="font-family:var(--mono);font-size:11px;color:var(--ink-dim);margin-top:14px">Mau salah satu dari #2-5 di-backtest kayak Venus-Jupiter (cari tanggal asli + data harga asli)? Tinggal sebut yang mana.</p>
   </section>
 
+  <section id="probability-engine">
+    <div class="section-head"><span class="num">11</span><h2>Probability Engine</h2><span class="sub">WIN-RATE 10 TAHUN, N=2620 HARI</span></div>
+    <p style="font-family:var(--mono);font-size:12px;color:var(--ink-dim);margin:0 0 14px">Win-rate = % hari dengan return positif (Close&gt;Open), dihitung dari 2016-2025. Beda dari "avg return" — ini probabilitas arah, bukan besar magnitude.</p>
+
+    <h3 style="font-family:var(--display);font-size:19px;color:var(--gold);margin:16px 0 8px">Heatmap Planet × Zodiak (win-rate %)</h3>
+    <div class="table-wrap" style="margin-bottom:20px">
+      <table id="heatmapTable" style="font-size:11.5px"></table>
+    </div>
+
+    <h3 style="font-family:var(--display);font-size:19px;color:var(--gold);margin:16px 0 8px">Kalkulator Composite Score (input posisi saat ini)</h3>
+    <div class="calc-wrap" style="grid-template-columns:1fr">
+      <div>
+        <div class="form-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px" id="planetSignInputs"></div>
+        <div class="field" style="margin-top:10px">
+          <label>ASPEK AKTIF (opsional, pilih yang exact sekarang)</label>
+          <div id="aspectInputs" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px"></div>
+        </div>
+        <div id="compositeResult" style="margin-top:16px"></div>
+      </div>
+    </div>
+
+    <h3 style="font-family:var(--display);font-size:19px;color:var(--gold);margin:20px 0 8px">Ranking Event (diurutkan dari sinyal terkuat)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Event</th><th>Win-rate</th><th>Arah</th><th>n</th><th>Confidence</th></tr></thead>
+        <tbody id="rankingBody"></tbody>
+      </table>
+    </div>
+  </section>
+
   <section id="chaldean-hours">
-    <div class="section-head"><span class="num">11</span><h2>Jam Planet Harian (Chaldean Hours) — Buat Scalping</h2><span class="sub">INTRADAY ENGINE</span></div>
+    <div class="section-head"><span class="num">12</span><h2>Jam Planet Harian (Chaldean Hours) — Buat Scalping</h2><span class="sub">INTRADAY ENGINE</span></div>
     <p style="font-family:var(--mono);font-size:12px;color:var(--ink-dim);margin:-6px 0 14px">
       Tiap hari dikuasai 1 planet (hari Selasa = Mars, dst), lalu tiap jam dari matahari terbit dibagi 24 slot mengikuti Urutan Kaldean (Chaldean Order): Saturn → Jupiter → Mars → Sun → Venus → Mercury → Moon, berulang. Kalkulator ini pakai pendekatan sunrise 06:00 / sunset 18:00 (12 jam siang, 12 jam malam) — buat presisi lokasi asli, ganti jam sunrise/sunset di bawah.
     </p>
@@ -388,7 +418,7 @@
   </section>
 
   <section id="excluded-planets">
-    <div class="section-head"><span class="num">12</span><h2>Kenapa Mercury / Uranus / Neptune / Pluto Gak Ada Tabel</h2></div>
+    <div class="section-head"><span class="num">13</span><h2>Kenapa Mercury / Uranus / Neptune / Pluto Gak Ada Tabel</h2></div>
     <div class="cards">
       <div class="card"><h3>☿ Mercury</h3><p>Ingress-nya kecepetan (~3-4 minggu/zodiak, sering retrograde) dan bukan ruler Gold — ruler-nya Berita/Retail. Kalau mau, bisa dibikin tabel Mercury→Leo terpisah tapi fungsinya buat baca sentimen berita, bukan timing Gold.</p></div>
       <div class="card"><h3>♅♆♇ Uranus, Neptune, Pluto</h3><p>Siklusnya 84 / 165 / 248 tahun. Ingress ke Leo terakhir jauh sebelum era data harga Gold modern ada (Gold baru free-float sejak 1971) — jadi gak ada data historis relevan buat dibandingin di window 10 tahun terakhir.</p></div>
@@ -396,17 +426,20 @@
   </section>
 
   <section id="calc">
-    <div class="section-head"><span class="num">13</span><h2>Kalkulator Square of 9</h2><span class="sub">√PRICE ENGINE</span></div>
+    <div class="section-head"><span class="num">14</span><h2>Kalkulator Square of 9</h2><span class="sub">√PRICE ENGINE</span></div>
     <div class="calc-wrap">
       <div>
         <h3>Input Harga</h3>
         <div class="field"><label>PRICE</label><input id="priceIn" type="number" value="3350" step="0.01"></div>
         <div class="field"><label>CUSTOM DEGREE (opsional, 0–360)</label><input id="degIn" type="number" value="90" step="1"></div>
         <p style="font-family:var(--mono);font-size:12px;color:var(--ink-dim);margin-top:6px">
-          Formula: root = √price &nbsp;→&nbsp; target = (root + deg/360)² <br>
+          Formula BUY/Resistance: target = (root + deg/360)² &nbsp;|&nbsp; Formula SELL/Support: target = (root − deg/360)²<br>
           Level kardinal (0/90/180/270°) & ordinal (45/135/225/315°) dihitung otomatis dari root harga.
         </p>
+        <h4 style="font-family:var(--mono);font-size:12px;color:var(--gold);margin:14px 0 4px;text-transform:uppercase">Target Buy (Resistance, di atas harga)</h4>
         <div class="result-grid" id="resultsGrid"></div>
+        <h4 style="font-family:var(--mono);font-size:12px;color:var(--mars);margin:14px 0 4px;text-transform:uppercase">Target Sell (Support, di bawah harga)</h4>
+        <div class="result-grid" id="resultsGridSell"></div>
       </div>
       <div class="wheel-holder">
         <svg id="sq9wheel" viewBox="0 0 320 320" width="320" height="320"></svg>
@@ -600,10 +633,17 @@ function computeLevels(price){
   return degs.map(d => ({deg:d, price: Math.pow(root + d/360, 2)}));
 }
 
+function computeLevelsSell(price){
+  const root = Math.sqrt(price);
+  const degs = [0,45,90,135,180,225,270,315,360];
+  return degs.map(d => ({deg:d, price: Math.max(0, Math.pow(root - d/360, 2))}));
+}
+
 function render(){
   const price = parseFloat(document.getElementById('priceIn').value) || 0;
   const customDeg = parseFloat(document.getElementById('degIn').value) || 0;
   const levels = computeLevels(price);
+  const levelsSell = computeLevelsSell(price);
   const grid = document.getElementById('resultsGrid');
   grid.innerHTML = '';
   levels.forEach(l=>{
@@ -611,14 +651,27 @@ function render(){
     div.innerHTML = `<div class="deg">${l.deg}°</div><div class="val">${l.price.toFixed(2)}</div>`;
     grid.appendChild(div);
   });
-  // custom degree result
+  const gridSell = document.getElementById('resultsGridSell');
+  gridSell.innerHTML = '';
+  levelsSell.forEach(l=>{
+    const div = document.createElement('div');
+    div.innerHTML = `<div class="deg">${l.deg}°</div><div class="val" style="color:var(--mars)">${l.price.toFixed(2)}</div>`;
+    gridSell.appendChild(div);
+  });
+  // custom degree result (buy + sell)
   const root = Math.sqrt(price);
-  const customPrice = Math.pow(root + customDeg/360, 2);
+  const customPriceBuy = Math.pow(root + customDeg/360, 2);
+  const customPriceSell = Math.max(0, Math.pow(root - customDeg/360, 2));
   const div = document.createElement('div');
   div.style.gridColumn = '1 / -1';
   div.style.borderColor = 'var(--gold)';
-  div.innerHTML = `<div class="deg">CUSTOM ${customDeg}°</div><div class="val">${customPrice.toFixed(2)}</div>`;
+  div.innerHTML = `<div class="deg">CUSTOM ${customDeg}° (BUY)</div><div class="val">${customPriceBuy.toFixed(2)}</div>`;
   grid.appendChild(div);
+  const divSell = document.createElement('div');
+  divSell.style.gridColumn = '1 / -1';
+  divSell.style.borderColor = 'var(--mars)';
+  divSell.innerHTML = `<div class="deg">CUSTOM ${customDeg}° (SELL)</div><div class="val" style="color:var(--mars)">${customPriceSell.toFixed(2)}</div>`;
+  gridSell.appendChild(divSell);
 
   drawWheel(price);
 }
@@ -880,6 +933,147 @@ y10Render();
   renderTable();
 })();
 
+</script>
+
+<script>
+const WINRATE = {"signs":{"sun":{"Cancer":[50.0,226],"Leo":[51.8,226],"Virgo":[54.1,218],"Libra":[54.6,218],"Scorpio":[50.7,217],"Sagittarius":[52.6,215],"Capricorn":[60.3,199],"Aquarius":[54.9,215],"Pisces":[46.4,220],"Aries":[55.5,211],"Taurus":[49.6,224],"Gemini":[51.5,231]},"moon":{"Capricorn":[61.2,224],"Aquarius":[52.9,221],"Aries":[54.8,217],"Taurus":[53.8,212],"Gemini":[57.8,225],"Cancer":[53.0,215],"Leo":[44.0,218],"Virgo":[47.7,218],"Libra":[50.7,219],"Scorpio":[56.1,214],"Sagittarius":[45.9,218],"Pisces":[52.5,219]},"venus":{"Leo":[50.5,275],"Virgo":[52.4,187],"Libra":[53.7,203],"Scorpio":[52.5,223],"Sagittarius":[52.5,177],"Capricorn":[51.8,245],"Aquarius":[54.4,180],"Pisces":[53.7,231],"Aries":[52.7,273],"Taurus":[50.3,187],"Gemini":[53.4,253],"Cancer":[53.2,186]},"mars":{"Scorpio":[61.2,170],"Sagittarius":[54.4,195],"Capricorn":[52.1,219],"Aquarius":[50.0,256],"Pisces":[56.2,176],"Aries":[52.9,289],"Taurus":[50.0,198],"Gemini":[48.7,300],"Cancer":[56.6,258],"Leo":[50.0,222],"Virgo":[49.4,172],"Libra":[52.1,165]},"mercury":{"Leo":[53.1,239],"Virgo":[48.8,252],"Libra":[54.7,192],"Scorpio":[54.1,229],"Sagittarius":[54.7,265],"Capricorn":[56.6,228],"Aquarius":[49.2,193],"Pisces":[53.0,236],"Aries":[50.4,232],"Taurus":[49.2,185],"Gemini":[50.6,166],"Cancer":[55.2,203]},"jupiter":{"Virgo":[52.5,40],"Libra":[52.1,280],"Scorpio":[49.5,279],"Sagittarius":[48.5,274],"Capricorn":[58.1,270],"Aquarius":[47.0,215],"Pisces":[55.3,188],"Aries":[49.3,217],"Taurus":[52.5,265],"Gemini":[54.6,271],"Cancer":[58.1,308],"Leo":[30.8,13]},"saturn":{"Sagittarius":[52.2,372],"Capricorn":[51.6,705],"Aquarius":[50.9,639],"Pisces":[55.7,714],"Aries":[50.5,190]}},"aspects":{"jupiter-saturn":{"Sextile":[49.2,183],"Conjunction":[48.6,37],"Square":[50.0,68],"Trine":[60.7,56]},"mars-saturn":{"Conjunction":[51.2,41],"Sextile":[41.2,68],"Square":[58.4,113],"Trine":[46.9,130],"Opposition":[53.1,32]},"sun-jupiter":{"Conjunction":[53.1,49],"Sextile":[51.6,95],"Square":[50.6,85],"Trine":[53.9,76],"Opposition":[54.5,33]},"mars-jupiter":{"Square":[51.8,112],"Trine":[40.3,72],"Opposition":[58.6,29],"Sextile":[55.1,78],"Conjunction":[51.5,33]},"moon-mars":{"Square":[52.6,76],"Trine":[57.7,97],"Conjunction":[50.0,38],"Sextile":[48.9,92],"Opposition":[60.0,45]},"moon-saturn":{"Trine":[47.7,86],"Square":[51.2,84],"Sextile":[52.8,89],"Conjunction":[45.7,46],"Opposition":[38.1,42]},"moon-sun":{"Opposition":[54.5,44],"Square":[55.1,89],"Sextile":[51.7,87],"Conjunction":[55.3,38],"Trine":[60.2,83]}}};
+
+const ZODIAC_PE = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
+const PLANETS_PE = ['sun','moon','venus','mars','mercury','jupiter','saturn'];
+const PLANET_LABEL = {sun:'Sun',moon:'Moon',venus:'Venus',mars:'Mars',mercury:'Mercury',jupiter:'Jupiter',saturn:'Saturn'};
+
+function wrColor(wr){
+  if(wr==null) return 'transparent';
+  const t = Math.max(0, Math.min(1, (wr-30)/40));
+  const r = Math.round(181 + (127-181)*t);
+  const g = Math.round(83 + (168-83)*t);
+  const b = Math.round(60 + (138-60)*t);
+  return 'rgb('+r+','+g+','+b+')';
+}
+
+function buildHeatmap(){
+  const table = document.getElementById('heatmapTable');
+  let html = '<thead><tr><th style="text-align:left">Planet</th>' + ZODIAC_PE.map(z=>'<th>'+z.slice(0,3)+'</th>').join('') + '</tr></thead><tbody>';
+  PLANETS_PE.forEach(p=>{
+    html += '<tr><td style="font-family:var(--mono);color:var(--gold)">'+PLANET_LABEL[p]+'</td>';
+    ZODIAC_PE.forEach(z=>{
+      const cell = WINRATE.signs[p][z];
+      if(cell){
+        const [wr,n] = cell;
+        html += '<td style="background:'+wrColor(wr)+';color:#0b0d16;font-family:var(--mono);font-weight:700;text-align:center;padding:6px 3px" title="n='+n+'">'+wr.toFixed(0)+'</td>';
+      } else {
+        html += '<td style="text-align:center;color:var(--ink-dim)">-</td>';
+      }
+    });
+    html += '</tr>';
+  });
+  html += '</tbody>';
+  table.innerHTML = html;
+}
+
+function buildPlanetInputs(){
+  const container = document.getElementById('planetSignInputs');
+  container.innerHTML = '';
+  PLANETS_PE.forEach(p=>{
+    const div = document.createElement('div');
+    const opts = ZODIAC_PE.map(z=>'<option value="'+z+'">'+z+'</option>').join('');
+    div.innerHTML = '<label style="display:block;font-family:var(--mono);font-size:10px;color:var(--ink-dim);margin-bottom:3px">'+PLANET_LABEL[p].toUpperCase()+'</label><select id="pe_'+p+'" style="width:100%;background:#0f1220;border:1px solid var(--line);color:var(--ink);font-family:var(--mono);font-size:12px;padding:6px;border-radius:6px">'+opts+'</select>';
+    container.appendChild(div);
+  });
+}
+
+function buildAspectInputs(){
+  const container = document.getElementById('aspectInputs');
+  container.innerHTML = '';
+  Object.keys(WINRATE.aspects).forEach(pair=>{
+    Object.keys(WINRATE.aspects[pair]).forEach(asp=>{
+      const cell = WINRATE.aspects[pair][asp];
+      if(!cell || cell[0]==null) return;
+      const id = 'asp_'+pair+'_'+asp;
+      const label = document.createElement('label');
+      label.style.cssText = 'font-family:var(--mono);font-size:10.5px;color:var(--ink-dim);display:flex;align-items:center;gap:4px;background:#0f1220;border:1px solid var(--line);padding:5px 8px;border-radius:6px;cursor:pointer';
+      label.innerHTML = '<input type="checkbox" id="'+id+'" data-pair="'+pair+'" data-asp="'+asp+'"> '+pair+' '+asp;
+      container.appendChild(label);
+    });
+  });
+}
+
+function computeComposite(){
+  let sumWN = 0, sumN = 0;
+  const parts = [];
+  PLANETS_PE.forEach(p=>{
+    const sel = document.getElementById('pe_'+p);
+    const sign = sel.value;
+    const cell = WINRATE.signs[p][sign];
+    if(cell){
+      const [wr,n] = cell;
+      sumWN += wr*n; sumN += n;
+      parts.push({label:PLANET_LABEL[p]+' in '+sign, wr, n});
+    }
+  });
+  document.querySelectorAll('#aspectInputs input[type=checkbox]:checked').forEach(cb=>{
+    const pair = cb.dataset.pair, asp = cb.dataset.asp;
+    const cell = WINRATE.aspects[pair][asp];
+    if(cell && cell[0]!=null){
+      const [wr,n] = cell;
+      sumWN += wr*n; sumN += n;
+      parts.push({label:pair+' '+asp, wr, n});
+    }
+  });
+  const composite = sumN>0 ? sumWN/sumN : 50;
+  const bull = composite, bear = 100-composite;
+  const confN = sumN;
+  const confLabel = confN>=1000?'Tinggi':confN>=400?'Sedang':'Rendah';
+  const div = document.getElementById('compositeResult');
+  div.innerHTML = '<div style="background:var(--bg2);border:1px solid var(--gold);border-radius:10px;padding:16px 18px">'+
+    '<div style="display:flex;gap:20px;margin-bottom:10px">'+
+    '<div><div style="font-family:var(--mono);font-size:10px;color:var(--ink-dim)">BULL PROBABILITY</div><div style="font-family:var(--display);font-size:30px;color:var(--ok);font-weight:700">'+bull.toFixed(1)+'%</div></div>'+
+    '<div><div style="font-family:var(--mono);font-size:10px;color:var(--ink-dim)">BEAR PROBABILITY</div><div style="font-family:var(--display);font-size:30px;color:var(--mars);font-weight:700">'+bear.toFixed(1)+'%</div></div>'+
+    '<div><div style="font-family:var(--mono);font-size:10px;color:var(--ink-dim)">CONFIDENCE</div><div style="font-family:var(--display);font-size:30px;color:var(--gold);font-weight:700">'+confLabel+'</div><div style="font-family:var(--mono);font-size:9px;color:var(--ink-dim)">total n='+confN+'</div></div>'+
+    '</div>'+
+    '<div style="font-family:var(--mono);font-size:10.5px;color:var(--ink-dim)">Komponen: '+parts.map(p=>p.label+' ('+p.wr.toFixed(0)+'%, n='+p.n+')').join(' · ')+'</div>'+
+    '</div>';
+}
+
+function buildRanking(){
+  const items = [];
+  PLANETS_PE.forEach(p=>{
+    ZODIAC_PE.forEach(z=>{
+      const cell = WINRATE.signs[p][z];
+      if(cell && cell[1]>=30){
+        items.push({label:PLANET_LABEL[p]+' in '+z, wr:cell[0], n:cell[1]});
+      }
+    });
+  });
+  Object.keys(WINRATE.aspects).forEach(pair=>{
+    Object.keys(WINRATE.aspects[pair]).forEach(asp=>{
+      const cell = WINRATE.aspects[pair][asp];
+      if(cell && cell[0]!=null && cell[1]>=30){
+        const [a,b] = pair.split('-');
+        items.push({label:PLANET_LABEL[a]+'-'+PLANET_LABEL[b]+' '+asp, wr:cell[0], n:cell[1]});
+      }
+    });
+  });
+  items.sort((x,y)=>Math.abs(y.wr-50)-Math.abs(x.wr-50));
+  const tbody = document.getElementById('rankingBody');
+  tbody.innerHTML = '';
+  items.slice(0,20).forEach((it,i)=>{
+    const dir = it.wr>50?'Bullish':'Bearish';
+    const dirClass = it.wr>50?'up':'down';
+    const conf = it.n>=200?'Tinggi':it.n>=80?'Sedang':'Rendah';
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td>'+(i+1)+'</td><td>'+it.label+'</td><td class="'+dirClass+'">'+it.wr.toFixed(1)+'%</td><td class="'+dirClass+'">'+dir+'</td><td>'+it.n+'</td><td>'+conf+'</td>';
+    tbody.appendChild(tr);
+  });
+}
+
+buildHeatmap();
+buildPlanetInputs();
+buildAspectInputs();
+buildRanking();
+document.getElementById('planetSignInputs').addEventListener('change', computeComposite);
+document.getElementById('aspectInputs').addEventListener('change', computeComposite);
+computeComposite();
 </script>
 </body>
 </html>
