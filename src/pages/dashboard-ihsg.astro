@@ -1,0 +1,389 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="IHSG Astrofinancial Dashboard" description="Korespondensi planet-zodiak-aspek terhadap Jakarta Composite Index (IHSG), plus pemetaan sektor & emiten IDX yang relevan.">
+  <Header />
+
+  <div class="ihsg-astro-page">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Spectral:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <header>
+      <div class="eyebrow">Astro · Sektor · Emiten</div>
+      <h1>IHSG Astrofinancial Dashboard</h1>
+      <div class="sub">Korespondensi planet-zodiak-aspek terhadap Jakarta Composite Index (IHSG), plus pemetaan sektor &amp; emiten IDX yang relevan. Epoch: 00:00 WIB (Jakarta).</div>
+      <div class="warn">⚠️ Data historis IHSG baru 1990-04-09 s/d 2010-09-28 (4.999 hari, kena limit export Investing.com). BELUM termasuk 2010-2026 — kesimpulan di bawah bisa berubah kalau data terbaru masuk. Tolong export lagi rentang 2010-2026 biar lengkap.</div>
+    </header>
+    <main>
+
+      <section>
+        <div class="section-head"><span class="num">01</span><h2>Ringkasan Data</h2></div>
+        <div class="stat-row">
+          <div class="stat"><div class="num">4.999</div><div class="lbl">HARI TRADING<br>(1990-2010)</div></div>
+          <div class="stat"><div class="num">20,5</div><div class="lbl">TAHUN CAKUPAN</div></div>
+          <div class="stat"><div class="num">633 → 3.472</div><div class="lbl">IHSG AWAL → AKHIR</div></div>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head"><span class="num">02</span><h2>Win-Rate Heatmap: Planet × Zodiak</h2><span class="sub2">% HARI IHSG NAIK</span></div>
+        <p class="desc">Beda dari framework Gold — IHSG dipengaruhi sentimen domestik + likuiditas asing, bukan cuma logam/safe-haven. Baca sebagai kecenderungan historis, bukan hukum pasti.</p>
+        <div class="table-wrap">
+          <table id="heatmapTable"></table>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head"><span class="num">03</span><h2>Aspek Antar-Planet vs IHSG</h2><span class="sub2">ORB 3°</span></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Pair</th><th>Conjunction</th><th>Sextile</th><th>Square</th><th>Trine</th><th>Opposition</th></tr></thead>
+            <tbody>
+              <tr><td>Jupiter–Saturn</td><td>48,6%</td><td>47,3%</td><td>52,2%</td><td style="color:var(--gold);font-weight:700">57,8%</td><td>54,0%</td></tr>
+              <tr><td>Mars–Saturn</td><td>46,5%</td><td>55,6%</td><td>52,6%</td><td>51,4%</td><td>54,8%</td></tr>
+              <tr><td>Sun–Jupiter</td><td>53,5%</td><td>51,1%</td><td>52,7%</td><td>53,5%</td><td style="color:var(--mars);font-weight:700">35,2% ⚠️</td></tr>
+              <tr><td>Mars–Jupiter</td><td>46,1%</td><td>44,8%</td><td>48,4%</td><td>55,6%</td><td>51,9%</td></tr>
+              <tr><td>Moon–Saturn</td><td style="color:var(--gold);font-weight:700">55,3%</td><td>47,9%</td><td>49,1%</td><td>47,8%</td><td>54,4%</td></tr>
+              <tr><td>Moon–Sun</td><td>50,0%</td><td>51,7%</td><td>49,7%</td><td>54,7%</td><td>51,3%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card"><h3>Temuan Menonjol</h3><p><b>Sun-Jupiter Opposition sangat bearish untuk IHSG (35,2%, avg −0,316%)</b> — KEBALIKAN dari Gold (bullish +0,208% di data 20th Gold). Ini masuk akal: Sun-Jupiter Opposition sering nyambung ke over-ekspansi/koreksi tajam pasar domestik, beda mekanisme dari safe-haven flow Gold. Jupiter-Saturn Trine (57,8%) &amp; Moon-Saturn Conjunction (55,3%) paling bullish untuk IHSG.</p></div>
+      </section>
+
+      <section>
+        <div class="section-head"><span class="num">04</span><h2>Posisi Planet Hari Ini + Composite Score</h2><span class="sub2">17 JUL 2026</span></div>
+        <div class="stat-row">
+          <div class="stat"><div class="num">48,6%</div><div class="lbl">BULL PROBABILITY</div></div>
+          <div class="stat"><div class="num">51,4%</div><div class="lbl">BEAR PROBABILITY</div></div>
+          <div class="stat"><div class="num">Rendah</div><div class="lbl">CONFIDENCE<br>(data blm lengkap)</div></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Planet</th><th>Posisi Sekarang</th><th>Win-rate IHSG (sign ini)</th></tr></thead>
+            <tbody>
+              <tr><td>☉ Sun</td><td>23,3° Cancer</td><td>52,0%</td></tr>
+              <tr><td>☽ Moon</td><td>17,6° Leo</td><td>51,6%</td></tr>
+              <tr><td>☿ Mercury</td><td>18,4° Cancer</td><td>50,6%</td></tr>
+              <tr><td>♀ Venus</td><td>6,8° Virgo</td><td style="color:var(--mars);font-weight:700">45,0% (terburuk)</td></tr>
+              <tr><td>♂ Mars</td><td>11,9° Gemini</td><td style="color:var(--mars)">46,8% (lemah)</td></tr>
+              <tr><td>♃ Jupiter</td><td>3,1° Leo</td><td style="color:var(--mars);font-weight:700">45,5% (terburuk)</td></tr>
+              <tr><td>♄ Saturn</td><td>14,3° Aries</td><td>49,2% (lemah)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card"><h3>Kesimpulan Jujur</h3><p>Gak ada sinyal bullish kuat dari astro buat IHSG saat ini — Jupiter &amp; Venus lagi di sign TERBURUK mereka masing-masing (45,5% dan 45,0%). Composite 48,6% Bull artinya condong netral-ke-bearish tipis. TAPI ini berdasarkan data 1990-2010 doang — begitu data 2010-2026 masuk, hasil bisa beda karena rezim pasar udah jauh berubah (IHSG udah 10x lipat dari 2010).</p></div>
+      </section>
+
+      <section>
+        <div class="section-head"><span class="num">05</span><h2>Pemetaan Sektor &amp; Emiten IDX</h2><span class="sub2">KORESPONDENSI PLANET → SEKTOR</span></div>
+        <p class="desc">Framework standar astrofinansial: planet menguasai sektor tertentu. Dikombinasikan sama win-rate sign saat ini buat nilai sektor mana yang "kondisinya baik/kurang baik" secara astro.</p>
+        <div class="cards">
+          <div class="card"><h3>☉ Sun → Metal &amp; Mining</h3><p><b>Emiten:</b> ANTM, MDKA, INCO<br>Sun di Cancer sekarang (52,0%, netral) — gak ada sinyal kuat ke arah manapun.</p></div>
+          <div class="card"><h3>☽ Moon → Consumer/FMCG</h3><p><b>Emiten:</b> UNVR, ICBP, INDF, MYOR<br>Moon di Leo (51,6%, netral) — sektor konsumsi domestik netral, gak istimewa.</p></div>
+          <div class="card"><h3>☿ Mercury → Telco/Tech/Media</h3><p><b>Emiten:</b> TLKM, EXCL, ISAT, GOTO<br>Mercury di Cancer (50,6%, netral).</p></div>
+          <div class="card"><h3>♀ Venus → Banking/Property</h3><p><b>Emiten:</b> BBCA, BBRI, BMRI, BSDE, CTRA<br>Venus di Virgo — <b style="color:var(--mars)">sign TERBURUK Venus (45,0%)</b>. Astro nunjukkin kondisi kurang mendukung buat sektor ini SAAT INI.</p></div>
+          <div class="card"><h3>♂ Mars → Energy/Konstruksi</h3><p><b>Emiten:</b> MEDC, PGAS, PTBA, WIKA, WSKT<br>Mars di Gemini (46,8%, lemah) — sedikit di bawah rata-rata.</p></div>
+          <div class="card"><h3>♃ Jupiter → Bank Besar/Konglomerasi</h3><p><b>Emiten:</b> BBRI, BMRI, ASII<br>Jupiter di Leo — <b style="color:var(--mars)">sign TERBURUK Jupiter (45,5%)</b>. Sektor bank besar/konglomerasi paling lemah secara astro saat ini.</p></div>
+          <div class="card"><h3>♄ Saturn → Semen/Infrastruktur Berat</h3><p><b>Emiten:</b> SMGR, INTP, WSKT, WTON<br>Saturn di Aries (49,2%, lemah).</p></div>
+        </div>
+        <div class="card" style="margin-top:16px;border-color:var(--gold)"><h3>Kesimpulan Emiten</h3><p><b>Gak ada sektor yang "menyala hijau kuat" saat ini.</b> Yang paling lemah: sektor Bank Besar/Konglomerasi (Jupiter di Leo) dan Banking/Property (Venus di Virgo) — dua-duanya di sign TERBURUK masing-masing planet. Kalau harus milih yang "paling gak buruk": sektor Consumer/FMCG (Moon-Leo, Mercury-Cancer, keduanya netral 50-52%) relatif paling stabil. Ini BUKAN rekomendasi beli — cuma pembacaan kondisi astro, gabungkan sama analisis fundamental &amp; teknikal beneran sebelum ambil keputusan.</p></div>
+      </section>
+
+      <section>
+        <div class="section-head"><span class="num">06</span><h2>Timeline Sejarah Indonesia vs Astrologi (1908-1966)</h2><span class="sub2">BURSA BELUM ADA — CUMA REFERENSI ASTROLOGI</span></div>
+        <p class="desc">Semua peristiwa di bawah terjadi sebelum IHSG modern aktif (1990an) — gak ada data harga buat dikorelasiin. Ini murni posisi planet di tanggal bersejarah, buat pola simbolis &amp; referensi.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Peristiwa</th><th>Tanggal</th><th>Sun</th><th>Moon</th><th>Venus</th><th>Mars</th><th>Mercury</th><th>Jupiter</th><th>Saturn</th></tr></thead>
+            <tbody>
+              <tr><td>Berdirinya Budi Utomo</td><td>20 Mei 1908</td><td>0,5° Gemini</td><td>30,0° Capricorn</td><td>13,3° Cancer</td><td>0,1° Cancer</td><td>15,3° Gemini</td><td>8,6° Leo</td><td>8,4° Aries</td></tr>
+              <tr><td>Ikrar Sumpah Pemuda</td><td>28 Okt 1928</td><td>6,0° Scorpio</td><td>2,7° Taurus</td><td>7,1° Sagittarius</td><td>8,9° Cancer</td><td>26,8° Libra</td><td>6,4° Taurus</td><td>17,4° Sagittarius</td></tr>
+              <tr><td>Penyerahan Belanda ke Jepang</td><td>8 Mar 1942</td><td>18,3° Pisces</td><td>2,3° Sagittarius</td><td>9,6° Aquarius</td><td>1,6° Gemini</td><td>21,0° Aquarius</td><td>13,8° Gemini</td><td>24,2° Taurus</td></tr>
+              <tr><td>Pembentukan BPUPKI</td><td>1 Mar 1945</td><td>11,5° Pisces</td><td>11,2° Libra</td><td>25,0° Aries</td><td>12,6° Aquarius</td><td>12,3° Pisces</td><td>24,9° Virgo</td><td>4,6° Cancer</td></tr>
+              <tr><td>Peristiwa Rengasdengklok</td><td>16 Agu 1945</td><td style="color:var(--gold);font-weight:700">24,2° Leo</td><td>1,8° Sagittarius</td><td>14,7° Cancer</td><td>17,0° Gemini</td><td>1,3° Virgo</td><td>29,1° Virgo</td><td>20,3° Cancer</td></tr>
+              <tr><td>Proklamasi Kemerdekaan</td><td>17 Agu 1945</td><td style="color:var(--gold);font-weight:700">25,2° Leo</td><td>13,9° Sagittarius</td><td>15,8° Cancer</td><td>17,7° Gemini</td><td>0,5° Virgo</td><td>29,3° Virgo</td><td>20,4° Cancer</td></tr>
+              <tr><td>Pertempuran Surabaya</td><td>10 Nov 1945</td><td>18,7° Scorpio</td><td>21,9° Capricorn</td><td>28,8° Libra</td><td>0,5° Leo</td><td>9,9° Sagittarius</td><td>17,1° Libra</td><td>25,6° Cancer</td></tr>
+              <tr><td>Konferensi Meja Bundar</td><td>27 Des 1949</td><td>6,3° Capricorn</td><td>11,1° Aries</td><td>15,9° Aquarius</td><td>1,3° Libra</td><td>24,9° Capricorn</td><td>6,3° Aquarius</td><td>20,1° Virgo</td></tr>
+              <tr><td>Konferensi Asia Afrika</td><td>18 Apr 1955</td><td>28,5° Aries</td><td>7,1° Pisces</td><td>23,5° Pisces</td><td>5,9° Gemini</td><td>23,5° Aries</td><td>22,2° Cancer</td><td>20,0° Scorpio</td></tr>
+              <tr><td>Dekrit Presiden 5 Juli 1959</td><td>5 Jul 1959</td><td>13,5° Cancer</td><td>9,2° Cancer</td><td>28,3° Leo</td><td>21,5° Leo</td><td>9,5° Leo</td><td>23,0° Scorpio</td><td>3,6° Capricorn</td></tr>
+              <tr><td>Supersemar</td><td>11 Mar 1966</td><td>21,2° Pisces</td><td>23,7° Scorpio</td><td>8,1° Aquarius</td><td>2,2° Aries</td><td>6,2° Aries</td><td>22,7° Gemini</td><td>20,5° Pisces</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card"><h3>Pola Menarik</h3><p><b>Rengasdengklok (16 Agu) &amp; Proklamasi (17 Agu)</b> — cuma beda 1 hari, Sun sama-sama di Leo (24,2° dan 25,2°). Golongan muda "menculik" Soekarno-Hatta pas Sun di domisilinya sendiri, lalu proklamasi dibacain 1 hari kemudian masih di Leo yang sama. Kalau ngikut logika "Sun = identitas/kepemimpinan di rumah sendiri = ekspresi paling murni", dua momen paling krusial kemerdekaan RI emang jatuh pas window astrologi yang sama.</p><p style="margin-top:8px"><b>Dekrit Presiden 1959:</b> Sun DAN Moon sama-sama di Cancer (13,5° dan 9,2°) — konjungsi Sun-Moon dekat New Moon, simbolis "awal baru" (Demokrasi Terpimpin dimulai). <b>Supersemar 1966:</b> Saturn di Pisces (akhir siklus/pembubaran struktur lama) — simbolis cocok sama "runtuhnya Orde Lama".</p></div>
+      </section>
+
+      <section>
+        <div class="section-head"><span class="num">07</span><h2>Krisis Indonesia vs Astrofinancial (Data Asli IHSG)</h2><span class="sub2">1997-2008, DENGAN HARGA ASLI</span></div>
+        <p class="desc">Window: 5 hari sebelum vs 14 hari sesudah tanggal kejadian. Ini krisis yang jatuh DALAM rentang data kita (1990-2010).</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Krisis</th><th>Tanggal</th><th>Sun</th><th>Moon</th><th>Venus</th><th>Mars</th><th>Mercury</th><th>Jupiter</th><th>Saturn</th><th>Harga Sblm</th><th>Harga Stlh</th><th>Perubahan</th></tr></thead>
+            <tbody>
+              <tr><td>Krismon — IDR Dilepas</td><td>14 Agu 1997</td><td>21,0°Leo</td><td>17,1°Sagittarius</td><td>25,4°Virgo</td><td>29,6°Libra</td><td>15,5°Virgo</td><td>16,5°Aquarius</td><td>20,3°Aries</td><td>675,44</td><td>530,37</td><td style="color:var(--mars);font-weight:700">−21,48% ⬇⬇⬇</td></tr>
+              <tr><td>Krismon — Puncak Krisis</td><td>15 Jan 1998</td><td>24,4°Capricorn</td><td>17,5°Leo</td><td>27,2°Capricorn</td><td>21,6°Aquarius</td><td>2,6°Capricorn</td><td>25,2°Aquarius</td><td>14,3°Aries</td><td>342,97</td><td>554,11</td><td style="color:var(--gold);font-weight:700">+61,56% ⬆⬆⬆*</td></tr>
+              <tr><td>Reformasi — Soeharto Lengser</td><td>21 Mei 1998</td><td>29,5°Taurus</td><td>19,2°Pisces</td><td>19,3°Aries</td><td>27,6°Taurus</td><td>8,6°Taurus</td><td>23,1°Pisces</td><td>27,9°Aries</td><td>405,94</td><td>406,33</td><td>+0,10% (flat)</td></tr>
+              <tr><td>Gus Dur Dimakzulkan</td><td>23 Jul 2001</td><td>29,9°Cancer</td><td>26,5°Leo</td><td>18,8°Gemini</td><td>15,1°Sagittarius</td><td>14,8°Cancer</td><td>2,1°Cancer</td><td>11,3°Gemini</td><td>453,30</td><td>430,81</td><td style="color:var(--mars)">−4,96% ⬇</td></tr>
+              <tr><td>Bom Bali I</td><td>12 Okt 2002</td><td>18,2°Libra</td><td>29,5°Sagittarius</td><td>15,6°Scorpio</td><td>27,4°Virgo</td><td>0,3°Libra</td><td>13,8°Leo</td><td>29,0°Gemini</td><td>401,84</td><td>361,68</td><td style="color:var(--mars);font-weight:700">−9,99% ⬇⬇</td></tr>
+              <tr><td>Tsunami Aceh</td><td>26 Des 2004</td><td>4,2°Capricorn</td><td>24,2°Gemini</td><td>11,2°Sagittarius</td><td>30,0°Scorpio</td><td>12,5°Sagittarius</td><td>16,6°Libra</td><td>25,3°Cancer</td><td>976,32</td><td>1.015,48</td><td style="color:var(--ok)">+4,01% ⬆</td></tr>
+              <tr><td>Bom Bali II</td><td>1 Okt 2005</td><td>7,6°Libra</td><td>7,0°Virgo</td><td>21,7°Scorpio</td><td>23,3°Taurus</td><td>17,2°Libra</td><td>24,4°Libra</td><td>8,8°Leo</td><td>1.034,59</td><td>1.090,09</td><td style="color:var(--ok)">+5,36% ⬆</td></tr>
+              <tr><td>Lehman Brothers (GFC)</td><td>15 Sep 2008</td><td>22,1°Virgo</td><td>13,6°Pisces</td><td>18,4°Libra</td><td>16,9°Libra</td><td>18,5°Libra</td><td>12,5°Capricorn</td><td>13,1°Virgo</td><td>1.885,04</td><td>1.832,51</td><td style="color:var(--mars)">−2,79% ⬇</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card"><h3>*Catatan Anomali Jan 1998</h3><p>Lonjakan +61,56% itu BUKAN sinyal bullish beneran — itu IHSG dalam Rupiah pas Rupiah lagi hyperinflasi/devaluasi ekstrem (dari ~Rp2.500/USD ke Rp10.000+/USD dalam bulan yang sama). Angka IHSG rupiah gak merefleksikan kehancuran ekonomi riil saat itu (kalau dikonversi ke USD, IHSG-nya justru anjlok parah). Pelajaran penting: di periode hyperinflasi, angka indeks nominal bisa menyesatkan.</p></div>
+        <div class="card"><h3>Temuan Umum</h3><p>4 dari 8 krisis (escl. anomali Jan1998) → IHSG turun setelahnya (wajar, ini kan emang krisis). Yang menarik: <b>bencana alam murni (Tsunami Aceh) &amp; terorisme (Bom Bali II) malah IHSG naik</b> setelahnya — kemungkinan karena market udah price-in duluan / recovery cepat / gak berdampak langsung ke fundamental ekonomi (beda sama krisis moneter/politik yang dampaknya sistemik). Krisis yang sifatnya <b>sistemik-finansial atau politik</b> (Krismon, Bom Bali I, GFC) konsisten paling merusak IHSG jangka pendek.</p></div>
+      </section>
+
+      <section>
+        <div class="section-head"><span class="num">09</span><h2>HUT Bursa Efek Indonesia (Pasar Modal)</h2><span class="sub2">10 AGUSTUS — REAKTIVASI BEJ 1977</span></div>
+        <p class="desc">Bursa Efek Jakarta diaktifkan kembali 10 Agustus 1977 oleh Presiden Soeharto (setelah vakum sejak era kolonial). Tanggal ini dirayakan tiap tahun sebagai HUT Pasar Modal Indonesia. Sun selalu di ~17-18° Leo tiap tanggal ini.</p>
+        <div class="table-wrap" style="margin-bottom:16px">
+          <table>
+            <thead><tr><th>Sun</th><th>Moon</th><th>Venus</th><th>Mars</th><th>Mercury</th><th>Jupiter</th><th>Saturn</th></tr></thead>
+            <tbody>
+              <tr><td style="color:var(--gold);font-weight:700">18,3° Leo</td><td>0,3° Cancer</td><td>9,4° Cancer</td><td>16,7° Gemini</td><td>15,5° Virgo</td><td>28,6° Gemini</td><td style="color:var(--gold);font-weight:700">20,4° Leo</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card" style="margin-bottom:16px"><h3>Founding Chart: Sun Conjunct Saturn di Leo</h3><p>Posisi di atas dihitung untuk tanggal aktivasi asli 10 Agustus 1977. Yang menonjol: <b>Sun (18,3°) dan Saturn (20,4°) sama-sama di Leo</b> — konjungsi Sun-Saturn. Secara astrologi klasik ini "signature institusi": Sun=identitas/otoritas, Saturn=struktur/lembaga formal. Cocok simbolis buat kelahiran institusi resmi negara (bursa efek). Tapi secara statistik historis (lihat di bawah), konjungsi ini justru bertepatan sama window musiman yang lemah buat IHSG.</p></div>
+        <div class="stat-row">
+          <div class="stat"><div class="num">8/21</div><div class="lbl">TAHUN NAIK (38%)</div></div>
+          <div class="stat"><div class="num">−2,83%</div><div class="lbl">RATA-RATA PERUBAHAN</div></div>
+          <div class="stat"><div class="num">−24,2%</div><div class="lbl">TERLEMAH (1997, Krismon)</div></div>
+        </div>
+        <div class="card"><h3>Interpretasi</h3><p>Menarik: HUT Bursa sendiri (38% naik) malah LEBIH BEARISH dari 17 Agustus (52%)! Sun sama-sama di Leo, tapi 10 Agustus jatuh pas persis window pra-krisis tahunan (Krismon 1997 aktivasi krisisnya 14 Agu, cuma 4 hari dari HUT Bursa). Kesimpulan: "ulang tahun bursa sendiri" ternyata bukan pertanda baik secara historis — kemungkinan besar karena Agustus emang bulan yang secara musiman lemah buat IHSG (lihat pola di section 06 &amp; 08).</p></div>
+      </section>
+
+      <section>
+        <div class="section-head"><span class="num">10</span><h2>Dampak Full Moon &amp; New Moon</h2><span class="sub2">SUN-MOON ASPECT, ORB 3°, 1990-2010</span></div>
+        <p class="desc">New Moon = Sun-Moon Conjunction (0°). Full Moon = Sun-Moon Opposition (180°). Terjadi ~2x/bulan, jadi n besar (76 kejadian tiap jenis).</p>
+        <div class="stat-row">
+          <div class="stat"><div class="num">50,0%</div><div class="lbl">NEW MOON<br>NAIK (38/76), avg +0,107%</div></div>
+          <div class="stat"><div class="num">51,3%</div><div class="lbl">FULL MOON<br>NAIK (39/76), avg +0,313%</div></div>
+          <div class="stat"><div class="num">Rendah</div><div class="lbl">EDGE STATISTIK<br>(keduanya ~netral)</div></div>
+        </div>
+        <div class="card"><h3>Kesimpulan</h3><p>New Moon &amp; Full Moon SAMA-SAMA praktis 50/50 buat IHSG — gak ada edge statistik yang jelas dari fase bulan doang. Full Moon sedikit lebih tinggi avg return (+0,313% vs +0,107%) tapi selisihnya kecil &amp; mungkin cuma noise. Beda dari framework Gann klasik yang biasanya nganggep Full Moon = puncak volatilitas — di data IHSG 1990-2010 ini gak konsisten kebukti sebagai sinyal arah, mungkin lebih relevan buat volatilitas/range harian ketimbang arah.</p></div>
+      </section>
+
+      <section>
+        <div class="section-head"><span class="num">11</span><h2>Ranking Planet: Mana yang Paling Ngaruh ke IHSG</h2><span class="sub2">AVG DEVIASI DARI 50%, SEMUA SIGN</span></div>
+        <p class="desc">Diurutkan dari planet yang posisinya paling "matter" (deviasi terbesar dari 50/50) sampai paling gak ngaruh.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Planet</th><th>Avg Deviasi dari 50%</th><th>Spread (Best-Worst Sign)</th><th>Interpretasi</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>♄ Saturn</td><td style="color:var(--gold);font-weight:700">4,08</td><td style="color:var(--gold);font-weight:700">23,1 poin</td><td>PALING NGARUH — spread ekstrem krn Capricorn (34,5%, terburuk absolut)</td></tr>
+              <tr><td>2</td><td>♃ Jupiter</td><td>3,61</td><td>12,6 poin</td><td>Ngaruh kuat, konsisten di semua window</td></tr>
+              <tr><td>3</td><td>☉ Sun</td><td>3,58</td><td>10,5 poin</td><td>Ngaruh sedang — meski ruler klasik, buat IHSG gak sekuat Saturn/Jupiter</td></tr>
+              <tr><td>4</td><td>♀ Venus</td><td>3,49</td><td>13,7 poin</td><td>Ngaruh sedang, spread lumayan besar (Taurus terbaik vs Virgo terburuk)</td></tr>
+              <tr><td>5</td><td>☿ Mercury</td><td>2,99</td><td>9,7 poin</td><td>Ngaruh sedang-lemah</td></tr>
+              <tr><td>6</td><td>♂ Mars</td><td>2,73</td><td>9,8 poin</td><td>Ngaruh lemah</td></tr>
+              <tr><td>7</td><td>☽ Moon</td><td style="color:var(--mars)">1,82</td><td style="color:var(--mars)">5,0 poin</td><td>PALING GAK NGARUH — gerak kecepetan, hasilnya paling "encer"/netral</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card"><h3>Kesimpulan</h3><p><b>Saturn = planet paling penting buat IHSG</b> (beda dari Gold yang paling penting Sun). Masuk akal secara logika: Saturn = struktur/regulasi/kebijakan makro — sangat relevan buat pasar domestik yang sensitif ke kebijakan pemerintah/BI. Moon paling gak reliable — kebalikan dari framework scalping Gold yang justru pakai Moon buat timing jam-jaman (Moon tetep bisa berguna buat microswing IHSG, tapi jangan buat sinyal arah harian).</p></div>
+      </section>
+
+      <section>
+        <div class="section-head"><span class="num">12</span><h2>Kalender Hari Gann vs IHSG</h2><span class="sub2">8 TITIK BALIK MUSIM (SOLSTICE/EQUINOX + CROSS-QUARTER)</span></div>
+        <p class="desc">Gann pakai 8 tanggal kalender matahari (bukan zodiak) sebagai titik waktu penting: 4 solstice/equinox + 4 cross-quarter day (titik tengah di antaranya). Window: 5 hari sebelum vs 14 hari sesudah, diulang tiap tahun 1990-2010.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Tanggal Gann</th><th>Jenis</th><th>Probabilitas Naik</th><th>Rata-rata Perubahan</th></tr></thead>
+            <tbody>
+              <tr><td>21 Desember</td><td>Winter Solstice</td><td style="color:var(--gold);font-weight:700">90% (18/20)</td><td style="color:var(--gold);font-weight:700">+4,28%</td></tr>
+              <tr><td>4 Februari</td><td>Cross-quarter (Imbolc)</td><td style="color:var(--ok)">70% (14/20)</td><td style="color:var(--ok)">+1,43%</td></tr>
+              <tr><td>5 Mei</td><td>Cross-quarter (Beltane)</td><td style="color:var(--ok)">62% (13/21)</td><td style="color:var(--ok)">+1,74%</td></tr>
+              <tr><td>21 Juni</td><td>Summer Solstice</td><td style="color:var(--ok)">62% (13/21)</td><td>+1,04%</td></tr>
+              <tr><td>23 September</td><td>Autumn Equinox</td><td>60% (12/20)</td><td>−0,18%</td></tr>
+              <tr><td>21 Maret</td><td>Spring Equinox</td><td>55% (11/20)</td><td style="color:var(--ok)">+2,07%</td></tr>
+              <tr><td>7 November</td><td>Cross-quarter (Samhain)</td><td>55% (11/20)</td><td>+1,53%</td></tr>
+              <tr><td>7 Agustus</td><td>Cross-quarter (Lammas)</td><td style="color:var(--mars);font-weight:700">43% (9/21)</td><td style="color:var(--mars);font-weight:700">−2,99%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card"><h3>Temuan Kuat: Winter Solstice Paling Reliable</h3><p><b>21 Desember (Winter Solstice) = sinyal PALING KUAT di seluruh dashboard IHSG ini</b> (90% naik, avg +4,28%) — konsisten dengan pola window-dressing/rally akhir tahun yang udah kita liat juga di Tsunami-anniversary (80%) dan Sumpah Pemuda (60%). Tiga sinyal independen semua nunjuk ke arah yang sama: <b>akhir Desember = window paling bullish buat IHSG</b>, kemungkinan besar karena "January Effect"/rebalancing institusional, bukan astro murni.</p><p style="margin-top:8px"><b>7 Agustus (Cross-quarter Lammas)</b> paling lemah (43%, −2,99%) — makin menguatkan pola "pertengahan Agustus = window lemah" yang udah konsisten muncul di HUT Bursa (10 Agu) dan Krismon-anniv (14 Agu).</p></div>
+      </section>
+
+      <section>
+        <div class="section-head"><span class="num">13</span><h2>Korelasi Master: Probabilitas Jika Sejarah Terulang</h2><span class="sub2">SEMUA PERISTIWA, 1990-2010</span></div>
+        <p class="desc">Ini gabungan SEMUA tanggal (hari nasional + HUT Bursa + anniversary krisis) dicek sebagai POLA TAHUNAN BERULANG — bukan cuma tahun kejadian aslinya. Window: 5 hari sebelum vs 14 hari sesudah tiap tanggal, diulang tiap tahun 1990-2010, diurutkan dari probabilitas naik tertinggi.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Peristiwa / Tanggal</th><th>Probabilitas Naik</th><th>Rata-rata Perubahan</th><th>Confidence</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Winter Solstice (21 Des)</td><td style="color:var(--gold);font-weight:700">90% (18/20)</td><td style="color:var(--gold);font-weight:700">+4,28%</td><td>Tinggi (n=20)</td></tr>
+              <tr><td>2</td><td>Anniv. Tsunami Aceh (26 Des)</td><td style="color:var(--gold);font-weight:700">80% (16/20)</td><td style="color:var(--gold);font-weight:700">+3,37%</td><td>Tinggi (n=20)</td></tr>
+              <tr><td>3</td><td>Cross-quarter Imbolc (4 Feb)</td><td style="color:var(--ok)">70% (14/20)</td><td style="color:var(--ok)">+1,43%</td><td>Tinggi (n=20)</td></tr>
+              <tr><td>4</td><td>Sumpah Pemuda (28 Okt)</td><td style="color:var(--ok)">60% (12/20)</td><td style="color:var(--ok)">+1,33%</td><td>Tinggi (n=20)</td></tr>
+              <tr><td>5</td><td>Anniv. Bom Bali II (1 Okt)</td><td style="color:var(--ok)">60% (12/20)</td><td>+0,31%</td><td>Tinggi (n=20)</td></tr>
+              <tr><td>6</td><td>Autumn Equinox (23 Sep)</td><td>60% (12/20)</td><td>−0,18%</td><td>Tinggi (n=20)</td></tr>
+              <tr><td>7</td><td>Anniv. Reformasi (21 Mei)</td><td style="color:var(--ok)">57% (12/21)</td><td style="color:var(--ok)">+2,11%</td><td>Tinggi (n=21)</td></tr>
+              <tr><td>8</td><td>Spring Equinox (21 Mar)</td><td>55% (11/20)</td><td style="color:var(--ok)">+2,07%</td><td>Tinggi (n=20)</td></tr>
+              <tr><td>9</td><td>Cross-quarter Samhain (7 Nov)</td><td>55% (11/20)</td><td>+1,53%</td><td>Tinggi (n=20)</td></tr>
+              <tr><td>10</td><td>17 Agustus (Kemerdekaan)</td><td>52% (11/21)</td><td>−1,79%</td><td>Tinggi (n=21)</td></tr>
+              <tr><td>11</td><td>Full Moon (semua kejadian)</td><td>51,3% (39/76)</td><td>+0,31%</td><td>Tinggi (n=76)</td></tr>
+              <tr><td>12</td><td>New Moon (semua kejadian)</td><td>50,0% (38/76)</td><td>+0,11%</td><td>Tinggi (n=76)</td></tr>
+              <tr><td>13</td><td>Anniv. Bom Bali I (12 Okt)</td><td>50% (10/20)</td><td>−1,20%</td><td>Tinggi (n=20)</td></tr>
+              <tr><td>14</td><td>Anniv. Krismon/IDR Float (14 Agu)</td><td style="color:var(--mars)">43% (9/21)</td><td style="color:var(--mars)">−2,55%</td><td>Tinggi (n=21)</td></tr>
+              <tr><td>15</td><td>HUT Bursa Efek Indonesia (10 Agu)</td><td style="color:var(--mars);font-weight:700">38% (8/21)</td><td style="color:var(--mars);font-weight:700">−2,83%</td><td>Tinggi (n=21)</td></tr>
+              <tr><td>16</td><td>Anniv. Lehman/GFC (15 Sep)</td><td style="color:var(--mars);font-weight:700">35% (7/20)</td><td style="color:var(--mars);font-weight:700">−3,61%</td><td>Tinggi (n=20)</td></tr>
+              <tr><td>17</td><td>Cross-quarter Lammas (7 Agu)</td><td style="color:var(--mars);font-weight:700">43% (9/21)</td><td style="color:var(--mars);font-weight:700">−2,99%</td><td>Tinggi (n=21)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card"><h3>Kalau Sejarah Terulang Tahun Ini...</h3><p><b>Paling layak diwaspadai (bearish):</b> pertengahan Agustus - pertengahan September secara historis KONSISTEN lemah (HUT Bursa 10 Agu, Krismon 14 Agu, Kemerdekaan 17 Agu, GFC 15 Sep — 4 dari 4 tanggal di window ini semua di bawah 55% probabilitas naik). Ini kemungkinan pola musiman riil (pre-September effect, profit taking jelang Lebaran/liburan, atau kebetulan konsentrasi krisis historis Indonesia banyak di window ini).</p><p style="margin-top:8px"><b>Paling layak diharapkan (bullish):</b> akhir Oktober (Sumpah Pemuda + Bom Bali II, keduanya 60%) sampai akhir Desember (Tsunami anniv 80%) — window ini konsisten window-dressing/rally akhir tahun, sejalan sama pola umum "Santa Claus rally" yang juga ada di pasar lain.</p></div>
+        <div class="card" style="margin-top:14px;border-color:var(--gold)"><h3>Disclaimer Penting</h3><p>Ini korelasi historis 1990-2010, BUKAN prediksi pasti. Anggaran sampel 20-21 tahun cukup buat pola musiman tapi bukan jaminan statistik kuat (beda sama analisis 50 tahun Gold). Kalau data 2010-2026 udah masuk, angka-angka ini WAJIB dihitung ulang — rezim IHSG udah beda jauh sejak 2010 (10x lipat pertumbuhan, struktur ekonomi beda).</p></div>
+      </section>
+
+      <section>
+        <div class="section-head"><span class="num">14</span><h2>Peristiwa Nasional Rutin vs IHSG</h2><span class="sub2">17 AGUSTUS &amp; 28 OKTOBER, 1990-2010</span></div>
+        <p class="desc">Tanggal nasional itu FIXED (gak geser tiap tahun kayak ingress planet lain) — jadi posisi Sun-nya juga selalu di derajat yang sama tiap tahun. Ini ngecek apa ada pola historis IHSG di sekitar tanggal-tanggal ini.</p>
+
+        <h3 style="font-family:var(--display);font-size:19px;color:var(--gold);margin:16px 0 8px">🇮🇩 17 Agustus — Hari Kemerdekaan (Sun selalu ~24-25° Leo)</h3>
+        <div class="stat-row">
+          <div class="stat"><div class="num">11/21</div><div class="lbl">TAHUN NAIK (52%)</div></div>
+          <div class="stat"><div class="num">−1,79%</div><div class="lbl">RATA-RATA (dgn 1997)</div></div>
+          <div class="stat"><div class="num">−0,96%</div><div class="lbl">RATA-RATA (tanpa 1997)</div></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Tahun</th><th>Sebelum</th><th>Sesudah</th><th>Perubahan</th><th>Catatan</th></tr></thead>
+            <tbody>
+              <tr><td>1997</td><td>662,95</td><td>540,93</td><td style="color:var(--mars);font-weight:700">−18,41% ⬇⬇⬇</td><td>Krisis Moneter Asia — puncak crash</td></tr>
+              <tr><td>2005</td><td>1.153,97</td><td>1.035,44</td><td style="color:var(--mars);font-weight:700">−10,27% ⬇⬇</td><td>Krisis harga BBM domestik</td></tr>
+              <tr><td>1998</td><td>408,63</td><td>370,55</td><td style="color:var(--mars);font-weight:700">−9,32% ⬇⬇</td><td>Pasca-krisis, reformasi</td></tr>
+              <tr><td>1991</td><td>337,65</td><td>314,05</td><td style="color:var(--mars)">−6,99% ⬇</td><td>—</td></tr>
+              <tr><td>1990</td><td>591,97</td><td>551,78</td><td style="color:var(--mars)">−6,79% ⬇</td><td>—</td></tr>
+              <tr><td colspan="5" style="text-align:center;color:var(--ink-dim);font-family:var(--mono);font-size:11px">... 16 tahun lainnya (mixed) ...</td></tr>
+              <tr><td>1994</td><td>475,00</td><td>498,54</td><td style="color:var(--ok)">+4,96% ⬆</td><td>—</td></tr>
+              <tr><td>2003</td><td>506,42</td><td>529,04</td><td style="color:var(--ok)">+4,47% ⬆</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card"><h3>Interpretasi</h3><p>Sun selalu di domisili Leo (sama kayak analisis Gold!), tapi hasilnya BEDA JAUH — buat IHSG malah agak bearish-leaning (52% naik, avg NEGATIF). Kemungkinan penyebab: Agustus historically sering bertepatan sama krisis (1997 Krismon, 1998 pasca-reformasi, 2005 krisis BBM) — musim "profit taking" institusional jelang libur + faktor domestik non-astro yang kebetulan numpuk di bulan ini. Beda mekanisme total sama Gold (Sun-Leo bullish krn ruler logam), karena IHSG gak ada hubungan langsung sama Sun sebagai "ruler".</p></div>
+
+        <h3 style="font-family:var(--display);font-size:19px;color:var(--gold);margin:24px 0 8px">🎓 28 Oktober — Sumpah Pemuda (Sun selalu ~5° Scorpio)</h3>
+        <div class="stat-row">
+          <div class="stat"><div class="num">12/20</div><div class="lbl">TAHUN NAIK (60%)</div></div>
+          <div class="stat"><div class="num">+1,33%</div><div class="lbl">RATA-RATA PERUBAHAN</div></div>
+          <div class="stat"><div class="num">+8,18%</div><div class="lbl">TERKUAT (2002)</div></div>
+        </div>
+        <div class="card"><h3>Interpretasi</h3><p>60% naik, avg POSITIF (+1,33%) — lebih bullish dari 17 Agustus. Scorpio = transformasi/intensitas/regenerasi, cocok secara simbolis sama semangat "kebangkitan pemuda". Secara musiman, akhir Oktober juga sering masuk window rally akhir tahun (window-dressing institusional jelang Nov-Des) — kemungkinan besar ini faktor musiman riil, bukan astro murni.</p></div>
+
+        <div class="card" style="margin-top:16px;border-color:var(--gold)"><h3>Kesimpulan Umum</h3><p>Tanggal nasional Indonesia TIDAK otomatis jadi sinyal astro kuat buat IHSG — beda total sama pola Sun→Leo di Gold. 17 Agustus malah condong lemah (kemungkinan numpang musim krisis Agustus historis: 1997, 1998, 2005), sementara 28 Oktober condong kuat (kemungkinan numpang window-dressing jelang akhir tahun). Kesimpulan: pola ini lebih ke <b>musiman-kalender/institusional</b> ketimbang astrologi murni — kebetulan tanggalnya fixed jadi Sun-nya juga fixed, tapi penyebab utamanya bukan posisi Sun itu sendiri.</p></div>
+      </section>
+
+      <section>
+        <div class="section-head"><span class="num">15</span><h2>Sektor Detail: Sawit/Pertanian, Tekno, Konsumer</h2><span class="sub2">RULER PLANET + EMITEN</span></div>
+        <div class="cards">
+          <div class="card"><h3>🌴 Sawit/Pertanian → ☽ Moon</h3><p>Moon = agrikultur/hasil bumi/staple domestik.<br><b>Emiten:</b> AALI, LSIP, SIMP, TBLA, DSNG, SGRO<br>Moon sekarang di Leo → <b>51,6% (netral)</b></p></div>
+          <div class="card"><h3>💻 Tekno → ☿ Mercury</h3><p>Mercury = komunikasi/digital/data.<br><b>Emiten:</b> GOTO, BUKA, EMTK, WIFI, MTDL<br>Mercury sekarang di Cancer → <b>50,6% (netral)</b></p></div>
+          <div class="card"><h3>🛒 Konsumer → ☽ Moon</h3><p>Sama ruler-nya kayak sawit (keduanya domestik/staple).<br><b>Emiten:</b> UNVR, ICBP, INDF, MYOR, GGRM, HMSP, AMRT<br>Moon-Leo → <b>51,6% (netral)</b></p></div>
+        </div>
+        <div class="card" style="margin-top:14px"><h3>Kesimpulan</h3><p>3 sektor ini semua netral (~50-52%), gak ada yang menyala kuat atau merah kayak Banking/Konglomerasi. Tekno (50,6%) ≈ Konsumer/Sawit (51,6%), beda tipis. Catatan: GOTO/BUKA baru IPO 2021-2022 jadi belum ada history buat backtest langsung ke saham itu — masih ngikut pembacaan sektor Mercury secara umum. Kalau ada CSV harga per-emiten, bisa dibacktest langsung.</p></div>
+      </section>
+
+      <section>
+        <div class="section-head"><span class="num">16</span><h2>Yang Masih Kurang</h2></div>
+        <div class="card"><p>1. <b>Data 2010-2026</b> — paling krusial, rezim pasar IHSG udah beda jauh (pra vs pasca boom komoditas 2011, COVID 2020, dll).<br>
+        2. <b>Data harga per-emiten</b> (BBCA, BBRI, ANTM, dll individual) — biar rekomendasi emiten bukan cuma dari sektor umum tapi dari performa historis saham itu sendiri vs astro.<br>
+        3. Kalau dua itu ada, dashboard ini bisa di-upgrade jadi selengkap dashboard Gold (heatmap 50th, ranking event, kalender confluence, dll).</p></div>
+      </section>
+
+    </main>
+  </div>
+
+  <Footer />
+</Layout>
+
+<style is:global>
+  .ihsg-astro-page {
+    --bg:#0b0d16; --panel:#151928; --line:#262c40;
+    --gold:#d4af6a; --mars:#b5533c; --ok:#7fa88a; --ink:#e8e6df; --ink-dim:#9aa0b4;
+    --display:'Cormorant Garamond', serif; --body:'Spectral', serif; --mono:'JetBrains Mono', monospace;
+    background: radial-gradient(ellipse at 20% -10%, #1c2138 0%, transparent 55%), var(--bg);
+    color: var(--ink); font-family: var(--body); line-height: 1.5;
+    position: relative; z-index: 10;
+  }
+  .ihsg-astro-page *{box-sizing:border-box;}
+  .ihsg-astro-page header{padding:40px 24px 20px; text-align:center;}
+  .ihsg-astro-page .eyebrow{font-family:var(--mono); letter-spacing:.3em; text-transform:uppercase; font-size:11px; color:var(--gold); text-align:center;}
+  .ihsg-astro-page h1{font-family:var(--display); font-weight:700; font-size:clamp(28px,4vw,44px); text-align:center; margin:8px 0 6px; color:#f2ead9;}
+  .ihsg-astro-page .sub{text-align:center; color:var(--ink-dim); font-size:14px; max-width:700px; margin:0 auto 10px;}
+  .ihsg-astro-page .warn{background:#2a1f14; border:1px solid var(--gold); border-radius:8px; padding:12px 18px; max-width:700px; margin:14px auto; font-family:var(--mono); font-size:12px; color:var(--gold);}
+  .ihsg-astro-page main{max-width:1180px; margin:0 auto; padding:0 24px 80px;}
+  .ihsg-astro-page section{margin-top:48px;}
+  .ihsg-astro-page .section-head{display:flex; align-items:baseline; gap:14px; margin-bottom:16px; border-bottom:1px solid var(--line); padding-bottom:10px; flex-wrap:wrap;}
+  .ihsg-astro-page .section-head .num{font-family:var(--mono); color:var(--mars); font-size:13px;}
+  .ihsg-astro-page .section-head h2{font-family:var(--display); font-weight:600; font-size:24px; margin:0; color:#f2ead9;}
+  .ihsg-astro-page .section-head .sub2{font-family:var(--mono); font-size:11px; color:var(--ink-dim); margin-left:auto;}
+  .ihsg-astro-page p.desc{font-family:var(--mono);font-size:12px;color:var(--ink-dim);margin:0 0 14px}
+
+  .ihsg-astro-page table{width:100%; border-collapse:collapse; font-size:12.5px;}
+  .ihsg-astro-page thead th{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; color:var(--gold); text-align:left; padding:8px 10px; border-bottom:1px solid var(--line);}
+  .ihsg-astro-page tbody td{padding:8px 10px; border-bottom:1px solid rgba(38,44,64,.5);}
+  .ihsg-astro-page tbody tr:hover{background:rgba(212,175,106,.05);}
+  .ihsg-astro-page .table-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:10px;}
+  .ihsg-astro-page .table-wrap table{min-width:600px;}
+
+  .ihsg-astro-page .card{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:18px 20px; margin-top:14px;}
+  .ihsg-astro-page .card h3{font-family:var(--display); font-size:19px; margin:0 0 8px; color:#f2ead9;}
+  .ihsg-astro-page .card p{font-size:13.5px; color:var(--ink-dim); margin:0;}
+
+  .ihsg-astro-page .stat-row{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:20px;}
+  @media(max-width:640px){.ihsg-astro-page .stat-row{grid-template-columns:1fr;}}
+  .ihsg-astro-page .stat{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px; text-align:center;}
+  .ihsg-astro-page .stat .num{font-family:var(--display); font-size:26px; font-weight:700; color:var(--gold);}
+  .ihsg-astro-page .stat .lbl{font-family:var(--mono); font-size:10px; color:var(--ink-dim); margin-top:4px;}
+
+  .ihsg-astro-page .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px;}
+</style>
+
+<script is:inline>
+const IHSG_WR = {"sun":{"Aries":[56.8,387],"Taurus":[56.4,431],"Gemini":[52.2,446],"Cancer":[52.0,467],"Leo":[46.3,447],"Virgo":[47.2,443],"Libra":[50.8,425],"Scorpio":[47.7,409],"Sagittarius":[54.0,402],"Capricorn":[55.4,336],"Aquarius":[55.3,403],"Pisces":[47.9,403]},"moon":{"Aries":[51.8,398],"Taurus":[49.5,422],"Gemini":[54.1,412],"Cancer":[54.3,420],"Leo":[51.6,430],"Virgo":[50.7,418],"Libra":[54.5,418],"Scorpio":[49.9,407],"Sagittarius":[49.9,419],"Capricorn":[51.0,420],"Aquarius":[50.9,426],"Pisces":[52.3,409]},"venus":{"Aries":[53.7,521],"Taurus":[58.7,363],"Gemini":[55.4,500],"Cancer":[52.8,375],"Leo":[46.8,496],"Virgo":[45.0,449],"Libra":[52.7,372],"Scorpio":[50.1,463],"Sagittarius":[49.2,329],"Capricorn":[57.4,420],"Aquarius":[49.6,349],"Pisces":[49.4,362]},"mars":{"Aries":[56.6,302],"Taurus":[47.7,444],"Gemini":[46.8,485],"Cancer":[51.6,548],"Leo":[50.0,590],"Virgo":[54.4,485],"Libra":[50.6,435],"Scorpio":[51.8,386],"Sagittarius":[50.5,394],"Capricorn":[55.2,281],"Aquarius":[54.8,283],"Pisces":[55.7,366]},"mercury":{"Aries":[53.1,382],"Taurus":[56.8,421],"Gemini":[56.7,379],"Cancer":[50.6,409],"Leo":[47.6,401],"Virgo":[47.1,469],"Libra":[48.0,448],"Scorpio":[50.4,452],"Sagittarius":[53.2,425],"Capricorn":[55.2,404],"Aquarius":[51.4,418],"Pisces":[51.7,391]},"jupiter":{"Aries":[54.9,233],"Taurus":[44.8,172],"Gemini":[49.6,254],"Cancer":[51.2,346],"Leo":[45.5,521],"Virgo":[51.6,521],"Libra":[57.4,533],"Scorpio":[51.8,527],"Sagittarius":[55.2,527],"Capricorn":[53.2,506],"Aquarius":[53.3,505],"Pisces":[46.0,354]},"saturn":{"Aries":[49.2,620],"Taurus":[46.6,579],"Gemini":[55.2,562],"Cancer":[56.1,512],"Leo":[57.5,522],"Virgo":[54.6,595],"Libra":[57.6,144],"Capricorn":[34.5,200],"Aquarius":[51.0,702],"Pisces":[49.4,563]}};
+const ZODIAC_IHSG = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
+const PLANET_LABEL_IHSG = {sun:'Sun',moon:'Moon',venus:'Venus',mars:'Mars',mercury:'Mercury',jupiter:'Jupiter',saturn:'Saturn'};
+
+function wrColorIhsg(wr){
+  const t = Math.max(0, Math.min(1, (wr-30)/35));
+  const r = Math.round(181 + (127-181)*t);
+  const g = Math.round(83 + (168-83)*t);
+  const b = Math.round(60 + (138-60)*t);
+  return 'rgb('+r+','+g+','+b+')';
+}
+
+function buildHeatmapIhsg(){
+  const table = document.getElementById('heatmapTable');
+  if(!table) return;
+  let html = '<thead><tr><th style="text-align:left">Planet</th>' + ZODIAC_IHSG.map(z=>'<th>'+z.slice(0,3)+'</th>').join('') + '</tr></thead><tbody>';
+  Object.keys(PLANET_LABEL_IHSG).forEach(p=>{
+    html += '<tr><td style="font-family:var(--mono);color:var(--gold)">'+PLANET_LABEL_IHSG[p]+'</td>';
+    ZODIAC_IHSG.forEach(z=>{
+      const cell = IHSG_WR[p][z];
+      if(cell){
+        const [wr,n] = cell;
+        html += '<td style="background:'+wrColorIhsg(wr)+';color:#0b0d16;font-family:var(--mono);font-weight:700;text-align:center;padding:6px 3px" title="n='+n+'">'+wr.toFixed(0)+'</td>';
+      } else {
+        html += '<td style="text-align:center;color:var(--ink-dim)">-</td>';
+      }
+    });
+    html += '</tr>';
+  });
+  html += '</tbody>';
+  table.innerHTML = html;
+}
+
+function init(){
+  buildHeatmapIhsg();
+}
+
+init();
+document.addEventListener('astro:after-swap', init);
+</script>

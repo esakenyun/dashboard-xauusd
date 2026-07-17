@@ -6,6 +6,16 @@ const isActive = (path: string) => {
   }
   return pathname.startsWith(path);
 };
+
+const dashboards = [
+  { href: '/dashboard-xauusd', label: 'XAUUSD', cls: 'gold', icon: '<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>' },
+  { href: '/dashboard-astrologi-xauusd', label: 'Astrologi XAUUSD', cls: 'astro', icon: '<path d="M12 3a6.36 6.36 0 0 1 9 9 9.75 9.75 0 0 0-9-9Z"/><path d="M11.3 12.7a5 5 0 1 1-7.1-7.1 9.75 9.75 0 0 0 7.1 7.1Z"/><path d="M12 22a9.75 9.75 0 0 0 9-9 9.75 9.75 0 0 0-9 9Z"/>' },
+  { href: '/dashboard-ihsg', label: 'IHSG', cls: 'ihsg', icon: '<path d="M3 3v18h18"/><path d="M7 14l3-4 3 2 4-6"/>' },
+  { href: '/dashboard-crypto', label: 'Crypto', cls: 'crypto', icon: '<circle cx="12" cy="12" r="10"/><path d="M9.5 8.5h3a1.75 1.75 0 0 1 0 3.5h-3m0 0h3.5a1.75 1.75 0 0 1 0 3.5h-4m1-11v11m3-11v1.5m0 8v1.5"/>' },
+  { href: '/dashboard-forex', label: 'Forex', cls: 'forex', icon: '<path d="M2 12h20M12 2c2.5 2.7 4 6.2 4 10s-1.5 7.3-4 10c-2.5-2.7-4-6.2-4-10s1.5-7.3 4-10Z"/>' },
+  { href: '/dashboard-saham', label: 'Saham', cls: 'saham', icon: '<path d="M3 3v18h18"/><path d="M18.7 8 12 14.7l-3.5-3.5L3 16.5"/>' },
+];
+const anyDashboardActive = dashboards.some(d => isActive(d.href));
 ---
 
 <header class="site-header">
@@ -35,26 +45,21 @@ const isActive = (path: string) => {
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         Home
       </a>
-      <a href="/dashboard-xauusd" class={`nav-item gold-hover ${isActive('/dashboard-xauusd') ? 'active gold-active' : ''}`}>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-        Dashboard XAUUSD
-      </a>
-      <a href="/dashboard-astrologi-xauusd" class={`nav-item astro-hover ${isActive('/dashboard-astrologi-xauusd') ? 'active astro-active' : ''}`}>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><path d="M12 3a6.36 6.36 0 0 1 9 9 9.75 9.75 0 0 0-9-9Z"/><path d="M11.3 12.7a5 5 0 1 1-7.1-7.1 9.75 9.75 0 0 0 7.1 7.1Z"/><path d="M12 22a9.75 9.75 0 0 0 9-9 9.75 9.75 0 0 0-9 9Z"/></svg>
-        Dashboard Astrologi
-      </a>
-      <a href="/dashboard-crypto" class={`nav-item crypto-hover ${isActive('/dashboard-crypto') ? 'active crypto-active' : ''}`}>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><circle cx="12" cy="12" r="10"/><path d="M9.5 8.5h3a1.75 1.75 0 0 1 0 3.5h-3m0 0h3.5a1.75 1.75 0 0 1 0 3.5h-4m1-11v11m3-11v1.5m0 8v1.5"/></svg>
-        Dashboard Crypto
-      </a>
-      <a href="/dashboard-forex" class={`nav-item forex-hover ${isActive('/dashboard-forex') ? 'active forex-active' : ''}`}>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><path d="M2 12h20M12 2c2.5 2.7 4 6.2 4 10s-1.5 7.3-4 10c-2.5-2.7-4-6.2-4-10s1.5-7.3 4-10Z"/></svg>
-        Dashboard Forex
-      </a>
-      <a href="/dashboard-saham" class={`nav-item saham-hover ${isActive('/dashboard-saham') ? 'active saham-active' : ''}`}>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><path d="M3 3v18h18"/><path d="M18.7 8 12 14.7l-3.5-3.5L3 16.5"/></svg>
-        Dashboard Saham
-      </a>
+      <div class="nav-dropdown" id="dashboards-dropdown">
+        <button class={`nav-item dropdown-trigger ${anyDashboardActive ? 'active' : ''}`} id="dashboards-trigger" aria-haspopup="true" aria-expanded="false">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Dashboards
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="dropdown-caret"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="dropdown-panel glass-panel" id="dashboards-panel">
+          {dashboards.map(d => (
+            <a href={d.href} class={`dropdown-item ${d.cls}-hover ${isActive(d.href) ? `active ${d.cls}-active` : ''}`}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon" set:html={d.icon} />
+              {d.label}
+            </a>
+          ))}
+        </div>
+      </div>
     </nav>
 
     <!-- Mobile Navigation Actions -->
@@ -75,26 +80,13 @@ const isActive = (path: string) => {
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         Home
       </a>
-      <a href="/dashboard-xauusd" class={`nav-item gold-hover ${isActive('/dashboard-xauusd') ? 'active gold-active' : ''}`}>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-        Dashboard XAUUSD
-      </a>
-      <a href="/dashboard-astrologi-xauusd" class={`nav-item astro-hover ${isActive('/dashboard-astrologi-xauusd') ? 'active astro-active' : ''}`}>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><path d="M12 3a6.36 6.36 0 0 1 9 9 9.75 9.75 0 0 0-9-9Z"/><path d="M11.3 12.7a5 5 0 1 1-7.1-7.1 9.75 9.75 0 0 0 7.1 7.1Z"/><path d="M12 22a9.75 9.75 0 0 0 9-9 9.75 9.75 0 0 0-9 9Z"/></svg>
-        Dashboard Astrologi
-      </a>
-      <a href="/dashboard-crypto" class={`nav-item crypto-hover ${isActive('/dashboard-crypto') ? 'active crypto-active' : ''}`}>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><circle cx="12" cy="12" r="10"/><path d="M9.5 8.5h3a1.75 1.75 0 0 1 0 3.5h-3m0 0h3.5a1.75 1.75 0 0 1 0 3.5h-4m1-11v11m3-11v1.5m0 8v1.5"/></svg>
-        Dashboard Crypto
-      </a>
-      <a href="/dashboard-forex" class={`nav-item forex-hover ${isActive('/dashboard-forex') ? 'active forex-active' : ''}`}>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><path d="M2 12h20M12 2c2.5 2.7 4 6.2 4 10s-1.5 7.3-4 10c-2.5-2.7-4-6.2-4-10s1.5-7.3 4-10Z"/></svg>
-        Dashboard Forex
-      </a>
-      <a href="/dashboard-saham" class={`nav-item saham-hover ${isActive('/dashboard-saham') ? 'active saham-active' : ''}`}>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><path d="M3 3v18h18"/><path d="M18.7 8 12 14.7l-3.5-3.5L3 16.5"/></svg>
-        Dashboard Saham
-      </a>
+      <div class="mobile-nav-label">Dashboards</div>
+      {dashboards.map(d => (
+        <a href={d.href} class={`nav-item ${d.cls}-hover ${isActive(d.href) ? `active ${d.cls}-active` : ''}`}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon" set:html={d.icon} />
+          {d.label}
+        </a>
+      ))}
     </nav>
   </div>
 </header>
@@ -250,7 +242,104 @@ const isActive = (path: string) => {
     background: rgba(239, 68, 68, 0.1) !important;
     border-color: rgba(239, 68, 68, 0.3) !important;
   }
-  
+
+  /* IHSG Hover & Active styles */
+  .ihsg-hover:hover {
+    color: #14b8a6;
+    border-color: rgba(20, 184, 166, 0.2);
+    background: rgba(20, 184, 166, 0.05);
+  }
+
+  .ihsg-active {
+    color: #14b8a6 !important;
+    background: rgba(20, 184, 166, 0.1) !important;
+    border-color: rgba(20, 184, 166, 0.3) !important;
+  }
+
+  /* Dashboards dropdown */
+  .nav-dropdown {
+    position: relative;
+  }
+
+  .dropdown-trigger {
+    cursor: pointer;
+    font: inherit;
+    appearance: none;
+    -webkit-appearance: none;
+    border: 1px solid transparent;
+    outline: none;
+    color: var(--text-secondary);
+    background-color: transparent;
+  }
+
+  .dropdown-trigger.active {
+    color: var(--text-primary);
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .dropdown-caret {
+    transition: transform 0.2s ease;
+    margin-left: -0.15rem;
+  }
+
+  .nav-dropdown.open .dropdown-caret {
+    transform: rotate(180deg);
+  }
+
+  .dropdown-panel {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-8px) scale(0.98);
+    min-width: 220px;
+    padding: 0.6rem;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    z-index: 103;
+    border-color: var(--border-gold);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 20px rgba(59, 130, 246, 0.1);
+  }
+
+  .nav-dropdown.open .dropdown-panel {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+    pointer-events: all;
+  }
+
+  .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.6rem 0.85rem;
+    border-radius: 10px;
+    transition: all 0.15s ease;
+    border: 1px solid transparent;
+    white-space: nowrap;
+  }
+
+  .dropdown-item:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .mobile-nav-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 0.5rem 1.25rem 0;
+  }
+
   /* Mobile header features */
   .mobile-actions {
     display: none;
@@ -403,9 +492,40 @@ const isActive = (path: string) => {
     }
   }
 
+  // Dashboards Dropdown Toggle Logic
+  function initDashboardsDropdown() {
+    const dropdown = document.getElementById('dashboards-dropdown');
+    const trigger = document.getElementById('dashboards-trigger');
+
+    if (dropdown && trigger) {
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = dropdown.classList.toggle('open');
+        trigger.setAttribute('aria-expanded', String(isOpen));
+      });
+
+      document.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement;
+        if (!dropdown.contains(target)) {
+          dropdown.classList.remove('open');
+          trigger.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          dropdown.classList.remove('open');
+          trigger.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+  }
+
   // Set up execution
   initMobileMenu();
+  initDashboardsDropdown();
   document.addEventListener('astro:after-swap', () => {
     initMobileMenu();
+    initDashboardsDropdown();
   });
 </script>

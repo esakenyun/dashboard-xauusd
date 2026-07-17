@@ -123,6 +123,48 @@ import Footer from '../components/Footer.astro';
 				</div>
 			</a>
 		</section>
+
+		<section class="more-section">
+			<h2 class="more-title">More Dashboards</h2>
+			<div class="more-grid">
+				<a href="/dashboard-ihsg" class="mini-card" style="--accent: #14b8a6; --accent-soft: rgba(20, 184, 166, 0.1); --accent-border: rgba(20, 184, 166, 0.3);">
+					<div class="mini-icon">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l3-4 3 2 4-6"/></svg>
+					</div>
+					<div class="mini-body">
+						<h3 class="mini-title">IHSG</h3>
+						<p class="mini-desc">Jakarta Composite Index astrofinancial correlation, sektor &amp; emiten IDX.</p>
+					</div>
+				</a>
+				<a href="/dashboard-crypto" class="mini-card" style="--accent: #f7931a; --accent-soft: rgba(247, 147, 26, 0.1); --accent-border: rgba(247, 147, 26, 0.3);">
+					<div class="mini-icon">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.5 8.5h3a1.75 1.75 0 0 1 0 3.5h-3m0 0h3.5a1.75 1.75 0 0 1 0 3.5h-4m1-11v11m3-11v1.5m0 8v1.5"/></svg>
+					</div>
+					<div class="mini-body">
+						<h3 class="mini-title">Crypto</h3>
+						<p class="mini-desc">Multi-coin Gann Fan, Square of 9 &amp; astro overlay for BTC and altcoins.</p>
+					</div>
+				</a>
+				<a href="/dashboard-forex" class="mini-card" style="--accent: #10b981; --accent-soft: rgba(16, 185, 129, 0.1); --accent-border: rgba(16, 185, 129, 0.3);">
+					<div class="mini-icon">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h20M12 2c2.5 2.7 4 6.2 4 10s-1.5 7.3-4 10c-2.5-2.7-4-6.2-4-10s1.5-7.3 4-10Z"/></svg>
+					</div>
+					<div class="mini-body">
+						<h3 class="mini-title">Forex</h3>
+						<p class="mini-desc">Major FX pairs — trade plan, live prices, Gann Time &amp; astro aspects.</p>
+					</div>
+				</a>
+				<a href="/dashboard-saham" class="mini-card" style="--accent: #ef4444; --accent-soft: rgba(239, 68, 68, 0.1); --accent-border: rgba(239, 68, 68, 0.3);">
+					<div class="mini-icon">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18.7 8 12 14.7l-3.5-3.5L3 16.5"/></svg>
+					</div>
+					<div class="mini-body">
+						<h3 class="mini-title">Saham IDX</h3>
+						<p class="mini-desc">20 saham IDX populer — Gann analysis, probability engine &amp; backtest.</p>
+					</div>
+				</a>
+			</div>
+		</section>
 	</main>
 
 	<Footer />
@@ -417,14 +459,95 @@ import Footer from '../components/Footer.astro';
 		text-align: center;
 	}
 
+	/* More Dashboards section */
+	.more-section {
+		width: 100%;
+		margin-top: 3.5rem;
+	}
+
+	.more-title {
+		font-family: var(--font-display);
+		font-size: 1.3rem;
+		font-weight: 700;
+		color: var(--text-primary);
+		letter-spacing: 0.05em;
+		margin-bottom: 1.25rem;
+		text-align: center;
+	}
+
+	.more-grid {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 1.25rem;
+	}
+
+	.mini-card {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.9rem;
+		text-decoration: none;
+		color: inherit;
+		padding: 1.25rem;
+		border-radius: 14px;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		background: rgba(255, 255, 255, 0.02);
+		transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+	}
+
+	.mini-card:hover {
+		transform: translateY(-4px);
+		border-color: var(--accent-border);
+		background: var(--accent-soft);
+		box-shadow: 0 12px 24px rgba(0,0,0,0.4);
+	}
+
+	.mini-icon {
+		flex-shrink: 0;
+		width: 36px;
+		height: 36px;
+		border-radius: 10px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: var(--accent-soft);
+		color: var(--accent);
+	}
+
+	.mini-icon svg {
+		width: 18px;
+		height: 18px;
+	}
+
+	.mini-title {
+		font-family: var(--font-display);
+		font-size: 1.05rem;
+		font-weight: 700;
+		color: var(--text-primary);
+		margin-bottom: 0.3rem;
+	}
+
+	.mini-card:hover .mini-title {
+		color: var(--accent);
+	}
+
+	.mini-desc {
+		font-size: 0.8rem;
+		color: var(--text-secondary);
+		line-height: 1.5;
+	}
+
 	@media (max-width: 1024px) {
 		.portal-grid {
 			grid-template-columns: 1fr;
 			gap: 2rem;
 		}
-		
+
 		.card-content {
 			padding: 2rem;
+		}
+
+		.more-grid {
+			grid-template-columns: repeat(2, 1fr);
 		}
 	}
 
@@ -432,9 +555,13 @@ import Footer from '../components/Footer.astro';
 		.hero-title {
 			font-size: 2.5rem;
 		}
-		
+
 		.landing-main {
 			padding: 2rem 1rem 3rem;
+		}
+
+		.more-grid {
+			grid-template-columns: 1fr;
 		}
 	}
 </style>
