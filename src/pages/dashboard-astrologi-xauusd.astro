@@ -25,6 +25,52 @@ import Footer from '../components/Footer.astro';
       </header>
 
       <main>
+        <section id="executive-summary">
+          <div class="section-head"><span class="num">00</span><h2>Executive Summary &amp; Master Signal Table</h2><span class="sub">SEMUA SIGNAL, 1 TEMPAT</span></div>
+
+          <div class="card" style="border-color:var(--gold)">
+            <h3>Ringkasan Eksekutif</h3>
+            <p>Dashboard ini menguji <b>60+ signal astrofinansial</b> terhadap XAUUSD pakai data asli 50 tahun (1975-2025, 13.115 hari). Temuan utama:</p>
+            <p style="margin-top:8px">1. <b>Winter Solstice (21 Des) = signal paling reliable lintas-kalender</b> — 63% win-rate, konsisten juga di dashboard IHSG (90%).<br>
+            2. <b>Syawwal &amp; Ramadhan = 2 bulan Hijriah terkuat</b> (69% &amp; 62%) — 5 dari 6 perang besar Islam terjadi di 2 bulan ini.<br>
+            3. <b>Juli &amp; Januari = 2 bulan Masehi terkuat</b> (65% &amp; 61%) — overlap sama Sun→Leo ingress &amp; January effect.<br>
+            4. <b>Peristiwa geopolitik/perang (bukan bencana alam) paling konsisten dorong Gold naik</b> — 70% dari 10 krisis dunia yang diuji.<br>
+            5. <b>Sampel kecil bisa menyesatkan</b> — Venus-Jupiter Conjunction awalnya keliatan 75% bullish (4 sampel), ternyata cuma 52% setelah diperluas ke 54 kejadian.</p>
+          </div>
+
+          <h3 style="font-family:var(--display);font-size:19px;color:var(--gold);margin:20px 0 10px">Grafik: Top 15 Signal Terkuat</h3>
+          <div class="table-wrap" style="padding:16px;background:var(--panel)">
+            <svg id="masterChart" viewBox="0 0 700 420" width="100%" style="max-width:700px;display:block;margin:0 auto"></svg>
+          </div>
+
+          <h3 style="font-family:var(--display);font-size:19px;color:var(--gold);margin:24px 0 10px">Master Signal Table</h3>
+          <div class="toolbar" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+            <input id="signalSearch" placeholder="cari signal (misal: Leo, Ramadhan, Solstice)..." style="flex:1;min-width:220px;background:var(--bg2);border:1px solid var(--line);color:var(--ink);font-family:var(--mono);font-size:13px;padding:9px 12px;border-radius:6px">
+          </div>
+          <div class="toolbar" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px" id="filterButtons">
+            <button class="filter-btn active" data-cat="all">Semua</button>
+            <button class="filter-btn" data-cat="Ingress">Ingress</button>
+            <button class="filter-btn" data-cat="Aspek">Aspek</button>
+            <button class="filter-btn" data-cat="Lunar">Lunar</button>
+            <button class="filter-btn" data-cat="Kalender Gann">Kalender Gann</button>
+            <button class="filter-btn" data-cat="Hijriah">Hijriah</button>
+            <button class="filter-btn" data-cat="Masehi">Masehi</button>
+            <button class="filter-btn" data-cat="Sejarah">Sejarah</button>
+            <button class="filter-btn" data-cat="Bullish">Bullish (&gt;55%)</button>
+            <button class="filter-btn" data-cat="Bearish">Bearish (&lt;45%)</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Signal</th><th>Kategori</th><th>Win Rate</th><th>Score</th><th>n</th></tr></thead>
+              <tbody id="masterSignalBody"></tbody>
+            </table>
+          </div>
+
+          <div class="card" style="margin-top:16px"><h3>#6 — Apakah Semua Udah Di-Backtest?</h3><p><b>Yang UDAH di-backtest data asli (real price):</b> semua ingress (Sun/Venus/Mars/Jupiter/Saturn), semua aspek (Jupiter-Saturn, Mars-Saturn, Sun-Jupiter, Mars-Jupiter, Venus-Jupiter, +5 aspek tambahan), Full/New Moon, 8 hari Gann, 12 bulan Hijriah, 12 bulan Masehi, tanggal-tanggal penting Islam (berulang), dan peristiwa dunia 1976-2025.</p>
+          <p style="margin-top:8px"><b>Yang BELUM/TIDAK BISA di-backtest (cuma astro simbolis):</b> Sirah Nabawiyah asli (571-632 M — Gold belum ada), peristiwa dunia sebelum 1975 (VOC 1602, Bretton Woods 1944, dll — di luar data floating-price). Yang ini ditandain jelas di section masing-masing dengan label "ASTRO MURNI, TANPA DATA HARGA".</p>
+          <p style="margin-top:8px"><b>Belum ada:</b> data 20 tahun-lebih-baru buat konfirmasi ulang beberapa temuan awal (misal window Jupiter-Saturn Opposition idealnya butuh 2-3x siklus 20 tahun buat sampel lebih besar dari n=94 sekarang).</p></div>
+        </section>
+
         <section id="table">
           <div class="section-head"><span class="num">01</span><h2>Tabel Korespondensi Planet</h2><span class="sub">DATA TABLE</span></div>
           <table>
@@ -267,8 +313,249 @@ import Footer from '../components/Footer.astro';
           <div class="card" style="margin-top:16px"><h3>Temuan Final: Regresi ke Rata-rata</h3><p>Pola yang sama kayak Venus-Jupiter Conjunction: makin banyak sampel, makin banyak aspek yang "collapse" ke ~50/50 (Sun Conjunct Jupiter turun dari 56%→51%, Sun Trine Jupiter turun dari 63%→51%, Venus Trine Saturn tetap 50%). <b>Cuma Mars Trine Pluto yang konsisten bearish</b> di kedua window (41%→39%) — ini satu-satunya aspek dari 5 ini yang punya edge statistik nyata (walau ke arah bearish, bukan bullish seperti dugaan awal).</p></div>
         </section>
 
+        <section id="full-new-moon">
+          <div class="section-head"><span class="num">11</span><h2>Dampak Full Moon &amp; New Moon vs Gold</h2><span class="sub">SUN-MOON ASPECT, ORB 3°, 50 TAHUN</span></div>
+          <p style="font-family:var(--mono);font-size:12px;color:var(--ink-dim);margin:0 0 14px">New Moon = Sun-Moon Conjunction (0°). Full Moon = Sun-Moon Opposition (180°). Terjadi ~2x/bulan.</p>
+          <div class="stat-row">
+            <div class="stat"><b>52,6%</b>New Moon naik<br>(111/211), avg +0,058%</div>
+            <div class="stat"><b>54,2%</b>Full Moon naik<br>(117/216), avg +0,056%</div>
+            <div class="stat"><b>Rendah</b>Edge statistik<br>(keduanya mendekati netral)</div>
+          </div>
+          <div class="card"><h3>Kesimpulan</h3><p>Full Moon (54,2%) sedikit lebih bullish dari New Moon (52,6%) buat Gold, tapi selisihnya kecil. Beda dari kepercayaan populer bahwa Full Moon = puncak volatilitas ekstrem — di data 50 tahun ini efeknya ke ARAH harga lemah, mungkin lebih relevan buat range/volatilitas harian ketimbang bias naik/turun. Sama persis polanya kayak IHSG (keduanya ~50-54%, gak ada edge kuat).</p></div>
+        </section>
+
+        <section id="gann-calendar">
+          <div class="section-head"><span class="num">12</span><h2>Kalender Hari Gann vs Gold</h2><span class="sub">8 TITIK BALIK MUSIM, 50 TAHUN</span></div>
+          <p style="font-family:var(--mono);font-size:12px;color:var(--ink-dim);margin:0 0 14px">4 solstice/equinox + 4 cross-quarter day. Window: 5 hari sebelum vs 14 hari sesudah, diulang tiap tahun 1975-2025 (n=51 tiap tanggal).</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Tanggal Gann</th><th>Jenis</th><th>Probabilitas Naik</th><th>Rata-rata Perubahan</th></tr></thead>
+              <tbody>
+                <tr><td>21 Desember</td><td>Winter Solstice</td><td style="color:var(--gold);font-weight:700">63% (32/51)</td><td style="color:var(--gold);font-weight:700">+1,43%</td></tr>
+                <tr><td>23 September</td><td>Autumn Equinox</td><td style="color:var(--ok)">57% (29/51)</td><td style="color:var(--ok)">+0,89%</td></tr>
+                <tr><td>21 Maret</td><td>Spring Equinox</td><td style="color:var(--ok)">55% (28/51)</td><td style="color:var(--ok)">+1,16%</td></tr>
+                <tr><td>4 Februari</td><td>Cross-quarter Imbolc</td><td>55% (28/51)</td><td>+0,49%</td></tr>
+                <tr><td>7 Agustus</td><td>Cross-quarter Lammas</td><td>49% (25/51)</td><td>+0,87%</td></tr>
+                <tr><td>5 Mei</td><td>Cross-quarter Beltane</td><td>49% (25/51)</td><td>+0,28%</td></tr>
+                <tr><td>7 November</td><td>Cross-quarter Samhain</td><td>49% (25/51)</td><td>−0,05%</td></tr>
+                <tr><td>21 Juni</td><td>Summer Solstice</td><td style="color:var(--mars);font-weight:700">35% (18/51)</td><td style="color:var(--mars);font-weight:700">−0,47%</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card"><h3>Temuan: Winter Solstice Paling Kuat (Konsisten Lintas-Aset!)</h3><p><b>21 Desember (Winter Solstice) = sinyal terkuat</b> (63%, +1,43%) — dan ini KONSISTEN sama temuan di dashboard IHSG (juga 90% naik, sinyal terkuat di sana). Dua aset yang beda total karakternya (Gold=safe-haven global, IHSG=domestik) SAMA-SAMA paling bullish di Winter Solstice — kemungkinan besar ini fenomena universal "year-end rally" institusional yang melintasi kelas aset, bukan astro murni. Summer Solstice (35%) paling lemah/bearish, kebalikan dari winter counterpart-nya.</p></div>
+        </section>
+
+        <section id="hijri-calendar">
+          <div class="section-head"><span class="num">13</span><h2>Pergerakan Gold vs Kalender Hijriah</h2><span class="sub">1 MUHARRAM (TAHUN BARU ISLAM), 1395-1447 H</span></div>
+          <p style="font-family:var(--mono);font-size:12px;color:var(--ink-dim);margin:0 0 14px">Kalender Hijriah = lunar, ~354 hari/tahun (geser ~11 hari lebih awal tiap tahun Masehi). Dihitung pakai kalender Hijriah tabular (arithmetic), akurasi ±1 hari dari kalender observasional/rukyat. 53 kejadian 1 Muharram dalam rentang data 1975-2025.</p>
+          <div class="stat-row">
+            <div class="stat"><b>45%</b>naik (24/53)</div>
+            <div class="stat"><b>+0,19%</b>rata-rata perubahan</div>
+            <div class="stat"><b>+13,5%</b>terkuat (1400H/1979 — bareng Revolusi Iran)</div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th colspan="4">5 TAHUN HIJRIAH PALING BULLISH</th></tr><tr><th>Tahun H</th><th>Tanggal M</th><th>Perubahan</th><th>Konteks</th></tr></thead>
+              <tbody>
+                <tr><td>1400 H</td><td>21 Nov 1979</td><td style="color:var(--gold);font-weight:700">+13,50%</td><td>Revolusi Iran &amp; jelang Invasi Soviet-Afghanistan</td></tr>
+                <tr><td>1407 H</td><td>6 Sep 1986</td><td style="color:var(--gold);font-weight:700">+13,20%</td><td>—</td></tr>
+                <tr><td>1399 H</td><td>2 Des 1978</td><td style="color:var(--ok)">+10,68%</td><td>Jelang Revolusi Iran</td></tr>
+                <tr><td>1411 H</td><td>24 Jul 1990</td><td style="color:var(--ok)">+8,73%</td><td>Jelang Perang Teluk I (Agu 1990)</td></tr>
+                <tr><td>1414 H</td><td>21 Jun 1993</td><td style="color:var(--ok)">+5,81%</td><td>—</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card"><h3>Kesimpulan</h3><p>45% naik, avg +0,19% — praktis netral/sedikit bearish-leaning, MIRIP New Moon (bukan kebetulan, karena 1 Muharram itu sendiri selalu jatuh di New Moon berdasarkan definisi kalender Hijriah — jadi temuan ini konsisten sama section 11). Tahun-tahun paling bullish sering numpang gejolak geopolitik Timur Tengah (Revolusi Iran 1979, Perang Teluk 1990) — bukan efek kalender itu sendiri, tapi karena kebetulan konsentrasi krisis Timur Tengah historis sering jatuh berdekatan sama Muharram.</p></div>
+        </section>
+
+        <section id="world-history">
+          <div class="section-head"><span class="num">14</span><h2>Peristiwa Sejarah Dunia vs Gold</h2><span class="sub">DATA ASLI 1976-2025 (BATAS DATA MULAI 1975)</span></div>
+          <p style="font-family:var(--mono);font-size:12px;color:var(--ink-dim);margin:0 0 14px">Dari daftar sejarah dunia/Islam yang dikasih — cuma yang jatuh SETELAH 1975 yang punya data harga Gold asli (sebelum itu, Gold masih fixed-peg/data gak lengkap). Window: 5 hari sebelum vs 14 hari sesudah.</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Peristiwa</th><th>Tanggal</th><th>Harga Sblm</th><th>Harga Stlh</th><th>Perubahan</th></tr></thead>
+              <tbody>
+                <tr><td>Gempa Tangshan</td><td>28 Jul 1976</td><td>111,2</td><td>114,5</td><td style="color:var(--ok)">+2,97% ⬆</td></tr>
+                <tr><td>Revolusi Iran (jatuhnya Shah)</td><td>11 Feb 1979</td><td>247,0</td><td>247,7</td><td>+0,28% (flat)</td></tr>
+                <tr><td>Invasi Soviet ke Afghanistan</td><td>24 Des 1979</td><td>480,0</td><td>634,0</td><td style="color:var(--gold);font-weight:700">+32,08% ⬆⬆⬆</td></tr>
+                <tr><td>Puncak Harga Emas Historis ($850)</td><td>21 Jan 1980</td><td>740,5</td><td>677,0</td><td style="color:var(--mars);font-weight:700">−8,58% ⬇⬇ (puncak lalu koreksi)</td></tr>
+                <tr><td>Perang Teluk I (Irak invasi Kuwait)</td><td>2 Agu 1990</td><td>368,0</td><td>417,9</td><td style="color:var(--gold);font-weight:700">+13,56% ⬆⬆</td></tr>
+                <tr><td>Tragedi 9/11</td><td>11 Sep 2001</td><td>275,0</td><td>291,8</td><td style="color:var(--ok)">+6,11% ⬆</td></tr>
+                <tr><td>Deklarasi Damai IRA</td><td>28 Jul 2005</td><td>425,0</td><td>450,9</td><td style="color:var(--ok)">+6,09% ⬆</td></tr>
+                <tr><td>Lehman Brothers Collapse (GFC)</td><td>15 Sep 2008</td><td>762,5</td><td>894,4</td><td style="color:var(--gold);font-weight:700">+17,30% ⬆⬆⬆</td></tr>
+                <tr><td>COVID-19 (Deklarasi Pandemi WHO)</td><td>11 Mar 2020</td><td>1.672,4</td><td>1.633,4</td><td style="color:var(--mars)">−2,33% ⬇ (dash-for-cash awal)</td></tr>
+                <tr><td>Invasi Rusia ke Ukraina</td><td>24 Feb 2022</td><td>1.899,8</td><td>2.000,4</td><td style="color:var(--ok)">+5,30% ⬆</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card"><h3>Probabilitas &amp; Pola</h3><p><b>7 dari 10 peristiwa → Gold naik (70%)</b> — mengonfirmasi peran klasik Gold sebagai safe-haven saat krisis geopolitik/perang (Soviet-Afghanistan +32%, Perang Teluk +13,6%, GFC +17,3%). Dua pengecualian turun: puncak historis 1980 (koreksi wajar pasca-rally ekstrem) dan COVID Maret 2020 (fase awal krisis likuiditas dash-for-cash sebelum rally sesungguhnya beberapa minggu kemudian). <b>Perang/invasi militer &amp; krisis finansial sistemik = paling reliable dorong Gold naik</b>; pandemi kesehatan murni butuh waktu lebih lama buat efek safe-haven kebentuk penuh.</p></div>
+          <div class="card" style="margin-top:14px;border-color:var(--gold)"><h3>Ada Peristiwa Lain?</h3><p>Kalau ada peristiwa sejarah dunia lain yang mau dicek, tinggal sebutin tanggalnya — bisa langsung dihitung asal jatuh di rentang 1975-2025 (data Gold floating-price). Di bawah ini pelengkap peristiwa PRA-1975 dari daftar yang dikasih, dengan posisi planet (astro murni, pakai DE406 buat rentang jauh).</p></div>
+
+          <h3 style="font-family:var(--display);font-size:19px;color:var(--gold);margin:24px 0 8px">Peristiwa Dunia Pra-1975 (Astro Murni, Tanpa Data Harga)</h3>
+          <p style="font-family:var(--mono);font-size:12px;color:var(--ink-dim);margin:0 0 14px">Semua di bawah terjadi sebelum Gold floating-price (1975) — TIDAK ADA data harga buat dikorelasiin. Ini posisi planet asli (dihitung ulang, DE406 ephemeris) buat referensi simbolis.</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Peristiwa</th><th>Tanggal</th><th>Sun</th><th>Moon</th><th>Jupiter</th><th>Saturn</th></tr></thead>
+              <tbody>
+                <tr><td>Koin Standar Croesus (Lydia)</td><td>~546 SM</td><td>17,0°Aquarius</td><td>27,5°Aries</td><td>25,1°Virgo</td><td>21,5°Sagittarius</td></tr>
+                <tr><td>Runtuhnya Roma Barat</td><td>4 Sep 476 M</td><td>3,3°Libra</td><td>23,4°Virgo</td><td>21,5°Scorpio</td><td>13,5°Virgo</td></tr>
+                <tr><td>Black Death Mulai (Eropa)</td><td>~Okt 1346</td><td>17,1°Libra</td><td>20,4°Capricorn</td><td>6,4°Aries</td><td>7,2°Pisces</td></tr>
+                <tr><td>Kejatuhan Konstantinopel</td><td>29 Mei 1453</td><td>15,3°Gemini</td><td>16,8°Scorpio</td><td>15,4°Aries</td><td>2,4°Scorpio</td></tr>
+                <tr><td>Eksekusi Thomas Cromwell</td><td>28 Jul 1540</td><td style="color:var(--gold)">11,3°Leo</td><td>5,2°Aquarius</td><td>15,3°Leo</td><td>16,3°Libra</td></tr>
+                <tr><td>Kentang Tiba di Inggris</td><td>28 Jul 1586</td><td style="color:var(--gold)">10,6°Leo</td><td>17,1°Capricorn</td><td>8,9°Cancer</td><td>8,1°Taurus</td></tr>
+                <tr><td>Pendirian VOC</td><td>20 Mar 1602</td><td>5,2°Aries</td><td>27,4°Aquarius</td><td>25,0°Libra</td><td>27,3°Scorpio</td></tr>
+                <tr><td>Pertempuran Talavera</td><td>28 Jul 1809</td><td style="color:var(--gold)">7,6°Leo</td><td>28,7°Aquarius</td><td>27,1°Aries</td><td>29,9°Scorpio</td></tr>
+                <tr><td>Pecahnya Perang Dunia I</td><td>28 Jul 1914</td><td style="color:var(--gold)">5,7°Leo</td><td>15,9°Libra</td><td>20,2°Aquarius</td><td>28,5°Gemini</td></tr>
+                <tr><td>Runtuhnya Khilafah Utsmaniyah</td><td>3 Mar 1924</td><td>13,7°Pisces</td><td>17,3°Aquarius</td><td>19,3°Sagittarius</td><td>3,0°Scorpio</td></tr>
+                <tr><td>Perjanjian Bretton Woods</td><td>22 Jul 1944</td><td style="color:var(--gold);font-weight:700">0,3°Leo</td><td>25,6°Leo</td><td>0,1°Virgo</td><td>4,9°Cancer</td></tr>
+                <tr><td>Nixon Shock (Standar Emas Dihapus)</td><td>15 Agu 1971</td><td style="color:var(--gold);font-weight:700">22,4°Leo</td><td>18,4°Gemini</td><td>27,7°Scorpio</td><td>5,9°Gemini</td></tr>
+                <tr><td>Perang Yom Kippur / Krisis Minyak</td><td>6 Okt 1973</td><td>13,5°Libra</td><td>6,0°Aquarius</td><td>2,8°Aquarius</td><td>5,0°Cancer</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card"><h3>Temuan Simbolis Paling Kuat: "28 Juli" &amp; Sun di Leo</h3><p><b>3 peristiwa beda abad, SEMUA tanggal 28 Juli, SEMUA Sun di Leo:</b> Eksekusi Cromwell (1540), Pertempuran Talavera (1809), Pecahnya PD I (1914). Ini pola kalender yang sangat mencolok — entah kebetulan statistik atau memang 28 Juli adalah "titik tekanan" berulang dalam sejarah Barat.</p><p style="margin-top:8px"><b>Lebih menarik lagi:</b> dua momen paling krusial sistem moneter dunia — <b>Bretton Woods (kelahiran sistem dolar-emas, 1944)</b> dan <b>Nixon Shock (kematian sistem itu, 1971)</b> — SAMA-SAMA terjadi dengan Sun di Leo (domisili Sun, ruler klasik Gold). Sistem moneter berbasis emas "lahir" dan "mati" pas Sun ada di rumah logam yang jadi jangkarnya. Ini interpretasi simbolis astrologi, BUKAN prediksi — tapi pola yang konsisten cukup untuk dicatat.</p></div>
+        </section>
+
+        <section id="sirah-nabawiyah">
+          <div class="section-head"><span class="num">15</span><h2>Sirah Nabawiyah vs Astrologi</h2><span class="sub">571-632 M · ASTRO MURNI, TANPA DATA HARGA</span></div>
+          <p style="font-family:var(--mono);font-size:12px;color:var(--ink-dim);margin:0 0 14px">Semua peristiwa 571-632 M jauh sebelum Gold floating-price (1975) — bahkan sebelum ephemeris DE421 standar (mulai 1899), jadi dihitung pakai DE406 (ephemeris rentang panjang, -3000 s/d +3000). Tanggal pakai kalender Gregorian proleptik (perkiraan, bisa geser 1-3 hari dari kalender Julian yang sebenarnya dipakai saat itu). Ini MURNI referensi simbolis astrologi, BUKAN data finansial.</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Peristiwa</th><th>Tanggal (M)</th><th>Sun</th><th>Moon</th><th>Venus</th><th>Mars</th><th>Mercury</th><th>Jupiter</th><th>Saturn</th></tr></thead>
+              <tbody>
+                <tr><td>Kelahiran Nabi (Tahun Gajah)</td><td>~20 Apr 571</td><td>19,5°Taurus</td><td>20,1°Leo</td><td>29,8°Taurus</td><td>21,9°Cancer</td><td>23,4°Aries</td><td>22,5°Scorpio</td><td>24,7°Scorpio</td></tr>
+                <tr><td>Nuzulul Qur'an (Wahyu Pertama)</td><td>~10 Agu 610</td><td>5,7°Virgo</td><td>1,4°Aquarius</td><td>21,4°Cancer</td><td>9,2°Leo</td><td>29,7°Leo</td><td>18,8°Pisces</td><td>14,4°Pisces</td></tr>
+                <tr><td>Awal Boikot Ekonomi Makkah</td><td>~616</td><td>29,7°Capricorn</td><td>16,9°Pisces</td><td>4,7°Aquarius</td><td>29,6°Aries</td><td>7,4°Capricorn</td><td>12,4°Virgo</td><td>16,6°Taurus</td></tr>
+                <tr><td>Isra' Mi'raj</td><td>~621</td><td>24,4°Aries</td><td>24,0°Aquarius</td><td>5,7°Gemini</td><td>30,0°Pisces</td><td>28,1°Aries</td><td>16,7°Aquarius</td><td>28,1°Cancer</td></tr>
+                <tr><td>Hijrah ke Madinah</td><td>~24 Sep 622</td><td style="color:var(--gold);font-weight:700">19,7°Libra</td><td>5,0°Pisces</td><td>25,9°Scorpio</td><td>24,4°Scorpio</td><td>7,9°Libra</td><td>19,1°Pisces</td><td style="color:var(--gold);font-weight:700">29,1°Leo</td></tr>
+                <tr><td>Perang Badr</td><td>~624</td><td>11,9°Aries</td><td>6,3°Libra</td><td>4,8°Taurus</td><td>17,2°Virgo</td><td>15,1°Aries</td><td>8,6°Taurus</td><td>9,9°Virgo</td></tr>
+                <tr><td>Perang Uhud</td><td>~625</td><td>17,5°Aries</td><td>15,9°Taurus</td><td>17,0°Pisces</td><td>25,7°Aries</td><td>20,9°Pisces</td><td>7,8°Gemini</td><td>23,4°Virgo</td></tr>
+                <tr><td>Perang Khandaq</td><td>~627</td><td>28,8°Aries</td><td>13,4°Cancer</td><td>7,9°Taurus</td><td>18,7°Taurus</td><td>26,9°Aries</td><td>6,9°Leo</td><td>19,2°Libra</td></tr>
+                <tr><td>Perjanjian Hudaibiyah</td><td>~628</td><td>0,0°Aries</td><td>28,4°Libra</td><td>13,9°Aquarius</td><td>15,2°Sagittarius</td><td>16,5°Pisces</td><td>10,2°Virgo</td><td>4,1°Scorpio</td></tr>
+                <tr><td>Fathu Makkah</td><td>~630</td><td>10,3°Aquarius</td><td>1,5°Libra</td><td>11,9°Capricorn</td><td>8,0°Sagittarius</td><td>20,7°Capricorn</td><td>16,0°Scorpio</td><td>27,2°Scorpio</td></tr>
+                <tr><td>Haji Wada'</td><td>~632</td><td>5,9°Aries</td><td>0,3°Cancer</td><td>28,0°Aries</td><td>4,2°Aquarius</td><td>10,9°Pisces</td><td>18,7°Capricorn</td><td>20,8°Sagittarius</td></tr>
+                <tr><td>Wafatnya Nabi Muhammad SAW</td><td>~8 Jun 632</td><td>5,7°Cancer</td><td>25,7°Scorpio</td><td>18,1°Leo</td><td>10,7°Aries</td><td>27,4°Cancer</td><td>18,1°Capricorn</td><td>16,2°Sagittarius</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card"><h3>Catatan Simbolis</h3><p><b>Hijrah ke Madinah:</b> Sun di Libra (keseimbangan/keadilan — cocok simbolis buat "piagam Madinah" yang menyeimbangkan berbagai suku/agama) dan Saturn nyaris 29,1° Leo (di ambang ingress ke Virgo) — Saturn=struktur, meninggalkan Leo (ego/individu) menuju Virgo (tatanan/organisasi) pas Nabi membangun struktur masyarakat baru di Madinah. Karena rentang tanggal ini pakai kalender proleptik &amp; ephemeris jarak jauh (DE406), presisi lebih rendah dibanding data modern — anggap sebagai referensi simbolis, bukan kepastian derajat.</p></div>
+
+          <h3 style="font-family:var(--display);font-size:19px;color:var(--gold);margin:24px 0 8px">Backtest Lengkap: Semua 12 Peristiwa Sirah (Tanggal Hijriah Berulang)</h3>
+          <p style="font-family:var(--mono);font-size:12px;color:var(--ink-dim);margin:0 0 14px">Peristiwa 571-632 M sendiri gak punya data harga (Gold belum ada). TAPI tanggal Hijriah-nya BERULANG tiap tahun — jadi bisa dicek: kalau tanggal Hijriah yang sama jatuh di kalender modern (1975-2025), gimana reaksi Gold-nya? Ini backtest LENGKAP 12 peristiwa (bukan cuma perang).</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Peristiwa</th><th>Tanggal Hijriah</th><th>Probabilitas Naik</th><th>Rata-rata Perubahan</th></tr></thead>
+              <tbody>
+                <tr><td>Nuzulul Qur'an / Perang Badr</td><td>17 Ramadhan</td><td style="color:var(--gold);font-weight:700">58% (30/52)</td><td style="color:var(--gold);font-weight:700">+1,51%</td></tr>
+                <tr><td>Fathul Makkah</td><td>10 Ramadhan</td><td style="color:var(--gold);font-weight:700">58% (30/52)</td><td style="color:var(--ok)">+1,14%</td></tr>
+                <tr><td>Perang Hunain</td><td>~6 Syawwal</td><td style="color:var(--gold);font-weight:700">58% (30/52)</td><td style="color:var(--ok)">+1,33%</td></tr>
+                <tr><td>Perang Khandaq</td><td>~1 Syawwal</td><td style="color:var(--gold);font-weight:700">58% (30/52)</td><td>+0,90%</td></tr>
+                <tr><td>Perang Uhud</td><td>7 Syawwal</td><td style="color:var(--ok)">56% (29/52)</td><td style="color:var(--ok)">+1,26%</td></tr>
+                <tr><td>Perjanjian Hudaibiyah</td><td>~6 Dzulqa'dah</td><td style="color:var(--ok)">56% (29/52)</td><td>+0,85%</td></tr>
+                <tr><td>Perang Tabuk</td><td>~1 Rajab</td><td>53% (28/53)</td><td>+0,32%</td></tr>
+                <tr><td>Kelahiran Nabi (Tahun Gajah)</td><td>12 Rabiul Awal</td><td>53% (28/53)</td><td>+0,28%</td></tr>
+                <tr><td>Wafatnya Nabi Muhammad SAW</td><td>12 Rabiul Awal</td><td>53% (28/53)</td><td>+0,28%</td></tr>
+                <tr><td>Hijrah ke Madinah (tiba)</td><td>12 Rabiul Awal</td><td>53% (28/53)</td><td>+0,28%</td></tr>
+                <tr><td>Haji Wada' (Arafah)</td><td>9 Dzulhijjah</td><td>50% (26/52)</td><td>+0,03%</td></tr>
+                <tr><td>Perang Mu'tah</td><td>~1 Jumadil Awal</td><td>49% (26/53)</td><td>+0,09%</td></tr>
+                <tr><td>Isra Mi'raj</td><td>27 Rajab</td><td style="color:var(--mars)">46% (24/52)</td><td style="color:var(--mars)">−0,28%</td></tr>
+                <tr><td>Perang Khaibar</td><td>~1 Muharram</td><td style="color:var(--mars)">45% (24/53)</td><td>+0,19%</td></tr>
+                <tr><td>Awal Boikot Ekonomi Makkah</td><td>periode multi-tahun (616-619M)</td><td colspan="2" style="color:var(--ink-dim)">Gak bisa dihitung — bukan tanggal tunggal, tapi blokade bertahun-tahun</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card"><h3>Temuan Kuat: Semua Peristiwa Ramadhan-Syawwal = Bullish 56-58%!</h3><p><b>4 peristiwa jatuh di Ramadhan/Syawwal SEMUA menunjukkan 58% naik</b> (Nuzulul Qur'an/Badr, Fathul Makkah, Hunain, Khandaq) — jauh lebih konsisten dibanding peristiwa di bulan lain. Ini bukan kebetulan tunggal, tapi pola yang berulang di 4 peristiwa berbeda. Menarik juga: <b>Kelahiran, Wafat, dan tibanya Hijrah semua di tanggal Hijriah yang SAMA (12 Rabiul Awal)</b> — jadi otomatis skor probabilitasnya identik (53%). Lihat section 17 di bawah buat analisis lengkap kenapa Ramadhan-Syawwal ini spesial.</p></div>
+          <div class="card" style="margin-top:14px;border-color:var(--gold)"><h3>Kesimpulan Backtest Sirah</h3><p>11 dari 12 peristiwa BISA di-backtest via tanggal Hijriah berulang (cuma Boikot Makkah yang gak bisa krn itu periode multi-tahun, bukan 1 tanggal). Rata-rata semua 11 peristiwa: <b>~53% naik</b> — sedikit di atas netral. Yang paling reliable secara statistik (n besar, deviasi jelas dari 50%): 4 peristiwa Ramadhan-Syawwal (58%) dan Isra Mi'raj/Khaibar (~45-46%, sedikit bearish).</p></div>
+        </section>
+
+        <section id="hijri-months-full">
+          <div class="section-head"><span class="num">16</span><h2>Korelasi 12 Bulan Hijriah vs Gold</h2><span class="sub">DATA ASLI 1975-2025 · REPRESENTATIF TGL 15 TIAP BULAN</span></div>
+          <p style="font-family:var(--mono);font-size:12px;color:var(--ink-dim);margin:0 0 14px">Cek pertanyaan: apakah Ramadhan-Syawwal beneran bulan paling "padat turning point" secara historis DAN secara data harga? Window: 5 hari sebelum vs 14 hari sesudah tanggal 15 tiap bulan Hijriah, diulang 1395-1447 H.</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>#</th><th>Bulan Hijriah</th><th>Probabilitas Naik</th><th>Rata-rata Perubahan</th><th>Peristiwa Sirah Terkait</th></tr></thead>
+              <tbody>
+                <tr><td>10</td><td style="color:var(--gold);font-weight:700">Syawwal</td><td style="color:var(--gold);font-weight:700">69% (36/52)</td><td style="color:var(--gold);font-weight:700">+1,68%</td><td>Uhud, Khandaq, Hunain, Idul Fitri</td></tr>
+                <tr><td>9</td><td style="color:var(--gold);font-weight:700">Ramadhan</td><td style="color:var(--gold);font-weight:700">62% (32/52)</td><td style="color:var(--gold);font-weight:700">+1,72%</td><td>Nuzulul Qur'an, Badr, Fathul Makkah</td></tr>
+                <tr><td>4</td><td>Rabiul Akhir</td><td style="color:var(--ok)">62% (33/53)</td><td>+0,08%</td><td>—</td></tr>
+                <tr><td>2</td><td>Safar</td><td style="color:var(--ok)">55% (29/53)</td><td style="color:var(--ok)">+1,31%</td><td>—</td></tr>
+                <tr><td>6</td><td>Jumadil Akhir</td><td style="color:var(--ok)">55% (29/53)</td><td style="color:var(--ok)">+1,23%</td><td>—</td></tr>
+                <tr><td>7</td><td>Rajab</td><td>54% (28/52)</td><td style="color:var(--mars)">−0,26%</td><td>Isra Mi'raj, Tabuk</td></tr>
+                <tr><td>12</td><td>Dzulhijjah</td><td>54% (28/52)</td><td>+0,60%</td><td>Haji Wada', Idul Adha</td></tr>
+                <tr><td>3</td><td>Rabiul Awal</td><td>51% (27/53)</td><td>+0,36%</td><td>Kelahiran &amp; Wafat Nabi, Hijrah, Maulid</td></tr>
+                <tr><td>11</td><td>Dzulqa'dah</td><td>50% (26/52)</td><td style="color:var(--ok)">+0,99%</td><td>Hudaibiyah</td></tr>
+                <tr><td>5</td><td>Jumadil Awal</td><td style="color:var(--mars)">45% (24/53)</td><td>+0,26%</td><td>Mu'tah</td></tr>
+                <tr><td>8</td><td>Syaban</td><td style="color:var(--mars)">44% (23/52)</td><td>+0,02%</td><td>—</td></tr>
+                <tr><td>1</td><td style="color:var(--mars);font-weight:700">Muharram</td><td style="color:var(--mars);font-weight:700">40% (21/53)</td><td>+0,25%</td><td>Asyura, Khaibar, Tahun Baru</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card" style="border-color:var(--gold)"><h3>Terkonfirmasi: Syawwal &amp; Ramadhan = 2 Bulan Terkuat!</h3><p><b>Hipotesis lo TERBUKTI di data:</b> Syawwal (69%, +1,68%) dan Ramadhan (62%, +1,72%) adalah 2 bulan dengan probabilitas naik TERTINGGI dari semua 12 bulan Hijriah — bukan cuma "padat peristiwa sejarah", tapi juga secara STATISTIK paling bullish buat Gold. Kebalikannya, <b>Muharram adalah bulan TERLEMAH</b> (cuma 40% naik) meskipun ini bulan suci &amp; Tahun Baru Islam.</p>
+          <p style="margin-top:8px">Kemungkinan penjelasan: Ramadhan-Syawwal secara historis emang jadi turning point besar (perang-perang krusial: Badr, Uhud, Khandaq, Fathul Makkah, Hunain — 5 dari 6 pertempuran besar!) — MUNGKIN pola psikologis/siklus "titik tekanan tinggi → breakthrough" yang sama berulang di alam &amp; pasar. Secara faktor riil non-astro: Ramadhan-Syawwal juga bertepatan permintaan emas fisik tinggi (zakat, mahar, hadiah Lebaran) di negara-negara mayoritas Muslim (termasuk Timur Tengah &amp; Asia Selatan yang jadi konsumen emas fisik terbesar dunia) — kemungkinan kombinasi faktor budaya-ekonomi riil + pola historis, bukan astro murni.</p></div>
+        </section>
+
+        <section id="islamic-important-dates">
+          <div class="section-head"><span class="num">17</span><h2>Tanggal Penting Islam (Berulang) vs Gold</h2><span class="sub">DATA ASLI 1975-2025 · WINDOW -5D/+14D</span></div>
+          <p style="font-family:var(--mono);font-size:12px;color:var(--ink-dim);margin:0 0 14px">Beda dari section sebelumnya (Sirah Nabi = 1 kejadian historis), ini tanggal Hijriah yang BERULANG tiap tahun — jadi punya data harga asli buat dianalisis kayak 1 Muharram.</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Tanggal Islam</th><th>Probabilitas Naik</th><th>Rata-rata Perubahan</th><th>n</th></tr></thead>
+              <tbody>
+                <tr><td>Perang Hunain (~6 Syawwal) — pasca Fathul Makkah</td><td style="color:var(--gold);font-weight:700">58% (30/52)</td><td style="color:var(--ok)">+1,33%</td><td>52</td></tr>
+                <tr><td>Perang Khandaq (~1 Syawwal)</td><td style="color:var(--gold);font-weight:700">58% (30/52)</td><td>+0,90%</td><td>52</td></tr>
+                <tr><td>17 Ramadhan — Nuzulul Qur'an &amp; Perang Badr (Kubra)</td><td style="color:var(--gold);font-weight:700">58% (30/52)</td><td style="color:var(--gold);font-weight:700">+1,51%</td><td>52</td></tr>
+                <tr><td>10 Ramadhan — Fathul Makkah (pembebasan Makkah tanpa darah)</td><td style="color:var(--gold);font-weight:700">58% (30/52)</td><td style="color:var(--ok)">+1,14%</td><td>52</td></tr>
+                <tr><td>1 Syawal (Idul Fitri)</td><td style="color:var(--gold);font-weight:700">58% (30/52)</td><td style="color:var(--ok)">+0,90%</td><td>52</td></tr>
+                <tr><td>7 Syawwal — Perang Uhud</td><td style="color:var(--ok)">56% (29/52)</td><td style="color:var(--ok)">+1,26%</td><td>52</td></tr>
+                <tr><td>Dzulqa'dah (~6) — Perjanjian Hudaibiyah (gencatan 10th, time window akumulasi kekuatan)</td><td style="color:var(--ok)">56% (29/52)</td><td>+0,85%</td><td>52</td></tr>
+                <tr><td>10 Muharram (Asyura)</td><td style="color:var(--ok)">55% (29/53)</td><td>+0,25%</td><td>53</td></tr>
+                <tr><td>Rajab (~1) — Perang Tabuk (ekspedisi terjauh, perang terakhir Nabi)</td><td>53% (28/53)</td><td>+0,32%</td><td>53</td></tr>
+                <tr><td>12 Rabiul Awal (Maulid Nabi)</td><td>53% (28/53)</td><td>+0,28%</td><td>53</td></tr>
+                <tr><td>9 Dzulhijjah — Haji Wada' (khutbah perpisahan, wahyu terakhir)</td><td>50% (26/52)</td><td>+0,03%</td><td>52</td></tr>
+                <tr><td>Jumadil Awal (~1) — Perang Mu'tah (benturan pertama vs Romawi Timur)</td><td>49% (26/53)</td><td>+0,09%</td><td>53</td></tr>
+                <tr><td>1 Muharram (Tahun Baru)</td><td style="color:var(--mars)">45% (24/53)</td><td>+0,19%</td><td>53</td></tr>
+                <tr><td>Muharram (~1) — Perang Khaibar (penaklukan benteng Yahudi)</td><td style="color:var(--mars)">45% (24/53)</td><td>+0,19%</td><td>53</td></tr>
+                <tr><td>27 Rajab (Isra Mi'raj)</td><td style="color:var(--mars)">46% (24/52)</td><td style="color:var(--mars)">−0,28%</td><td>52</td></tr>
+                <tr><td>10 Dzulhijjah (Idul Adha)</td><td style="color:var(--mars)">44% (23/52)</td><td>+0,01%</td><td>52</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card"><h3>Pola Ramadhan-Syawwal Menonjol</h3><p><b>4 dari 5 slot teratas jatuh di Ramadhan/Syawwal</b> (Hunain, Khandaq, Badr, Fathul Makkah, semua 58%) — pola paling konsisten di seluruh dashboard sejarah Islam ini. Perang-perang paling krusial dalam Sirah (Badr=kemenangan pertama, Fathul Makkah=integrasi total Arab, Hunain=konsolidasi pasca-penaklukan) semua terjadi persis di window Ramadhan-Syawwal, dan window kalender yang sama secara statistik juga paling bullish buat Gold. Lihat section 17 buat analisis lengkap 12 bulan.</p></div>
+          <div class="card" style="margin-top:14px;border-color:var(--gold)"><h3>Catatan Metodologi</h3><p>Kalender Hijriah dihitung pakai formula tabular/arithmetic (bukan rukyat/observasi hilal asli) — bisa geser ±1-2 hari dari tanggal perayaan resmi di masing-masing negara. Tanggal battle yang gak eksplisit disebut hari-nya (Khandaq, Khaibar, Mu'tah, Tabuk, Hudaibiyah) dipakai tanggal 1/6 nominal di bulan tersebut sebagai perkiraan — bukan tanggal presisi historis. Buat presisi maksimal, cross-check tanggal spesifik tahun berjalan dari kalender resmi Kemenag/otoritas setempat.</p></div>
+        </section>
+
+        <section id="gregorian-months">
+          <div class="section-head"><span class="num">18</span><h2>Korelasi 12 Bulan Masehi vs Gold</h2><span class="sub">DATA ASLI 1975-2025 · REPRESENTATIF TGL 15 TIAP BULAN</span></div>
+          <p style="font-family:var(--mono);font-size:12px;color:var(--ink-dim);margin:0 0 14px">Sama metodologi kayak 12 bulan Hijriah — biar bisa dibandingin: kalender mana yang time cluster-nya lebih jelas? Window: 5 hari sebelum vs 14 hari sesudah tanggal 15 tiap bulan, 1975-2025 (n=51 tiap bulan).</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>#</th><th>Bulan Masehi</th><th>Probabilitas Naik</th><th>Rata-rata Perubahan</th><th>Catatan</th></tr></thead>
+              <tbody>
+                <tr><td>7</td><td style="color:var(--gold);font-weight:700">Juli</td><td style="color:var(--gold);font-weight:700">65% (33/51)</td><td style="color:var(--gold);font-weight:700">+1,00%</td><td>Overlap Sun→Leo ingress (section 05, 73% bullish)</td></tr>
+                <tr><td>1</td><td style="color:var(--gold);font-weight:700">Januari</td><td style="color:var(--gold);font-weight:700">61% (31/51)</td><td style="color:var(--ok)">+1,01%</td><td>"January Effect" klasik, numpang rally akhir tahun (section 12)</td></tr>
+                <tr><td>12</td><td>Desember</td><td style="color:var(--ok)">57% (29/51)</td><td style="color:var(--ok)">+0,89%</td><td>Winter Solstice 21 Des ada di sini (63%, sec.12)</td></tr>
+                <tr><td>9</td><td>September</td><td>55% (28/51)</td><td>+0,78%</td><td>—</td></tr>
+                <tr><td>11</td><td>November</td><td>53% (27/51)</td><td>+0,71%</td><td>—</td></tr>
+                <tr><td>3</td><td>Maret</td><td>49% (25/51)</td><td>−0,10%</td><td>—</td></tr>
+                <tr><td>5</td><td>Mei</td><td>49% (25/51)</td><td>+0,39%</td><td>—</td></tr>
+                <tr><td>4</td><td>April</td><td>47% (24/51)</td><td>−0,28%</td><td>—</td></tr>
+                <tr><td>10</td><td>Oktober</td><td>47% (24/51)</td><td>−0,50%</td><td>—</td></tr>
+                <tr><td>6</td><td>Juni</td><td style="color:var(--mars)">45% (23/51)</td><td style="color:var(--mars)">−0,52%</td><td>Overlap Summer Solstice 21 Jun (35%, sec.12 — terlemah)</td></tr>
+                <tr><td>8</td><td>Agustus</td><td style="color:var(--mars)">45% (23/51)</td><td>+0,47%</td><td>—</td></tr>
+                <tr><td>2</td><td style="color:var(--mars);font-weight:700">Februari</td><td style="color:var(--mars);font-weight:700">39% (20/51)</td><td style="color:var(--mars);font-weight:700">−0,63%</td><td>Bulan TERLEMAH sepanjang tahun</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card"><h3>Time Cluster Masehi: Juli-Januari (Solstice Axis) vs Februari-Juni (Lemah)</h3><p><b>Juli &amp; Januari adalah 2 bulan terkuat</b> (65% &amp; 61%) — keduanya bertepatan sama titik balik matahari/solstice (Januari dekat Winter Solstice baru lewat, Juli dekat pertengahan tahun &amp; Sun masuk Leo). <b>Februari paling lemah</b> (39%) — konsisten sepanjang berbagai analisis kita (musim "January effect" udah abis, belum masuk musim rally lagi).</p></div>
+          <div class="card" style="margin-top:14px;border-color:var(--gold)"><h3>Masehi vs Hijriah: Mana Lebih Jelas Time Cluster-nya?</h3><table style="margin-top:10px"><thead><tr><th>Kalender</th><th>Terkuat</th><th>Terlemah</th><th>Spread (Terkuat−Terlemah)</th></tr></thead><tbody>
+            <tr><td>Masehi</td><td>Juli 65%</td><td>Februari 39%</td><td style="color:var(--gold);font-weight:700">26 poin</td></tr>
+            <tr><td>Hijriah</td><td>Syawwal 69%</td><td>Muharram 40%</td><td style="color:var(--gold);font-weight:700">29 poin</td></tr>
+            </tbody></table>
+          <p style="margin-top:10px">Spread Hijriah (29 poin) SEDIKIT lebih lebar dari Masehi (26 poin) — tapi keduanya sama-sama nunjukkin time cluster yang jelas &amp; kuat. Kesimpulan: baik kalender Masehi maupun Hijriah SAMA-SAMA punya pola musiman yang nyata buat Gold, cuma mekanismenya beda — Masehi lebih ke solstice/equinox astronomis + "January effect" institusional, Hijriah lebih ke pola historis Ramadhan-Syawwal + demand emas fisik budaya Islam. Idealnya kombinasikan KEDUANYA: kalau window Masehi (Jul/Jan) DAN window Hijriah (Ramadhan/Syawwal) kebetulan overlap di tahun tertentu, itu confluence paling kuat.</p></div>
+        </section>
+
         <section id="probability-engine">
-          <div class="section-head"><span class="num">11</span><h2>Probability Engine</h2><span class="sub">WIN-RATE 50 TAHUN, N=13115 HARI</span></div>
+          <div class="section-head"><span class="num">19</span><h2>Probability Engine</h2><span class="sub">WIN-RATE 50 TAHUN, N=13115 HARI</span></div>
           <p style="font-family:var(--mono);font-size:12px;color:var(--ink-dim);margin:0 0 14px">Win-rate = % hari dengan return positif (Close&gt;Open), dihitung dari 1975-2025 (50 tahun, 13.115 hari — Grand Cycle mendekati, dibatasi data floating-price Gold yang tersedia). Beda dari "avg return" — ini probabilitas arah, bukan besar magnitude. Kalkulator Composite Score di bawah juga pakai data 50 tahun yang sama.</p>
 
           <h3 style="font-family:var(--display);font-size:19px;color:var(--gold);margin:16px 0 8px">Heatmap Planet × Zodiak (win-rate %)</h3>
@@ -298,7 +585,7 @@ import Footer from '../components/Footer.astro';
         </section>
 
         <section id="prediction-engine">
-          <div class="section-head"><span class="num">12</span><h2>Prediksi Masa Depan</h2><span class="sub">FORECAST ENGINE · Jul 2026 - Des 2029</span></div>
+          <div class="section-head"><span class="num">20</span><h2>Prediksi Masa Depan</h2><span class="sub">FORECAST ENGINE · Jul 2026 - Des 2029</span></div>
           <p style="font-family:var(--mono);font-size:12px;color:var(--ink-dim);margin:0 0 14px">
             Posisi planet MASA DEPAN dihitung langsung dari ephemeris (bukan tebakan) — akurat karena orbit planet 100% deterministik, cuma HARGA yang gak bisa diprediksi pasti. Cara pakai: 1) cek tanggal spesifik di kalkulator bawah buat liat posisi planet &amp; composite bias, 2) atau liat kalender confluence di bawah buat semua event penting yang udah kejadwal.
           </p>
@@ -350,7 +637,7 @@ import Footer from '../components/Footer.astro';
 
 
         <section id="chaldean-hours">
-          <div class="section-head"><span class="num">13</span><h2>Jam Planet Harian (Chaldean Hours) — Buat Scalping</h2><span class="sub">INTRADAY ENGINE</span></div>
+          <div class="section-head"><span class="num">21</span><h2>Jam Planet Harian (Chaldean Hours) — Buat Scalping</h2><span class="sub">INTRADAY ENGINE</span></div>
           <p style="font-family:var(--mono);font-size:12px;color:var(--ink-dim);margin:-6px 0 14px">
             Tiap hari dikuasai 1 planet (hari Selasa = Mars, dst), lalu tiap jam dari matahari terbit dibagi 24 slot mengikuti Urutan Kaldean (Chaldean Order): Saturn → Jupiter → Mars → Sun → Venus → Mercury → Moon, berulang.
             <b style="color:var(--gold)">Pakai jam New York (EDT/EST)</b> — konsisten sama seluruh dashboard ini yang epoch-nya 00:00 New York, dan karena XAUUSD acuan harganya emang sesi COMEX/NY. Default sunrise/sunset di bawah pakai perkiraan NY musim panas (05:30/20:30) — sesuaikan per tanggal kalau mau presisi (cek sunrise-sunset.org buat NYC).
@@ -389,7 +676,7 @@ import Footer from '../components/Footer.astro';
         </section>
 
         <section id="excluded-planets">
-          <div class="section-head"><span class="num">14</span><h2>Kenapa Mercury / Uranus / Neptune / Pluto Gak Ada Tabel</h2></div>
+          <div class="section-head"><span class="num">22</span><h2>Kenapa Mercury / Uranus / Neptune / Pluto Gak Ada Tabel</h2></div>
           <div class="cards">
             <div class="card"><h3>☿ Mercury</h3><p>Ingress-nya kecepetan (~3-4 minggu/zodiak, sering retrograde) dan bukan ruler Gold — ruler-nya Berita/Retail. Kalau mau, bisa dibikin tabel Mercury→Leo terpisah tapi fungsinya buat baca sentimen berita, bukan timing Gold.</p></div>
             <div class="card"><h3>♅♆♇ Uranus, Neptune, Pluto</h3><p>Siklusnya 84 / 165 / 248 tahun. Ingress ke Leo terakhir jauh sebelum era data harga Gold modern ada (Gold baru free-float sejak 1971) — jadi gak ada data historis relevan buat dibandingin di window 10 tahun terakhir.</p></div>
@@ -397,7 +684,7 @@ import Footer from '../components/Footer.astro';
         </section>
 
         <section id="calc">
-          <div class="section-head"><span class="num">15</span><h2>Kalkulator Square of 9</h2><span class="sub">√PRICE ENGINE</span></div>
+          <div class="section-head"><span class="num">23</span><h2>Kalkulator Square of 9</h2><span class="sub">√PRICE ENGINE</span></div>
           <div class="calc-wrap">
             <div>
               <h3>Input Harga</h3>
@@ -643,6 +930,10 @@ import Footer from '../components/Footer.astro';
   .xauusd-terpadu-page .card{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:18px 20px;}
   .xauusd-terpadu-page .card h3{font-family:var(--display); font-size:19px; margin:0 0 8px; color:#f2ead9; font-weight:600;}
   .xauusd-terpadu-page .card p{font-size:13.5px; color:var(--ink-dim); margin:0 0 8px;}
+
+  .xauusd-terpadu-page .filter-btn{background:var(--panel); border:1px solid var(--line); color:var(--ink-dim); font-family:var(--mono); font-size:11px; padding:7px 14px; border-radius:20px; cursor:pointer;}
+  .xauusd-terpadu-page .filter-btn.active{background:var(--gold); color:#0b0d16; border-color:var(--gold); font-weight:700;}
+  .xauusd-terpadu-page .filter-btn:hover{border-color:var(--gold);}
   .xauusd-terpadu-page .card .rule{font-size:13px; color:var(--ink); border-left:2px solid var(--gold); padding-left:10px; margin-top:10px;}
 
   .xauusd-terpadu-page .calc-wrap{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:26px 28px; display:grid; grid-template-columns:1fr 1fr; gap:28px;}
@@ -1195,8 +1486,91 @@ function bindY10Handlers(){
   };
 }
 
+const MASTER_SIGNALS = [["Sun \u2192 Leo (ingress domisili)","Ingress",73,46,51],["Venus \u2192 Taurus (ingress domisili)","Ingress",40,-20,52],["Mars \u2192 Leo (ingress)","Ingress",58,16,31],["Jupiter domisili (Sagittarius/Pisces)","Ingress",73,46,11],["Saturn domisili (Capricorn/Aquarius)","Ingress",63,26,8],["Mars \u2192 Aries (ingress domisili)","Ingress",61,22,28],["Venus-Jupiter Conjunction","Aspek",52,4,54],["Jupiter-Saturn Opposition","Aspek",56,12,94],["Jupiter Conjunct Neptune","Aspek",60,20,5],["Sun Conjunct Jupiter","Aspek",51,2,47],["Sun Trine Jupiter","Aspek",51,2,94],["Venus Trine Saturn","Aspek",50,0,105],["Mars Trine Pluto","Aspek",39,-22,59],["Full Moon (Sun-Moon Opposition)","Lunar",54,8,216],["New Moon (Sun-Moon Conjunction)","Lunar",53,6,211],["Winter Solstice (21 Des)","Kalender Gann",63,26,51],["Autumn Equinox (23 Sep)","Kalender Gann",57,14,51],["Spring Equinox (21 Mar)","Kalender Gann",55,10,51],["Cross-quarter Imbolc (4 Feb)","Kalender Gann",55,10,51],["Cross-quarter Lammas (7 Agu)","Kalender Gann",49,-2,51],["Cross-quarter Beltane (5 Mei)","Kalender Gann",49,-2,51],["Cross-quarter Samhain (7 Nov)","Kalender Gann",49,-2,51],["Summer Solstice (21 Jun)","Kalender Gann",35,-30,51],["Bulan Syawwal","Hijriah",69,38,52],["Bulan Ramadhan","Hijriah",62,24,52],["Bulan Rabiul Akhir","Hijriah",62,24,53],["Bulan Safar","Hijriah",55,10,53],["Bulan Jumadil Akhir","Hijriah",55,10,53],["Bulan Rajab","Hijriah",54,8,52],["Bulan Dzulhijjah","Hijriah",54,8,52],["Bulan Rabiul Awal","Hijriah",51,2,53],["Bulan Dzulqa'dah","Hijriah",50,0,52],["Bulan Jumadil Awal","Hijriah",45,-10,53],["Bulan Syaban","Hijriah",44,-12,52],["Bulan Muharram","Hijriah",40,-20,53],["17 Ramadhan (Nuzulul Qur'an/Badr)","Hijriah",58,16,52],["Fathul Makkah (10 Ramadhan)","Hijriah",58,16,52],["Perang Hunain (~Syawwal)","Hijriah",58,16,52],["Perang Khandaq (~Syawwal)","Hijriah",58,16,52],["1 Syawal (Idul Fitri)","Hijriah",58,16,52],["Perang Uhud (7 Syawwal)","Hijriah",56,12,52],["Perjanjian Hudaibiyah (Dzulqa'dah)","Hijriah",56,12,52],["10 Muharram (Asyura)","Hijriah",55,10,53],["Perang Tabuk (~Rajab)","Hijriah",53,6,53],["12 Rabiul Awal (Maulid Nabi)","Hijriah",53,6,53],["Haji Wada' (9 Dzulhijjah)","Hijriah",50,0,52],["Perang Mu'tah (~Jumadil Awal)","Hijriah",49,-2,53],["1 Muharram (Tahun Baru Islam)","Hijriah",45,-10,53],["Perang Khaibar (~Muharram)","Hijriah",45,-10,53],["27 Rajab (Isra Mi'raj)","Hijriah",46,-8,52],["10 Dzulhijjah (Idul Adha)","Hijriah",44,-12,52],["Bulan Juli (Masehi)","Masehi",65,30,51],["Bulan Januari (Masehi)","Masehi",61,22,51],["Bulan Desember (Masehi)","Masehi",57,14,51],["Bulan September (Masehi)","Masehi",55,10,51],["Bulan November (Masehi)","Masehi",53,6,51],["Bulan Maret (Masehi)","Masehi",49,-2,51],["Bulan Mei (Masehi)","Masehi",49,-2,51],["Bulan April (Masehi)","Masehi",47,-6,51],["Bulan Oktober (Masehi)","Masehi",47,-6,51],["Bulan Juni (Masehi)","Masehi",45,-10,51],["Bulan Agustus (Masehi)","Masehi",45,-10,51],["Bulan Februari (Masehi)","Masehi",39,-22,51],["Peristiwa Geopolitik/Perang (agregat)","Sejarah",70,40,10]];
+
+let currentFilter = 'all';
+let currentSearch = '';
+
+function signalMatchesFilter(sig, filter){
+  if(filter==='all') return true;
+  if(filter==='Bullish') return sig[2] > 55;
+  if(filter==='Bearish') return sig[2] < 45;
+  return sig[1] === filter;
+}
+
+function renderMasterTable(){
+  const tbody = document.getElementById('masterSignalBody');
+  if(!tbody) return;
+  tbody.innerHTML = '';
+  const q = currentSearch.toLowerCase();
+  let filtered = MASTER_SIGNALS.filter(sig => signalMatchesFilter(sig, currentFilter) && sig[0].toLowerCase().includes(q));
+  filtered.sort((a,b) => Math.abs(b[3]) - Math.abs(a[3]));
+  filtered.forEach(sig => {
+    const label = sig[0], cat = sig[1], wr = sig[2], score = sig[3], n = sig[4];
+    const dirClass = wr>50 ? 'up' : wr<50 ? 'down' : 'flat';
+    const scoreColor = score>0 ? 'var(--ok)' : score<0 ? 'var(--mars)' : 'var(--ink-dim)';
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td>'+label+'</td><td style="font-family:var(--mono);font-size:11px;color:var(--ink-dim)">'+cat+'</td><td class="'+dirClass+'">'+wr+'%</td><td style="color:'+scoreColor+';font-weight:700">'+(score>0?'+':'')+score+'</td><td>'+n+'</td>';
+    tbody.appendChild(tr);
+  });
+  if(filtered.length===0){
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--ink-dim);padding:20px">Gak ada signal yang cocok.</td></tr>';
+  }
+}
+
+function bindMasterSignalHandlers(){
+  const searchEl = document.getElementById('signalSearch');
+  if(searchEl){
+    searchEl.oninput = function(e){
+      currentSearch = e.target.value;
+      renderMasterTable();
+    };
+  }
+  document.querySelectorAll('#filterButtons .filter-btn').forEach(function(btn){
+    btn.onclick = function(){
+      document.querySelectorAll('#filterButtons .filter-btn').forEach(function(b){b.classList.remove('active');});
+      btn.classList.add('active');
+      currentFilter = btn.dataset.cat;
+      renderMasterTable();
+    };
+  });
+}
+
+function renderMasterChart(){
+  const svg = document.getElementById('masterChart');
+  if(!svg) return;
+  const top15 = MASTER_SIGNALS.slice().sort(function(a,b){return Math.abs(b[3]) - Math.abs(a[3]);}).slice(0,15);
+  const barHeight = 22, gap = 10, leftPad = 300, barMax = 130, topPad = 10, svgW = 800, scoreColX = 730;
+  const maxAbsScore = Math.max.apply(null, top15.map(function(s){return Math.abs(s[3]);}));
+  let bgHtml = '', fgHtml = '';
+  top15.forEach(function(sig, i){
+    const label = sig[0], score = sig[3];
+    const y = topPad + i*(barHeight+gap);
+    const barW = Math.max(2, Math.abs(score)/maxAbsScore * barMax);
+    const isPositive = score >= 0;
+    const barX = isPositive ? leftPad : leftPad - barW;
+    const color = isPositive ? '#7fa88a' : '#b5533c';
+    const shortLabel = label.length > 26 ? label.slice(0,24)+'..' : label;
+    if(i%2===0){
+      bgHtml += '<rect x="0" y="'+(y-3)+'" width="'+svgW+'" height="'+(barHeight+6)+'" fill="#ffffff" opacity="0.02"/>';
+    }
+    bgHtml += '<rect x="'+barX+'" y="'+y+'" width="'+barW+'" height="'+barHeight+'" fill="'+color+'" rx="2"/>';
+    fgHtml += '<text x="'+(leftPad-10)+'" y="'+(y+barHeight/2+4)+'" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="10.5" fill="#e8e6df">'+shortLabel+'</text>';
+    fgHtml += '<text x="'+scoreColX+'" y="'+(y+barHeight/2+4)+'" text-anchor="start" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="'+color+'">'+(score>0?'+':'')+score+'</text>';
+  });
+  const chartBottom = topPad + 15*(barHeight+gap);
+  const axisHtml = '<line x1="'+leftPad+'" y1="0" x2="'+leftPad+'" y2="'+chartBottom+'" stroke="#3a4258" stroke-width="1"/>' +
+    '<line x1="'+(scoreColX-15)+'" y1="0" x2="'+(scoreColX-15)+'" y2="'+chartBottom+'" stroke="#262c40" stroke-width="1"/>';
+  svg.innerHTML = axisHtml + bgHtml + fgHtml;
+  svg.setAttribute('viewBox', '0 0 '+svgW+' '+(chartBottom + 10));
+}
+
 function init(){
   initTabs();
+
+  bindMasterSignalHandlers();
+  renderMasterTable();
+  renderMasterChart();
 
   const priceEl = document.getElementById('priceIn'), degEl = document.getElementById('degIn');
   if(priceEl && degEl){
