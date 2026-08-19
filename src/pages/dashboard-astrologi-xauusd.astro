@@ -15,6 +15,7 @@ import Footer from '../components/Footer.astro';
     <div class="maintabs">
       <button class="tabbtn active" data-tab="gann">Gann Astrofinancial Panel</button>
       <button class="tabbtn" data-tab="database">XAUUSD Astro Database</button>
+      <button class="tabbtn" data-tab="wheel">Gann Wheel Calculator</button>
     </div>
 
     <div id="tab-gann" class="tabpanel active">
@@ -865,6 +866,62 @@ import Footer from '../components/Footer.astro';
         </div>
       </main>
     </div>
+
+    <div id="tab-wheel" class="tabpanel">
+      <div class="gann-wheel-calc">
+        <div class="wrap">
+          <div class="eyebrow">Time &times; Price &middot; Square of Nine</div>
+          <h1>Gann Wheel Calculator</h1>
+          <div class="sub">Masukkan titik pivot (tanggal &amp; harga) &mdash; kalkulator ini memproyeksikan tanggal masa depan (roda 360&deg;) dan level harga (Square of Nine) dari titik itu.</div>
+
+          <div class="grid">
+            <div>
+              <div class="panel">
+                <div class="panel-title">Titik Anchor (Pivot)</div>
+
+                <label for="gwAnchorDate">Tanggal Pivot</label>
+                <input type="date" id="gwAnchorDate" value="2026-08-03">
+
+                <label for="gwAnchorPrice">Harga Pivot (USD)</label>
+                <input type="number" id="gwAnchorPrice" value="4074.00" step="0.01">
+
+                <label>Arah Proyeksi Harga</label>
+                <div class="toggle-row">
+                  <div class="toggle-btn active-up" id="gwBtnUp">&#9650; NAIK (dari Low)</div>
+                  <div class="toggle-btn" id="gwBtnDown">&#9660; TURUN (dari High)</div>
+                </div>
+
+                <label for="gwRotations">Jumlah Rotasi 360&deg;</label>
+                <input type="number" id="gwRotations" value="1" min="1" max="4" step="1">
+
+                <div class="anchor-summary" id="gwSummary"></div>
+              </div>
+
+              <div class="panel">
+                <div class="panel-title">Roda Waktu (Visual)</div>
+                <div class="wheel-box" id="gwWheelBox"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="panel">
+                <div class="panel-title">Proyeksi Waktu &amp; Harga per Derajat</div>
+                <table>
+                  <thead>
+                    <tr><th>Sudut</th><th>Tanggal Proyeksi</th><th>Level Harga (Sq9)</th></tr>
+                  </thead>
+                  <tbody id="gwTableBody"></tbody>
+                </table>
+              </div>
+
+              <div class="footnote">
+                CARA BACA &mdash; Kolom "Tanggal Proyeksi" pakai konvensi 1 derajat = 1 hari kalender (Square of 360, Jilid I/X). Baris ditandai emas (kardinal: 90&deg;/180&deg;/270&deg;/360&deg;) secara historis dianggap lebih kuat dibanding sudut diagonal (45&deg;/135&deg;/dst). Level harga dihitung Square Root Rule: P = (&radic;Anchor &plusmn; &theta;/180)&sup2;. Ingat: berdasar pengujian statistik 27 tahun data XAUUSD riil (Jilid VI, IX, XI), proyeksi ini TIDAK terbukti mengalahkan baseline acak secara agregat &mdash; pakai sebagai peta konfluensi, bukan sinyal berdiri sendiri.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <Footer />
@@ -979,6 +1036,97 @@ import Footer from '../components/Footer.astro';
   .xauusd-terpadu-page .form-grid textarea{grid-column:1/-1; min-height:50px; font-family:var(--body); font-size:13px;}
   .xauusd-terpadu-page .form-actions{margin-top:14px; display:flex; gap:10px; align-items:center;}
   .xauusd-terpadu-page #saveMsg{font-family:var(--mono); font-size:12px; color:var(--ok);}
+
+  .gann-wheel-calc{
+    --gw-bg:#0f1214; --gw-panel:#171b1e; --gw-panel2:#1d2226; --gw-line:#2a3034;
+    --gw-gold:#c9a227; --gw-gold-soft:#8a7328; --gw-amber:#d97b3f;
+    --gw-text:#e8e6df; --gw-text-dim:#8b9198; --gw-text-faint:#5c6268;
+    --gw-up:#4a9d6e; --gw-down:#c25b4a;
+    background:var(--gw-bg); color:var(--gw-text);
+    font-family:'Georgia',serif;
+    padding:28px 16px 60px;
+  }
+  .gann-wheel-calc *{box-sizing:border-box; margin:0; padding:0;}
+  .gann-wheel-calc .wrap{max-width:1000px; margin:0 auto;}
+  .gann-wheel-calc .eyebrow{
+    font-family:'Courier New',monospace; font-size:11px; letter-spacing:0.18em;
+    color:var(--gw-gold-soft); text-transform:uppercase; margin-bottom:6px;
+  }
+  .gann-wheel-calc h1{
+    font-size:28px; font-weight:400; letter-spacing:0.01em; margin-bottom:4px;
+    color:var(--gw-text);
+  }
+  .gann-wheel-calc .sub{font-family:'Courier New',monospace; font-size:12.5px; color:var(--gw-text-dim); margin-bottom:28px; line-height:1.6;}
+
+  .gann-wheel-calc .grid{display:grid; grid-template-columns:340px 1fr; gap:22px;}
+  @media (max-width:820px){ .gann-wheel-calc .grid{grid-template-columns:1fr;} }
+
+  .gann-wheel-calc .panel{
+    background:var(--gw-panel); border:1px solid var(--gw-line); border-radius:3px;
+    padding:20px 20px 22px;
+  }
+  .gann-wheel-calc .panel + .panel{margin-top:18px;}
+  .gann-wheel-calc .panel-title{
+    font-family:'Courier New',monospace; font-size:11px; letter-spacing:0.14em;
+    color:var(--gw-gold); text-transform:uppercase; margin-bottom:16px;
+    border-bottom:1px solid var(--gw-line); padding-bottom:10px;
+  }
+  .gann-wheel-calc label{
+    display:block; font-family:'Courier New',monospace; font-size:11px;
+    color:var(--gw-text-dim); letter-spacing:0.06em; margin-bottom:6px; margin-top:16px;
+  }
+  .gann-wheel-calc label:first-of-type{margin-top:0;}
+  .gann-wheel-calc input[type=date], .gann-wheel-calc input[type=number]{
+    width:100%; background:var(--gw-panel2); border:1px solid var(--gw-line); color:var(--gw-text);
+    font-family:'Courier New',monospace; font-size:15px; padding:9px 10px; border-radius:2px;
+    outline:none;
+  }
+  .gann-wheel-calc input:focus{border-color:var(--gw-gold-soft);}
+  .gann-wheel-calc .toggle-row{display:flex; gap:8px; margin-top:6px;}
+  .gann-wheel-calc .toggle-btn{
+    flex:1; background:var(--gw-panel2); border:1px solid var(--gw-line); color:var(--gw-text-dim);
+    font-family:'Courier New',monospace; font-size:12px; letter-spacing:0.05em;
+    padding:9px 6px; border-radius:2px; cursor:pointer; text-align:center;
+    transition:all .15s ease;
+  }
+  .gann-wheel-calc .toggle-btn.active-up{background:rgba(74,157,110,0.15); border-color:var(--gw-up); color:var(--gw-up);}
+  .gann-wheel-calc .toggle-btn.active-down{background:rgba(194,91,74,0.15); border-color:var(--gw-down); color:var(--gw-down);}
+
+  .gann-wheel-calc .anchor-summary{
+    margin-top:20px; padding-top:16px; border-top:1px solid var(--gw-line);
+    font-family:'Courier New',monospace; font-size:11.5px; color:var(--gw-text-faint); line-height:1.9;
+  }
+  .gann-wheel-calc .anchor-summary b{color:var(--gw-gold); font-weight:400;}
+
+  .gann-wheel-calc .wheel-box{display:flex; justify-content:center; padding:6px 0 4px;}
+  .gann-wheel-calc svg{max-width:100%; height:auto;}
+
+  .gann-wheel-calc table{width:100%; border-collapse:collapse; margin-top:4px;}
+  .gann-wheel-calc th{
+    font-family:'Courier New',monospace; font-size:10.5px; letter-spacing:0.08em;
+    color:var(--gw-text-faint); text-transform:uppercase; text-align:left;
+    padding:8px 10px; border-bottom:1px solid var(--gw-line);
+  }
+  .gann-wheel-calc td{
+    font-family:'Courier New',monospace; font-size:13px; color:var(--gw-text);
+    padding:8px 10px; border-bottom:1px solid rgba(255,255,255,0.04);
+  }
+  .gann-wheel-calc tr.cardinal td{color:var(--gw-gold); }
+  .gann-wheel-calc tr.cardinal{background:rgba(201,162,39,0.05);}
+  .gann-wheel-calc .deg-tag{
+    display:inline-block; font-size:10px; padding:1px 6px; border-radius:2px;
+    background:var(--gw-panel2); color:var(--gw-text-faint); margin-right:6px;
+  }
+  .gann-wheel-calc tr.cardinal .deg-tag{background:rgba(201,162,39,0.15); color:var(--gw-gold);}
+
+  .gann-wheel-calc .two-col{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+  @media (max-width:600px){ .gann-wheel-calc .two-col{grid-template-columns:1fr;} }
+
+  .gann-wheel-calc .footnote{
+    font-family:'Courier New',monospace; font-size:11px; color:var(--gw-text-faint);
+    line-height:1.7; margin-top:22px; padding:14px 16px; background:var(--gw-panel2);
+    border-left:2px solid var(--gw-gold-soft); border-radius:0 2px 2px 0;
+  }
 </style>
 
 <script is:inline>
@@ -1565,8 +1713,124 @@ function renderMasterChart(){
   svg.setAttribute('viewBox', '0 0 '+svgW+' '+(chartBottom + 10));
 }
 
+const gwMonthNamesID = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+let gwDirection = 1; // 1 = up, -1 = down
+
+function gwFmtDate(d){
+  return d.getDate() + ' ' + gwMonthNamesID[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+function gwSq9Level(anchor, theta, dir){
+  const r = Math.sqrt(anchor);
+  const rr = r + (dir * theta) / 180;
+  if(rr <= 0) return null;
+  return rr*rr;
+}
+
+function gwBuildDegreeSteps(rotations){
+  const steps = [];
+  const maxDeg = 360 * rotations;
+  for(let d = 15; d <= maxDeg; d += 15){
+    steps.push(d);
+  }
+  return steps;
+}
+
+function gwDrawWheel(degreeHighlights){
+  const size = 300, cx = size/2, cy = size/2, r = 118;
+  let svg = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">`;
+  svg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#2a3034" stroke-width="1"/>`;
+  svg += `<circle cx="${cx}" cy="${cy}" r="${r*0.5}" fill="none" stroke="#2a3034" stroke-width="0.6"/>`;
+
+  [0,90,180,270].forEach(deg=>{
+    const rad = (deg-90) * Math.PI/180;
+    const x2 = cx + r*Math.cos(rad), y2 = cy + r*Math.sin(rad);
+    svg += `<line x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" stroke="#2a3034" stroke-width="0.6"/>`;
+  });
+
+  const cardLabels = [["0°/360°",0],["90°",90],["180°",180],["270°",270]];
+  cardLabels.forEach(([lbl,deg])=>{
+    const rad = (deg-90)*Math.PI/180;
+    const lx = cx + (r+16)*Math.cos(rad), ly = cy + (r+16)*Math.sin(rad);
+    svg += `<text x="${lx}" y="${ly}" fill="#c9a227" font-family="Courier New,monospace" font-size="10" text-anchor="middle" dominant-baseline="middle">${lbl}</text>`;
+  });
+
+  const ax = cx, ay = cy - r;
+  svg += `<circle cx="${ax}" cy="${ay}" r="5" fill="#d97b3f"/>`;
+
+  degreeHighlights.forEach(deg=>{
+    const modDeg = deg % 360;
+    const rad = (modDeg-90)*Math.PI/180;
+    const isCardinal = modDeg % 90 === 0;
+    const px = cx + r*Math.cos(rad), py = cy + r*Math.sin(rad);
+    svg += `<circle cx="${px}" cy="${py}" r="${isCardinal?4:2.3}" fill="${isCardinal?'#c9a227':'#5c6268'}" opacity="${isCardinal?1:0.7}"/>`;
+  });
+
+  svg += `<text x="${cx}" y="${cy-6}" fill="#8b9198" font-family="Courier New,monospace" font-size="9.5" text-anchor="middle">1 LINGKARAN</text>`;
+  svg += `<text x="${cx}" y="${cy+8}" fill="#8b9198" font-family="Courier New,monospace" font-size="9.5" text-anchor="middle">= 360 HARI</text>`;
+
+  svg += `</svg>`;
+  document.getElementById('gwWheelBox').innerHTML = svg;
+}
+
+function gwRender(){
+  const dateInput = document.getElementById('gwAnchorDate');
+  const priceInput = document.getElementById('gwAnchorPrice');
+  const rotInput = document.getElementById('gwRotations');
+  const anchorDate = new Date(dateInput.value + 'T00:00:00');
+  const anchorPrice = parseFloat(priceInput.value) || 0;
+  const rotations = Math.max(1, Math.min(4, parseInt(rotInput.value) || 1));
+
+  if(isNaN(anchorDate.getTime()) || anchorPrice <= 0) return;
+
+  const steps = gwBuildDegreeSteps(rotations);
+  const tbody = document.getElementById('gwTableBody');
+  tbody.innerHTML = '';
+
+  steps.forEach(deg=>{
+    const projDate = new Date(anchorDate);
+    projDate.setDate(projDate.getDate() + deg);
+    const priceLevel = gwSq9Level(anchorPrice, deg, gwDirection);
+    const isCardinal = deg % 90 === 0;
+
+    const tr = document.createElement('tr');
+    if(isCardinal) tr.className = 'cardinal';
+    tr.innerHTML = `
+      <td><span class="deg-tag">${deg}&deg;</span>${isCardinal ? '(kardinal)' : ''}</td>
+      <td>${gwFmtDate(projDate)}</td>
+      <td>${priceLevel ? '$' + priceLevel.toFixed(2) : '&mdash;'}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('gwSummary').innerHTML = `
+    Anchor: <b>${gwFmtDate(anchorDate)}</b><br>
+    Harga: <b>$${anchorPrice.toFixed(2)}</b><br>
+    Arah: <b>${gwDirection===1 ? 'NAIK (Low pivot)' : 'TURUN (High pivot)'}</b><br>
+    Rotasi: <b>${rotations}&times;360&deg;</b> (${360*rotations} hari / ${steps.length} titik)
+  `;
+
+  gwDrawWheel(steps);
+}
+
+function initGannWheel(){
+  const dateInput = document.getElementById('gwAnchorDate');
+  const priceInput = document.getElementById('gwAnchorPrice');
+  const rotInput = document.getElementById('gwRotations');
+  const btnUp = document.getElementById('gwBtnUp');
+  const btnDown = document.getElementById('gwBtnDown');
+  if(!dateInput) return;
+
+  btnUp.onclick = () => { gwDirection = 1; btnUp.classList.add('active-up'); btnDown.classList.remove('active-down'); gwRender(); };
+  btnDown.onclick = () => { gwDirection = -1; btnDown.classList.add('active-down'); btnUp.classList.remove('active-up'); gwRender(); };
+  [dateInput, priceInput, rotInput].forEach(el => el.oninput = gwRender);
+
+  gwRender();
+}
+
 function init(){
   initTabs();
+  initGannWheel();
 
   bindMasterSignalHandlers();
   renderMasterTable();

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gann Wheel Calculator</title>
+<style>
+  :root{
+    --bg:#0f1214; --panel:#171b1e; --panel2:#1d2226; --line:#2a3034;
+    --gold:#c9a227; --gold-soft:#8a7328; --amber:#d97b3f;
+    --text:#e8e6df; --text-dim:#8b9198; --text-faint:#5c6268;
+    --up:#4a9d6e; --down:#c25b4a;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:'Georgia',serif;
+    min-height:100vh; padding:28px 16px 60px;
+  }
+  .wrap{max-width:1000px; margin:0 auto;}
+  .eyebrow{
+    font-family:'Courier New',monospace; font-size:11px; letter-spacing:0.18em;
+    color:var(--gold-soft); text-transform:uppercase; margin-bottom:6px;
+  }
+  h1{
+    font-size:28px; font-weight:400; letter-spacing:0.01em; margin-bottom:4px;
+    color:var(--text);
+  }
+  .sub{font-family:'Courier New',monospace; font-size:12.5px; color:var(--text-dim); margin-bottom:28px; line-height:1.6;}
+
+  .grid{display:grid; grid-template-columns:340px 1fr; gap:22px;}
+  @media (max-width:820px){ .grid{grid-template-columns:1fr;} }
+
+  .panel{
+    background:var(--panel); border:1px solid var(--line); border-radius:3px;
+    padding:20px 20px 22px;
+  }
+  .panel + .panel{margin-top:18px;}
+  .panel-title{
+    font-family:'Courier New',monospace; font-size:11px; letter-spacing:0.14em;
+    color:var(--gold); text-transform:uppercase; margin-bottom:16px;
+    border-bottom:1px solid var(--line); padding-bottom:10px;
+  }
+  label{
+    display:block; font-family:'Courier New',monospace; font-size:11px;
+    color:var(--text-dim); letter-spacing:0.06em; margin-bottom:6px; margin-top:16px;
+  }
+  label:first-of-type{margin-top:0;}
+  input[type=date], input[type=number]{
+    width:100%; background:var(--panel2); border:1px solid var(--line); color:var(--text);
+    font-family:'Courier New',monospace; font-size:15px; padding:9px 10px; border-radius:2px;
+    outline:none;
+  }
+  input:focus{border-color:var(--gold-soft);}
+  .toggle-row{display:flex; gap:8px; margin-top:6px;}
+  .toggle-btn{
+    flex:1; background:var(--panel2); border:1px solid var(--line); color:var(--text-dim);
+    font-family:'Courier New',monospace; font-size:12px; letter-spacing:0.05em;
+    padding:9px 6px; border-radius:2px; cursor:pointer; text-align:center;
+    transition:all .15s ease;
+  }
+  .toggle-btn.active-up{background:rgba(74,157,110,0.15); border-color:var(--up); color:var(--up);}
+  .toggle-btn.active-down{background:rgba(194,91,74,0.15); border-color:var(--down); color:var(--down);}
+
+  .anchor-summary{
+    margin-top:20px; padding-top:16px; border-top:1px solid var(--line);
+    font-family:'Courier New',monospace; font-size:11.5px; color:var(--text-faint); line-height:1.9;
+  }
+  .anchor-summary b{color:var(--gold); font-weight:400;}
+
+  .wheel-box{display:flex; justify-content:center; padding:6px 0 4px;}
+  svg{max-width:100%; height:auto;}
+
+  table{width:100%; border-collapse:collapse; margin-top:4px;}
+  th{
+    font-family:'Courier New',monospace; font-size:10.5px; letter-spacing:0.08em;
+    color:var(--text-faint); text-transform:uppercase; text-align:left;
+    padding:8px 10px; border-bottom:1px solid var(--line);
+  }
+  td{
+    font-family:'Courier New',monospace; font-size:13px; color:var(--text);
+    padding:8px 10px; border-bottom:1px solid rgba(255,255,255,0.04);
+  }
+  tr.cardinal td{color:var(--gold); }
+  tr.cardinal{background:rgba(201,162,39,0.05);}
+  .deg-tag{
+    display:inline-block; font-size:10px; padding:1px 6px; border-radius:2px;
+    background:var(--panel2); color:var(--text-faint); margin-right:6px;
+  }
+  tr.cardinal .deg-tag{background:rgba(201,162,39,0.15); color:var(--gold);}
+
+  .two-col{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+  @media (max-width:600px){ .two-col{grid-template-columns:1fr;} }
+
+  .footnote{
+    font-family:'Courier New',monospace; font-size:11px; color:var(--text-faint);
+    line-height:1.7; margin-top:22px; padding:14px 16px; background:var(--panel2);
+    border-left:2px solid var(--gold-soft); border-radius:0 2px 2px 0;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Time &times; Price &middot; Square of Nine</div>
+  <h1>Gann Wheel Calculator</h1>
+  <div class="sub">Masukkan titik pivot (tanggal &amp; harga) &mdash; kalkulator ini memproyeksikan tanggal masa depan (roda 360&deg;) dan level harga (Square of Nine) dari titik itu.</div>
+
+  <div class="grid">
+    <!-- LEFT: INPUTS -->
+    <div>
+      <div class="panel">
+        <div class="panel-title">Titik Anchor (Pivot)</div>
+
+        <label for="anchorDate">Tanggal Pivot</label>
+        <input type="date" id="anchorDate" value="2026-08-03">
+
+        <label for="anchorPrice">Harga Pivot (USD)</label>
+        <input type="number" id="anchorPrice" value="4074.00" step="0.01">
+
+        <label>Arah Proyeksi Harga</label>
+        <div class="toggle-row">
+          <div class="toggle-btn active-up" id="btnUp">&#9650; NAIK (dari Low)</div>
+          <div class="toggle-btn" id="btnDown">&#9660; TURUN (dari High)</div>
+        </div>
+
+        <label for="rotations">Jumlah Rotasi 360&deg;</label>
+        <input type="number" id="rotations" value="1" min="1" max="4" step="1">
+
+        <div class="anchor-summary" id="summary"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Roda Waktu (Visual)</div>
+        <div class="wheel-box" id="wheelBox"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: OUTPUTS -->
+    <div>
+      <div class="panel">
+        <div class="panel-title">Proyeksi Waktu &amp; Harga per Derajat</div>
+        <table>
+          <thead>
+            <tr><th>Sudut</th><th>Tanggal Proyeksi</th><th>Level Harga (Sq9)</th></tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="footnote">
+        CARA BACA &mdash; Kolom "Tanggal Proyeksi" pakai konvensi 1 derajat = 1 hari kalender (Square of 360, Jilid I/X). Baris ditandai emas (kardinal: 90&deg;/180&deg;/270&deg;/360&deg;) secara historis dianggap lebih kuat dibanding sudut diagonal (45&deg;/135&deg;/dst). Level harga dihitung Square Root Rule: P = (&radic;Anchor &plusmn; &theta;/180)&sup2;. Ingat: berdasar pengujian statistik 27 tahun data XAUUSD riil (Jilid VI, IX, XI), proyeksi ini TIDAK terbukti mengalahkan baseline acak secara agregat &mdash; pakai sebagai peta konfluensi, bukan sinyal berdiri sendiri.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const monthNamesID = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+
+let direction = 1; // 1 = up, -1 = down
+
+const dateInput = document.getElementById('anchorDate');
+const priceInput = document.getElementById('anchorPrice');
+const rotInput = document.getElementById('rotations');
+const btnUp = document.getElementById('btnUp');
+const btnDown = document.getElementById('btnDown');
+
+btnUp.addEventListener('click', () => { direction = 1; btnUp.classList.add('active-up'); btnDown.classList.remove('active-down'); render(); });
+btnDown.addEventListener('click', () => { direction = -1; btnDown.classList.add('active-down'); btnUp.classList.remove('active-up'); render(); });
+
+[dateInput, priceInput, rotInput].forEach(el => el.addEventListener('input', render));
+
+function fmtDate(d){
+  return d.getDate() + ' ' + monthNamesID[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+function sq9Level(anchor, theta, dir){
+  const r = Math.sqrt(anchor);
+  const rr = r + (dir * theta) / 180;
+  if(rr <= 0) return null;
+  return rr*rr;
+}
+
+function buildDegreeSteps(rotations){
+  const steps = [];
+  const maxDeg = 360 * rotations;
+  for(let d = 15; d <= maxDeg; d += 15){
+    steps.push(d);
+  }
+  return steps;
+}
+
+function drawWheel(anchorDateVal, degreeHighlights){
+  const size = 300, cx = size/2, cy = size/2, r = 118;
+  let svg = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">`;
+  svg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#2a3034" stroke-width="1"/>`;
+  svg += `<circle cx="${cx}" cy="${cy}" r="${r*0.5}" fill="none" stroke="#2a3034" stroke-width="0.6"/>`;
+
+  // 4 kardinal thin spokes
+  [0,90,180,270].forEach(deg=>{
+    const rad = (deg-90) * Math.PI/180;
+    const x2 = cx + r*Math.cos(rad), y2 = cy + r*Math.sin(rad);
+    svg += `<line x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" stroke="#2a3034" stroke-width="0.6"/>`;
+  });
+
+  // labels for 4 cardinal points (generic degree, not tied to calendar since anchor varies)
+  const cardLabels = [["0°/360°",0],["90°",90],["180°",180],["270°",270]];
+  cardLabels.forEach(([lbl,deg])=>{
+    const rad = (deg-90)*Math.PI/180;
+    const lx = cx + (r+16)*Math.cos(rad), ly = cy + (r+16)*Math.sin(rad);
+    svg += `<text x="${lx}" y="${ly}" fill="#c9a227" font-family="Courier New,monospace" font-size="10" text-anchor="middle" dominant-baseline="middle">${lbl}</text>`;
+  });
+
+  // anchor point marker at 0deg (top)
+  const ax = cx, ay = cy - r;
+  svg += `<circle cx="${ax}" cy="${ay}" r="5" fill="#d97b3f"/>`;
+
+  // plot highlight degrees (mod 360) as dots along circle
+  degreeHighlights.forEach(deg=>{
+    const modDeg = deg % 360;
+    const rad = (modDeg-90)*Math.PI/180;
+    const isCardinal = modDeg % 90 === 0;
+    const px = cx + r*Math.cos(rad), py = cy + r*Math.sin(rad);
+    svg += `<circle cx="${px}" cy="${py}" r="${isCardinal?4:2.3}" fill="${isCardinal?'#c9a227':'#5c6268'}" opacity="${isCardinal?1:0.7}"/>`;
+  });
+
+  svg += `<text x="${cx}" y="${cy-6}" fill="#8b9198" font-family="Courier New,monospace" font-size="9.5" text-anchor="middle">1 LINGKARAN</text>`;
+  svg += `<text x="${cx}" y="${cy+8}" fill="#8b9198" font-family="Courier New,monospace" font-size="9.5" text-anchor="middle">= 360 HARI</text>`;
+
+  svg += `</svg>`;
+  document.getElementById('wheelBox').innerHTML = svg;
+}
+
+function render(){
+  const anchorDate = new Date(dateInput.value + 'T00:00:00');
+  const anchorPrice = parseFloat(priceInput.value) || 0;
+  const rotations = Math.max(1, Math.min(4, parseInt(rotInput.value) || 1));
+
+  if(isNaN(anchorDate.getTime()) || anchorPrice <= 0) return;
+
+  const steps = buildDegreeSteps(rotations);
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+
+  steps.forEach(deg=>{
+    const projDate = new Date(anchorDate);
+    projDate.setDate(projDate.getDate() + deg);
+    const priceLevel = sq9Level(anchorPrice, deg, direction);
+    const isCardinal = deg % 90 === 0;
+
+    const tr = document.createElement('tr');
+    if(isCardinal) tr.className = 'cardinal';
+    tr.innerHTML = `
+      <td><span class="deg-tag">${deg}&deg;</span>${isCardinal ? '(kardinal)' : ''}</td>
+      <td>${fmtDate(projDate)}</td>
+      <td>${priceLevel ? '$' + priceLevel.toFixed(2) : '&mdash;'}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('summary').innerHTML = `
+    Anchor: <b>${fmtDate(anchorDate)}</b><br>
+    Harga: <b>$${anchorPrice.toFixed(2)}</b><br>
+    Arah: <b>${direction===1 ? 'NAIK (Low pivot)' : 'TURUN (High pivot)'}</b><br>
+    Rotasi: <b>${rotations}&times;360&deg;</b> (${360*rotations} hari / ${steps.length} titik)
+  `;
+
+  drawWheel(anchorDate, steps);
+}
+
+render();
+</script>
+</body>
+</html>
